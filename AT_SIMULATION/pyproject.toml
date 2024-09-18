@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "AT_SIMULATION"
+version = "0.1.0"
+description = ""
+authors = ["Leonov Vladislav <vladleonov21032002@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+SQLAlchemy = "^2.0.32"
+fastapi = {extras = ["standard"], version = "^0.111.1"}
+uvicorn = "^0.30.6"
+at-queue = {git = "https://github.com/grigandal625/AT_QUEUE.git", rev = "master"}
+alembic = "^1.13.2"
+psycopg2-binary = "^2.9.9"
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.2"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

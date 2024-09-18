@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "at-message-broker"
+version = "0.1.0"
+description = ""
+authors = ["Leonov Vladislav <leonov.vladislav14@wb.ru>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+at-queue = {git = "https://github.com/grigandal625/AT_QUEUE.git", rev = "master"}
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

@@ -1,0 +1,23 @@
+version: '3.9'
+
+services:
+  rabbitmq:
+    container_name: rabbitmq
+    image: "rabbitmq:management"
+    ports:
+      - "15672:15672"  
+      - "5672:5672"    
+    networks:
+      - custom-network
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 30s
+      timeout: 30s
+      retries: 3
+
+networks:
+  custom-network:
+    external: true

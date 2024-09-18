@@ -1,0 +1,72 @@
+version: "3.9"
+
+services:
+  server: 
+    container_name: at_user_server
+    build:
+      context: ../..
+      dockerfile: ./docker/base/Dockerfile
+    ports:
+      - "${SERVER_PORT}:${SERVER_PORT}"
+    networks:
+      - custom-network
+    environment:
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
+      DB_NAME: ${DB_NAME}
+      SERVER_PORT: ${SERVER_PORT}
+      RABBITMQ_HOST: ${RABBITMQ_HOST}
+      RABBITMQ_PORT: ${RABBITMQ_PORT}
+    depends_on:
+      postgres_user:
+        condition: service_healthy
+      # rabbitmq:
+      #   condition: service_healthy
+    
+  postgres_user:
+    container_name: at_user_db
+    image: "postgres:alpine"
+    expose:
+      - ${DB_PORT}
+    ports:
+      - "${DB_PORT}:5432"
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASS}
+      POSTGRES_DB: ${DB_NAME}
+    restart: unless-stopped
+    networks:
+      - custom-network
+    healthcheck:
+      test: pg_isready --dbname=$DB_NAME --username=$DB_USER
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  # rabbitmq:
+  #   container_name: rabbitmq
+  #   image: "rabbitmq:management"
+  #   ports:
+  #     - "15672:15672"  
+  #     - "5672:5672"    
+  #   networks:
+  #     - custom-network
+  #   environment:
+  #     RABBITMQ_DEFAULT_USER: guest
+  #     RABBITMQ_DEFAULT_PASS: guest
+  #   healthcheck:
+  #     test: ["CMD", "rabbitmq-diagnostics", "ping"]
+  #     interval: 30s
+  #     timeout: 30s
+  #     retries: 3
+
+networks:
+  custom-network:
+    external: true
+
+volumes:
+  postgres-data:

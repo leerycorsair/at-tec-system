@@ -1,0 +1,54 @@
+version: "3.9"
+
+services:
+  server: 
+    container_name: at_simulation_server
+    build:
+      context: ../..
+      dockerfile: ./docker/base/Dockerfile
+    ports:
+      - "${SERVER_PORT}:${SERVER_PORT}"
+    networks:
+      - custom-network
+    environment:
+      DB_HOST: postgres_simulation
+      DB_PORT: 5433   # Ensure this matches the internal port PostgreSQL is listening on
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
+      DB_NAME: ${DB_NAME}
+      SERVER_PORT: ${SERVER_PORT}
+      RABBITMQ_HOST: ${RABBITMQ_HOST}
+      RABBITMQ_PORT: ${RABBITMQ_PORT}
+    depends_on:
+      postgres_simulation:
+        condition: service_healthy
+    
+  postgres_simulation:
+    container_name: at_simulation_db
+    image: "postgres:alpine"
+    expose:
+      - "5433"
+    ports:
+      - "5433:5433"  # Expose port 5433 both inside the container and on the host
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASS}
+      POSTGRES_DB: ${DB_NAME}
+    restart: unless-stopped
+    networks:
+      - custom-network
+    healthcheck:
+      test: pg_isready --dbname=$DB_NAME --username=$DB_USER --host=localhost --port=5433
+      interval: 10s  
+      timeout: 5s
+      retries: 10 
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    command: ["postgres", "-c", "port=5433"]
+
+networks:
+  custom-network:
+    external: true
+
+volumes:
+  postgres-data:

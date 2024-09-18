@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "at-user"
+version = "0.1.0"
+description = "AT_USER"
+authors = ["Leonov Vladislav"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+fastapi = "^0.111.1"
+passlib = "^1.7.4"
+pyjwt = "^2.9.0"
+sqlalchemy = "^2.0.31"
+alembic = "^1.13.2"
+psycopg2-binary = "^2.9.9"
+psycopg2 = "^2.9.9"
+python-jose = "^3.3.0"
+at-queue = {git = "https://github.com/grigandal625/AT_QUEUE.git", rev = "master"}
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
