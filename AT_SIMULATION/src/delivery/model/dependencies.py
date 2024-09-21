@@ -5,7 +5,7 @@ from src.client.auth_client import AuthClientSingleton
 
 import asyncio
 
-from src.service.model.model import ModelService
+from src.service.model.service import ModelService
 
 bearer_scheme = HTTPBearer()
 
@@ -41,3 +41,4 @@ async def check_model_rights(
     model_service: ModelService = Depends(),
 ):
     await model_service.check_rights(model_id, user_id)
+    return model_id

@@ -3,9 +3,9 @@ from fastapi import Depends
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import NoResultFound
 
-from src.dto.db.model.model import (
+from src.repository.model.models.conversions import to_ModelMetaDB
+from src.repository.model.models.models import (
     CreateModelParamsDB,
-    ModelFullDB,
     ModelMetaDB,
     UpdateModelParamsDB,
 )
@@ -17,7 +17,7 @@ class ModelRepository:
     def __init__(self, db_session: Session = Depends(get_db)):
         self.db_session = db_session
 
-    async def create_model(self, model: CreateModelParamsDB) -> int:
+    async def create_model(self, model: CreateModelParamsDB) -> ModelMetaDB:
         new_model = Model(
             name=model.name,
             user_id=model.user_id,
@@ -25,7 +25,7 @@ class ModelRepository:
         self.db_session.add(new_model)
         self.db_session.commit()
         self.db_session.refresh(new_model)
-        return new_model.id
+        return to_ModelMetaDB(model)
 
     async def get_model_short(self, model_id: int) -> ModelMetaDB:
         existing_model = self.db_session.query(Model).filter_by(id=model_id).first()
@@ -33,12 +33,7 @@ class ModelRepository:
             raise ValueError(f"Model with id {model_id} does not exist")
         self.db_session.commit()
         self.db_session.refresh(existing_model)
-        return ModelMetaDB(
-            id=existing_model.id,
-            name=existing_model.name,
-            user_id=existing_model.user_id,
-            created_at=existing_model.created_at,
-        )
+        return to_ModelMetaDB(existing_model)
 
     async def get_models(self, user_id: int) -> List[ModelMetaDB]:
         models = self.db_session.query(Model).filter_by(user_id=user_id).all()
@@ -46,15 +41,7 @@ class ModelRepository:
         if not models:
             return []
 
-        return [
-            ModelMetaDB(
-                id=model.id,
-                name=model.name,
-                user_id=model.user_id,
-                created_at=model.created_at,
-            )
-            for model in models
-        ]
+        return [to_ModelMetaDB(model) for model in models]
 
     async def update_model(
         self, model_id: int, params: UpdateModelParamsDB
@@ -65,17 +52,13 @@ class ModelRepository:
         existing_model.name = params.name
         self.db_session.commit()
         self.db_session.refresh(existing_model)
-        return ModelMetaDB(
-            id=existing_model.id,
-            name=existing_model.name,
-            user_id=existing_model.user_id,
-            created_at=existing_model.created_at,
-        )
+        return to_ModelMetaDB(existing_model)
 
-    async def delete_model(self, model_id: int) -> None:
+    async def delete_model(self, model_id: int) -> int:
         try:
             model_to_delete = self.db_session.query(Model).filter_by(id=model_id).one()
             self.db_session.delete(model_to_delete)
             self.db_session.commit()
+            return model_id
         except NoResultFound:
             raise ValueError(f"Model with id {model_id} does not exist")

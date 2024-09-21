@@ -38,8 +38,13 @@ class ModelService:
     async def create_model(
         self, user_id: int, model: CreateModelRequest
     ) -> CreateModelResponse:
-        return await self._model_rep.create_model(
+        new_model = await self._model_rep.create_model(
             CreateModelParamsDB(name=model.name, user_id=user_id)
+        )
+        return CreateModelResponse(
+            id=new_model.id,
+            name=new_model.name,
+            created_at=new_model.created_at,
         )
 
     async def get_model(self, model_id: int) -> GetModelResponse:
@@ -86,5 +91,5 @@ class ModelService:
             created_at=model.created_at,
         )
 
-    async def delete_model(self, model_id: int) -> None:
-        await self._model_rep.delete_model(model_id)
+    async def delete_model(self, model_id: int) -> int:
+        return await self._model_rep.delete_model(model_id)

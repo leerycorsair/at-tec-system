@@ -10,8 +10,9 @@ from src.dto.api.model.model import (
     GetModelResponse,
     GetModelsListResponse,
     UpdateModelRequest,
+    UpdateModelResponse,
 )
-from src.service.model.model import ModelService
+from src.service.model.service import ModelService
 
 
 router = APIRouter(
@@ -45,20 +46,20 @@ async def get_models(
     return await model_service.get_models(user_id)
 
 
-@router.put("/{model_id}", response_model=None)
+@router.put("/{model_id}", response_model=UpdateModelResponse)
 async def update_model(
     body: UpdateModelRequest,
     model_id: int = Depends(check_model_rights),
     model_service: ModelService = Depends(),
-) -> None:
-    await model_service.update_model(model_id, body)
+) -> UpdateModelResponse:
+    return await model_service.update_model(model_id, body)
 
 
-@router.delete("/{model_id}", response_model=None)
+@router.delete("/{model_id}", response_model=int)
 async def delete_model(
     model_id: int = Depends(check_model_rights),
     model_service: ModelService = Depends(),
-) -> None:
+) -> int:
     await model_service.delete_model(model_id)
 
 

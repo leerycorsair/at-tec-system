@@ -59,7 +59,6 @@ class IrregularEventBodyDB(BaseModel):
 class GeneratorTypeEnum(Enum):
     NORMAL = "normal"
     PRECISE = "precise"
-    RANDOM = "random"
     UNIFORM = "uniform"
     EXPONENTIAL = "exponential"
     GAUSSIAN = "gaussian"
