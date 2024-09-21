@@ -1,5 +1,5 @@
 from fastapi import Depends, HTTPException
-from src.dto.api.editor.resource import (
+from src.service.editor.resource.models.models import (
     CreateResourceTypeRequest,
     GetResourceTypeResponse,
     GetResourceTypesResponse,

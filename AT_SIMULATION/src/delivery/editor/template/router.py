@@ -1,7 +1,7 @@
 from typing import List
 from fastapi import APIRouter
 
-from src.dto.api.editor.template import (
+from src.service.editor.template.models.models import (
     IrregularEventTemplate,
     OperationTemplate,
     RuleTemplate,

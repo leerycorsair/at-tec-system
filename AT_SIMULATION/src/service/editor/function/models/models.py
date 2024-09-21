@@ -1,5 +1,5 @@
 from typing import List
-from pydantic import BaseModel, ValidationInfo, field_validator
+from pydantic import BaseModel
 
 
 class FunctionParameter(BaseModel):

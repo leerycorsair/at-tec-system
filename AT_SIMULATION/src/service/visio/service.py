@@ -1,4 +1,4 @@
-from src.dto.api.visio.board import (
+from src.service.visio.models.models import (
     MoveNodeRequest,
     UpdateNodeResponse,
 )

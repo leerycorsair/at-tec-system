@@ -4,7 +4,7 @@ from src.delivery.model.dependencies import (
     check_model_rights,
     get_current_user,
 )
-from src.dto.api.model.model import (
+from src.service.model.models.models import (
     CreateModelRequest,
     CreateModelResponse,
     GetModelResponse,

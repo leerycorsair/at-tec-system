@@ -2,7 +2,7 @@ from datetime import datetime
 from os import name
 
 from fastapi import Depends
-from src.dto.api.model.model import (
+from src.service.model.models.models import (
     CreateModelRequest,
     CreateModelResponse,
     GetModelResponse,

@@ -2,7 +2,7 @@ from typing import List
 from fastapi import APIRouter, Depends
 
 from src.delivery.model.dependencies import get_current_model
-from src.dto.api.editor.resource import (
+from src.service.editor.resource.models.models import (
     CreateResourceTypeRequest,
     GetResourceTypeResponse,
     GetResourceTypesResponse,

@@ -12,6 +12,7 @@ uvicorn = "^0.30.6"
 at-queue = {git = "https://github.com/grigandal625/AT_QUEUE.git", rev = "master"}
 alembic = "^1.13.2"
 psycopg2-binary = "^2.9.9"
+fastapi-code-generator = "^0.5.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"

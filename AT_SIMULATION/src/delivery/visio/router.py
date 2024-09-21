@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from src.delivery.model.dependencies import check_model_rights
-from src.dto.api.visio.board import MoveNodeRequest, UpdateNodeResponse
-from src.service.visio.visio import VisioService
+from src.service.visio.models.models import MoveNodeRequest, UpdateNodeResponse
+from src.service.visio.service import VisioService
 
 router = APIRouter(
     prefix="/visio",

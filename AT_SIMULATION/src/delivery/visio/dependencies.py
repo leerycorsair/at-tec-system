@@ -1,7 +1,7 @@
 from fastapi import Depends
 
 from src.delivery.model.dependencies import check_model_rights
-from src.service.visio.visio import VisioService
+from src.service.visio.service import VisioService
 
 
 async def check_node_rights(

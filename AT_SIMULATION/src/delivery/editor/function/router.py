@@ -1,6 +1,6 @@
 from typing import List
 from fastapi import APIRouter
-from src.dto.api.editor.function import Function
+from src.service.editor.function.models.models import Function
 
 function_router = APIRouter(
     prefix="/functions",

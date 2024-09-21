@@ -3,8 +3,8 @@ from fastapi import Depends
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import NoResultFound
 
-from src.repository.model.models.conversions import to_ModelMetaDB
-from src.repository.model.models.models import (
+from .models.conversions import to_ModelMetaDB
+from .models.models import (
     CreateModelParamsDB,
     ModelMetaDB,
     UpdateModelParamsDB,
