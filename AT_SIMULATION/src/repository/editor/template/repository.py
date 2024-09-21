@@ -3,7 +3,7 @@ from fastapi import Depends
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 
-from src.dto.db.editor.template import (
+from src.repository.editor.template.models.models import (
     IrregularEventBodyDB,
     IrregularEventGeneratorDB,
     IrregularEventTemplateDB,

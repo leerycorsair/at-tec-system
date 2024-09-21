@@ -3,8 +3,13 @@ from fastapi import Depends
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 
+from src.repository.editor.function.models.conversions import (
+    to_Function,
+    to_FunctionDB,
+    to_FunctionParameter,
+)
 from src.store.postgres.session import get_db
-from src.dto.db.editor.function import FunctionDB, FunctionParameterDB
+from src.repository.editor.function.models.models import FunctionDB
 from src.schema.function import Function, FunctionParameter
 
 
@@ -14,23 +19,14 @@ class FunctionRepository:
 
     async def create_function(self, function: FunctionDB) -> int:
         try:
-            new_function = Function(
-                name=function.name,
-                ret_type=function.ret_type,
-                body=function.body,
-                model_id=function.model_id,
-            )
+            new_function = to_Function(function)
 
             self.db_session.add(new_function)
             self.db_session.commit()
             self.db_session.refresh(new_function)
 
             new_function_parameters = [
-                FunctionParameter(
-                    name=param.name,
-                    type=param.type,
-                    function_id=new_function.id,
-                )
+                to_FunctionParameter(param, new_function.id)
                 for param in function.params
             ]
 
@@ -58,24 +54,7 @@ class FunctionRepository:
                 .all()
             )
 
-            function_db = FunctionDB(
-                id=function.id,
-                name=function.name,
-                ret_type=function.ret_type,
-                body=function.body,
-                model_id=function.model_id,
-                params=[
-                    FunctionParameterDB(
-                        id=param.id,
-                        name=param.name,
-                        type=param.type,
-                        function_id=param.function_id,
-                    )
-                    for param in parameters
-                ],
-            )
-
-            return function_db
+            return to_FunctionDB(function, parameters)
 
         except SQLAlchemyError as e:
             raise RuntimeError(f"Failed to get function: {e}")
@@ -95,24 +74,7 @@ class FunctionRepository:
                     .filter(FunctionParameter.function_id == function.id)
                     .all()
                 )
-                functions_db.append(
-                    FunctionDB(
-                        id=function.id,
-                        name=function.name,
-                        ret_type=function.ret_type,
-                        body=function.body,
-                        model_id=function.model_id,
-                        params=[
-                            FunctionParameterDB(
-                                id=param.id,
-                                name=param.name,
-                                type=param.type,
-                                function_id=param.function_id,
-                            )
-                            for param in parameters
-                        ],
-                    )
-                )
+                functions_db.append(to_FunctionDB(function, parameters))
 
             return functions_db
 
@@ -148,12 +110,7 @@ class FunctionRepository:
                     existing_param.name = param.name
                     existing_param.type = param.type
                 else:
-                    new_param = FunctionParameter(
-                        name=param.name,
-                        type=param.type,
-                        function_id=function.id,
-                    )
-                    self.db_session.add(new_param)
+                    self.db_session.add(to_FunctionParameter(param, function.id))
 
             self.db_session.commit()
 
