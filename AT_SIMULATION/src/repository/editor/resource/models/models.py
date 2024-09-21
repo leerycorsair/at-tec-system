@@ -18,9 +18,9 @@ class ResourceTypeDB(BaseModel):
     attributes: List[ResourceTypeAttributeDB]
 
 
-class ResourceAttrDB(BaseModel):
-    id: str
-    name: str
+class ResourceAttributeDB(BaseModel):
+    id: int
+    rta_id: int
     value: str
 
 
@@ -29,5 +29,5 @@ class ResourceDB(BaseModel):
     name: str
     type: str
     to_be_traced: bool
-    attributes: List[ResourceAttrDB]
+    attributes: List[ResourceAttributeDB]
     model_id: int

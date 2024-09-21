@@ -3,11 +3,19 @@ from fastapi import Depends
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 
-from src.dto.db.editor.resource import (
+from src.repository.editor.resource.models.conversions import (
+    to_Resource,
+    to_ResourceAttribute,
+    to_ResourceAttributeDB,
+    to_ResourceDB,
+    to_ResourceType,
+    to_ResourceTypeAttribute,
+    to_ResourceTypeAttributeDB,
+    to_ResourceTypeDB,
+)
+from src.repository.editor.resource.models.models import (
     ResourceDB,
     ResourceTypeDB,
-    ResourceTypeAttributeDB,
-    ResourceAttrDB,
 )
 from src.schema.resource import (
     ResourceType,
@@ -24,24 +32,14 @@ class ResourceRepository:
 
     async def create_resource_type(self, resource_type: ResourceTypeDB) -> int:
         try:
-            new_resource_type = ResourceType(
-                name=resource_type.name,
-                type=resource_type.type,
-                model_id=resource_type.model_id,
-            )
+            new_resource_type = to_ResourceType(resource_type)
 
             self.db_session.add(new_resource_type)
             self.db_session.commit()
             self.db_session.refresh(new_resource_type)
 
             new_resource_types_attributes = [
-                ResourceTypeAttribute(
-                    name=attr.name,
-                    type=attr.type,
-                    default_value=attr.default_value,
-                    resource_type_id=new_resource_type.id,
-                )
-                for attr in resource_type.attributes
+                to_ResourceTypeAttribute(attr) for attr in resource_type.attributes
             ]
 
             self.db_session.add_all(new_resource_types_attributes)
@@ -70,24 +68,7 @@ class ResourceRepository:
                 .all()
             )
 
-            resource_type_db = ResourceTypeDB(
-                id=resource_type.id,
-                name=resource_type.name,
-                type=resource_type.type,
-                model_id=resource_type.model_id,
-                attributes=[
-                    ResourceTypeAttributeDB(
-                        id=attr.id,
-                        name=attr.name,
-                        type=attr.type,
-                        default_value=attr.default_value,
-                        resource_type_id=attr.resource_type_id,
-                    )
-                    for attr in attributes
-                ],
-            )
-
-            return resource_type_db
+            return to_ResourceTypeDB(resource_type, attributes)
 
         except SQLAlchemyError as e:
             raise RuntimeError(f"Failed to get resource type: {e}")
@@ -107,24 +88,7 @@ class ResourceRepository:
                     .filter(ResourceTypeAttribute.resource_type_id == resource_type.id)
                     .all()
                 )
-                resource_types_db.append(
-                    ResourceTypeDB(
-                        id=resource_type.id,
-                        name=resource_type.name,
-                        type=resource_type.type,
-                        model_id=resource_type.model_id,
-                        attributes=[
-                            ResourceTypeAttributeDB(
-                                id=attr.id,
-                                name=attr.name,
-                                type=attr.type,
-                                default_value=attr.default_value,
-                                resource_type_id=attr.resource_type_id,
-                            )
-                            for attr in attributes
-                        ],
-                    )
-                )
+                resource_types_db.append(to_ResourceTypeDB(resource_type, attributes))
 
             return resource_types_db
 
@@ -162,13 +126,7 @@ class ResourceRepository:
                     existing_attr.type = attr.type
                     existing_attr.default_value = attr.default_value
                 else:
-                    new_attr = ResourceTypeAttribute(
-                        name=attr.name,
-                        type=attr.type,
-                        default_value=attr.default_value,
-                        resource_type_id=resource_type.id,
-                    )
-                    self.db_session.add(new_attr)
+                    self.db_session.add(to_ResourceTypeAttribute(attr))
 
             self.db_session.commit()
 
@@ -196,31 +154,22 @@ class ResourceRepository:
             self.db_session.rollback()
             raise RuntimeError(f"Failed to delete resource type: {e}")
 
-    async def create_resource_type(self, resource_type: ResourceTypeDB) -> int:
+    async def create_resource(self, resource: ResourceDB) -> int:
         try:
-            new_resource_type = ResourceType(
-                name=resource_type.name,
-                type=resource_type.type,
-                model_id=resource_type.model_id,
-            )
+            new_resource = to_Resource(resource)
 
-            self.db_session.add(new_resource_type)
+            self.db_session.add(new_resource)
             self.db_session.commit()
-            self.db_session.refresh(new_resource_type)
+            self.db_session.refresh(new_resource)
 
             new_resource_types_attributes = [
-                ResourceTypeAttribute(
-                    name=attr.name,
-                    type=attr.type,
-                    default_value=attr.default_value,
-                    resource_type_id=new_resource_type.id,
-                )
-                for attr in resource_type.attributes
+                to_ResourceAttribute(attr, new_resource.id)
+                for attr in resource.attributes
             ]
 
             self.db_session.add_all(new_resource_types_attributes)
             self.db_session.commit()
-            return new_resource_type.id
+            return new_resource.id
 
         except SQLAlchemyError as e:
             self.db_session.rollback()
@@ -242,23 +191,7 @@ class ResourceRepository:
                 .all()
             )
 
-            resource_db = ResourceDB(
-                id=resource.id,
-                name=resource.name,
-                type=resource.resource_type_id,
-                to_be_traced=resource.to_be_traced,
-                attributes=[
-                    ResourceAttrDB(
-                        id=attr.id,
-                        name=attr.name,
-                        value=attr.value,
-                    )
-                    for attr in attributes
-                ],
-                model_id=resource.model_id,
-            )
-
-            return resource_db
+            return to_ResourceDB(resource, attributes)
 
         except SQLAlchemyError as e:
             raise RuntimeError(f"Failed to get resource: {e}")
@@ -278,23 +211,7 @@ class ResourceRepository:
                     .filter(ResourceAttribute.resource_id == resource.id)
                     .all()
                 )
-                resources_db.append(
-                    ResourceDB(
-                        id=resource.id,
-                        name=resource.name,
-                        type=resource.resource_type_id,
-                        to_be_traced=resource.to_be_traced,
-                        attributes=[
-                            ResourceAttrDB(
-                                id=attr.id,
-                                name=attr.name,
-                                value=attr.value,
-                            )
-                            for attr in attributes
-                        ],
-                        model_id=resource.model_id,
-                    )
-                )
+                resources_db.append(to_ResourceDB(resource, attributes))
 
             return resources_db
 
@@ -329,12 +246,7 @@ class ResourceRepository:
                 if existing_attr:
                     existing_attr.value = attr.value
                 else:
-                    new_attr = ResourceAttribute(
-                        value=attr.value,
-                        resource_id=resource.id,
-                        rta_id=attr.id,
-                    )
-                    self.db_session.add(new_attr)
+                    self.db_session.add(to_ResourceAttribute(attr, resource.id))
 
             self.db_session.commit()
 

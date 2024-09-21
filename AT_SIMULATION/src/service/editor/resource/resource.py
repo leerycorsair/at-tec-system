@@ -5,7 +5,7 @@ from src.dto.api.editor.resource import (
     GetResourceTypesResponse,
     UpdateResourceTypeRequest,
 )
-from src.dto.db.editor.resource import ResourceTypeDB
+from src.repository.editor.resource.models.models import ResourceTypeDB
 from src.repository.editor.resource.repository import ResourceRepository
 
 

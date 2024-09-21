@@ -10,7 +10,7 @@ from src.dto.api.model.model import (
     ModelMeta,
     UpdateModelRequest,
 )
-from src.dto.db.model.model import CreateModelParamsDB, UpdateModelParamsDB
+from src.repository.model.models.models import CreateModelParamsDB, UpdateModelParamsDB
 from src.repository.editor.function.repository import FunctionRepository
 from src.repository.editor.resource.repository import ResourceRepository
 from src.repository.editor.template.repository import TemplateRepository
