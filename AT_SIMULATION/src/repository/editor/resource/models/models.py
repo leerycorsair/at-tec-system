@@ -7,6 +7,7 @@ class ResourceTypeAttributeDB(BaseModel):
     name: str
     type: str
     default_value: Optional[str] = None
+    enum_values_set: Optional[List[str]] = None
     resource_type_id: int
 
 
@@ -21,13 +22,14 @@ class ResourceTypeDB(BaseModel):
 class ResourceAttributeDB(BaseModel):
     id: int
     rta_id: int
+    resource_id: int
     value: str
 
 
 class ResourceDB(BaseModel):
     id: int
     name: str
-    type: str
     to_be_traced: bool
     attributes: List[ResourceAttributeDB]
     model_id: int
+    resource_type_id: int

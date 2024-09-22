@@ -6,7 +6,6 @@ from pydantic import BaseModel
 class ModelMeta(BaseModel):
     id: int
     name: str
-    user_id: int
     created_at: datetime
 
 

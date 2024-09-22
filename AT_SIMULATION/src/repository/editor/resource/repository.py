@@ -6,11 +6,9 @@ from sqlalchemy.exc import SQLAlchemyError
 from src.repository.editor.resource.models.conversions import (
     to_Resource,
     to_ResourceAttribute,
-    to_ResourceAttributeDB,
     to_ResourceDB,
     to_ResourceType,
     to_ResourceTypeAttribute,
-    to_ResourceTypeAttributeDB,
     to_ResourceTypeDB,
 )
 from src.repository.editor.resource.models.models import (
@@ -39,7 +37,8 @@ class ResourceRepository:
             self.db_session.refresh(new_resource_type)
 
             new_resource_types_attributes = [
-                to_ResourceTypeAttribute(attr) for attr in resource_type.attributes
+                to_ResourceTypeAttribute(attr, new_resource_type.id)
+                for attr in resource_type.attributes
             ]
 
             self.db_session.add_all(new_resource_types_attributes)

@@ -20,7 +20,6 @@ def to_ModelMeta(model: ModelMetaDB) -> ModelMeta:
     return ModelMeta(
         id=model.id,
         name=model.name,
-        user_id=model.user_id,
         created_at=model.created_at,
     )
 
@@ -29,7 +28,6 @@ def to_CreateModelResponse(model: ModelMetaDB) -> CreateModelResponse:
     return CreateModelResponse(
         id=model.id,
         name=model.name,
-        user_id=model.user_id,
         created_at=model.created_at,
     )
 
@@ -50,7 +48,6 @@ def to_UpdateModelsResponse(model: ModelMetaDB) -> UpdateModelResponse:
     return UpdateModelResponse(
         id=model.id,
         name=model.name,
-        user_id=model.user_id,
         created_at=model.created_at,
     )
 
@@ -63,6 +60,5 @@ def to_DeleteModelResponse(model: ModelMetaDB) -> DeleteModelResponse:
     return DeleteModelResponse(
         id=model.id,
         name=model.name,
-        user_id=model.user_id,
         created_at=model.created_at,
     )

@@ -10,32 +10,11 @@ class BaseTypesEnum(Enum):
     ENUM = "enum"
 
 
-class ResourceTypeAttrRequest(BaseModel):
+class ResourceTypeAttribute(BaseModel):
     name: str
     type: BaseTypesEnum
     enum_values_set: Optional[List[str]] = None
     default_value: Optional[str] = None
-
-
-class ResourceTypeRequest(BaseModel):
-    name: str
-    type: BaseTypesEnum
-    attributes: List[ResourceTypeAttrRequest]
-
-
-class ResourceTypeAttrResponse(BaseModel):
-    id: int
-    name: str
-    type: BaseTypesEnum
-    enum_values_set: Optional[List[str]] = None
-    default_value: Optional[str] = None
-
-
-class ResourceTypeResponse(BaseModel):
-    id: int
-    name: str
-    type: BaseTypesEnum
-    attributes: List[ResourceTypeAttrResponse]
 
 
 class ResourceTypeTypesEnum(Enum):
@@ -43,25 +22,85 @@ class ResourceTypeTypesEnum(Enum):
     TEMPORAL = "temporal"
 
 
-class CreateResourceTypeRequest(ResourceTypeRequest):
+class ResourceType(BaseModel):
+    name: str
+    type: ResourceTypeTypesEnum
+    attributes: List[ResourceTypeAttribute]
+
+
+class CreateResourceTypeRequest(ResourceType):
     pass
 
 
-class GetResourceTypeResponse(ResourceTypeResponse):
-    pass
+class CreateResourceTypeResponse(BaseModel):
+    id: int
+
+
+class UpdateResourceTypeAttribute(ResourceTypeAttribute):
+    id: int
+
+
+class UpdateResourceTypeRequest(ResourceType):
+    attributes: List[UpdateResourceTypeAttribute]
+
+
+class UpdateResourceTypeResponse(BaseModel):
+    id: int
+
+
+class DeleteResourceTypeResponse(BaseModel):
+    id: int
+
+
+class GetResourceTypeResponse(ResourceType):
+    id: int
 
 
 class GetResourceTypesResponse(BaseModel):
-    resource_types: List[ResourceTypeResponse]
+    resource_types: List[GetResourceTypeResponse]
     total: int
 
 
-class UpdateResourceTypeRequest(ResourceTypeRequest):
-    id: int
+class ResourceAttribute(BaseModel):
+    rta_id: int
+    value: str
 
 
-class ResourceType(BaseModel):
-    id: int
+class Resource(BaseModel):
     name: str
-    type: BaseTypesEnum
-    attributes: List[ResourceTypeAttrRequest]
+    to_be_traced: bool
+    attributes: List[ResourceAttribute]
+    resource_type_id: int
+
+
+class CreateResourceRequest(Resource):
+    pass
+
+
+class CreateResourceResponse(BaseModel):
+    id: int
+
+
+class UpdateResourceAttribute(ResourceAttribute):
+    id: int
+
+
+class UpdateResourceRequest(Resource):
+    attributes: List[UpdateResourceAttribute]
+
+
+class UpdateResourceResponse(BaseModel):
+    id: int
+
+
+class DeleteResourceResponse(BaseModel):
+    id: int
+
+
+class GetResourceResponse(Resource):
+    id: int
+
+
+class GetResourcesResponse(BaseModel):
+    resources: List[GetResourceResponse]
+    total: int
