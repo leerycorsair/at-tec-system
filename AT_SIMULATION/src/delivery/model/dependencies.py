@@ -1,13 +1,54 @@
+from abc import ABC, abstractmethod
+from typing import List
 from fastapi import Depends, Header, HTTPException, Security
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from src.client.auth_client import AuthClientSingleton
 
 
-import asyncio
-
+from src.delivery.model.models.models import UpdateModelRequest
+from src.repository.model.models.models import (
+    CreateModelParamsDB,
+    ModelMetaDB,
+    UpdateModelParamsDB,
+)
 from src.service.model.service import ModelService
 
+
 bearer_scheme = HTTPBearer()
+
+
+class IModelService(ABC):
+    @abstractmethod
+    async def check_rights(self, model_id: int, user_id: int) -> bool:
+        pass
+
+    @abstractmethod
+    async def create_model(
+        self, user_id: int, params: CreateModelParamsDB
+    ) -> ModelMetaDB:
+        pass
+
+    # @abstractmethod
+    # async def get_model(self, model_id: int) -> service.Model:
+    #     pass
+
+    @abstractmethod
+    async def get_models(self, user_id: int) -> List[ModelMetaDB]:
+        pass
+
+    @abstractmethod
+    async def update_model(
+        self, model_id: int, params: UpdateModelParamsDB
+    ) -> ModelMetaDB:
+        pass
+
+    @abstractmethod
+    async def delete_model(self, model_id: int) -> ModelMetaDB:
+        pass
+
+
+def get_model_service() -> IModelService:
+    return ModelService()
 
 
 async def get_current_user(

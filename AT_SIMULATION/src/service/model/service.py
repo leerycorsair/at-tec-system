@@ -1,7 +1,5 @@
-from datetime import datetime
-from os import name
-
 from fastapi import Depends
+from src.delivery.model.dependencies import IModelService
 from src.service.model.models.models import (
     CreateModelRequest,
     CreateModelResponse,
@@ -17,7 +15,7 @@ from src.repository.editor.template.repository import TemplateRepository
 from src.repository.model.repository import ModelRepository
 
 
-class ModelService:
+class ModelService(IModelService):
     def __init__(
         self,
         model_rep: ModelRepository = Depends(ModelRepository),

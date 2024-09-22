@@ -4,7 +4,6 @@ from pydantic import BaseModel
 
 class CreateModelParamsDB(BaseModel):
     name: str
-    user_id: int
 
 
 class ModelMetaDB(BaseModel):

@@ -52,28 +52,28 @@ async def delete_resource_type(
     pass
 
 
-# # type_id сразу давать
-# @router.post("/", response_model=int)
-# async def create_resource(body: Resource):
-#     pass
+# type_id сразу давать
+@router.post("/", response_model=int)
+async def create_resource(body: Resource):
+    pass
 
 
-# # здесь просто название типа
-# @router.get("/", response_model=List[Resource])
-# async def get_resources():
-#     pass
+# здесь просто название типа
+@router.get("/", response_model=List[Resource])
+async def get_resources():
+    pass
 
 
-# @router.get("/{resource_id}", response_model=Resource)
-# async def get_resource():
-#     pass
+@router.get("/{resource_id}", response_model=Resource)
+async def get_resource():
+    pass
 
 
-# @router.put("/{resource_id}", response_model=int)
-# async def update_resource(body: Resource):
-#     pass
+@router.put("/{resource_id}", response_model=int)
+async def update_resource(body: Resource):
+    pass
 
 
-# @router.delete("/{resource_id}", response_model=int)
-# async def delete_resource():
-#     pass
+@router.delete("/{resource_id}", response_model=int)
+async def delete_resource():
+    pass
