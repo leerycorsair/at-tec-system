@@ -5,7 +5,6 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from src.client.auth_client import AuthClientSingleton
 
 
-from src.delivery.model.models.models import UpdateModelRequest
 from src.repository.model.models.models import (
     CreateModelParamsDB,
     ModelMetaDB,

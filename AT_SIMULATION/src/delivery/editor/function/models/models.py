@@ -1,52 +1,30 @@
-from typing import List
+from typing import List, Optional
 from pydantic import BaseModel
 
 
-class FunctionParameter(BaseModel):
+class FunctionParameterRequest(BaseModel):
+    id: Optional[int] = None
     name: str
     type: str
 
 
-class Function(BaseModel):
+class FunctionRequest(BaseModel):
+    id: Optional[int] = None
     name: str
     ret_type: str
     body: str
-    params: List[FunctionParameter]
+    params: List[FunctionParameterRequest]
 
 
-class CreateFunctionRequest(Function):
-    pass
-
-
-class CreateFunctionResponse(BaseModel):
+class FunctionParameterResponse(FunctionParameterRequest):
     id: int
 
 
-class UpdateFunctionParameterRequest(FunctionParameter):
+class FunctionResponse(FunctionRequest):
     id: int
+    params: List[FunctionParameterResponse]
 
 
-class UpdateFunctionRequest(Function):
-    params: List[UpdateFunctionParameterRequest]
-
-
-class UpdateFunctionResponse(BaseModel):
-    id: int
-
-
-class GetFunctionParameterResponse(FunctionParameter):
-    id: int
-
-
-class GetFunctionResponse(Function):
-    id: int
-    params: List[GetFunctionParameterResponse]
-
-
-class GetFunctionsResponse(BaseModel):
-    functions: List[GetFunctionResponse]
+class FunctionsResponse(BaseModel):
+    functions: List[FunctionResponse]
     total: int
-
-
-class DeleteFunctionResponse(BaseModel):
-    id: int

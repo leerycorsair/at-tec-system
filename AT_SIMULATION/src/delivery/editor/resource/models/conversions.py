@@ -2,23 +2,16 @@ from typing import List
 from src.delivery.editor.resource.models.models import (
     BaseTypesEnum,
     CreateResourceRequest,
-    CreateResourceResponse,
     CreateResourceTypeRequest,
-    CreateResourceTypeResponse,
-    DeleteResourceResponse,
-    DeleteResourceTypeResponse,
     GetResourceResponse,
     GetResourceTypeResponse,
     GetResourceTypesResponse,
     GetResourcesResponse,
-    Resource,
     ResourceAttribute,
     ResourceTypeAttribute,
     ResourceTypeTypesEnum,
     UpdateResourceRequest,
-    UpdateResourceResponse,
     UpdateResourceTypeRequest,
-    UpdateResourceTypeResponse,
 )
 from src.repository.editor.resource.models.models import (
     ResourceAttributeDB,
@@ -41,12 +34,6 @@ def to_ResourceTypeAttributeDB(
         enum_values_set=attr.enum_values_set,
         resource_type_id=resource_type_id,
     )
-
-
-def to_CreateResourceTypeResponse(
-    resource_type_id: int,
-) -> CreateResourceTypeResponse:
-    return CreateResourceTypeResponse(id=resource_type_id)
 
 
 def create_to_ResourceTypeDB(
@@ -115,18 +102,6 @@ def to_GetResourceTypesResponse(
     )
 
 
-def to_UpdateResourceTypeResponse(
-    resource_type_id: int,
-) -> UpdateResourceTypeResponse:
-    return UpdateResourceTypeResponse(id=resource_type_id)
-
-
-def to_DeleteResourceTypeResponse(
-    resource_type_id: int,
-) -> DeleteResourceTypeResponse:
-    return DeleteResourceTypeResponse(id=resource_type_id)
-
-
 def to_ResourceAttributeDB(
     attr: ResourceAttribute,
     resource_id: int,
@@ -170,24 +145,6 @@ def update_to_ResourceDB(
         model_id=model_id,
         resource_type_id=request.resource_type_id,
     )
-
-
-def to_CreateResourceResponse(
-    resource_id: int,
-) -> CreateResourceResponse:
-    return CreateResourceResponse(id=resource_id)
-
-
-def to_UpdateResourceResponse(
-    resource_id: int,
-) -> UpdateResourceResponse:
-    return UpdateResourceResponse(id=resource_id)
-
-
-def to_DeleteResourceResponse(
-    resource_id: int,
-) -> DeleteResourceResponse:
-    return DeleteResourceResponse(id=resource_id)
 
 
 def to_ResourceAttribute(attr: ResourceAttributeDB) -> ResourceAttribute:

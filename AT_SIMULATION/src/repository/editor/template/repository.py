@@ -6,16 +6,15 @@ from sqlalchemy.exc import SQLAlchemyError
 from src.repository.editor.template.models.models import (
     IrregularEventBodyDB,
     IrregularEventGeneratorDB,
-    IrregularEventTemplateDB,
+    IrregularEventDB,
     OperationBodyDB,
-    OperationTemplateDB,
+    OperationDB,
     RelevantResourceDB,
     RuleBodyDB,
-    RuleTemplateDB,
+    RuleDB,
     TemplateMetaDB,
     TemplateUsageDB,
     TemplateUsageArgumentDB,
-    TemplateTypeEnum,
 )
 from src.store.postgres.session import get_db
 from src.schema.template import (
@@ -36,7 +35,7 @@ class TemplateRepository:
     async def create_template(
         self,
         template_data: Union[
-            IrregularEventTemplateDB, OperationTemplateDB, RuleTemplateDB
+            IrregularEventDB, OperationDB, RuleDB
         ],
         body_model: Type[Union[IrregularEventBody, OperationBodies, RuleBodies]],
         generator_model: Optional[Type[IrregularEventGenerator]] = None,
@@ -99,7 +98,7 @@ class TemplateRepository:
         template_id: int,
         body_model: Type[Union[IrregularEventBody, OperationBodies, RuleBodies]],
         generator_model: Optional[Type[IrregularEventGenerator]] = None,
-    ) -> Optional[Union[IrregularEventTemplateDB, OperationTemplateDB, RuleTemplateDB]]:
+    ) -> Optional[Union[IrregularEventDB, OperationDB, RuleDB]]:
         try:
             template = self._get_template_base(template_id)
             if not template:
@@ -120,7 +119,7 @@ class TemplateRepository:
         except SQLAlchemyError as e:
             raise RuntimeError(f"Failed to get template: {e}")
 
-    async def get_irregular_event_templates(self) -> List[IrregularEventTemplateDB]:
+    async def get_irregular_event_templates(self) -> List[IrregularEventDB]:
         try:
             templates = (
                 self.db_session.query(Template)
@@ -144,7 +143,7 @@ class TemplateRepository:
         except SQLAlchemyError as e:
             raise RuntimeError(f"Failed to get irregular event templates: {e}")
 
-    async def get_operation_templates(self) -> List[OperationTemplateDB]:
+    async def get_operation_templates(self) -> List[OperationDB]:
         try:
             templates = (
                 self.db_session.query(Template)
@@ -167,7 +166,7 @@ class TemplateRepository:
         except SQLAlchemyError as e:
             raise RuntimeError(f"Failed to get operation templates: {e}")
 
-    async def get_rule_templates(self) -> List[RuleTemplateDB]:
+    async def get_rule_templates(self) -> List[RuleDB]:
         try:
             templates = (
                 self.db_session.query(Template)
@@ -193,7 +192,7 @@ class TemplateRepository:
     async def update_template(
         self,
         template_data: Union[
-            IrregularEventTemplateDB, OperationTemplateDB, RuleTemplateDB
+            IrregularEventDB, OperationDB, RuleDB
         ],
         body_model: Type[Union[IrregularEventBody, OperationBodies, RuleBodies]],
         generator_model: Optional[Type[IrregularEventGenerator]] = None,
@@ -440,9 +439,9 @@ class TemplateRepository:
         body: Union[IrregularEventBody, OperationBodies, RuleBodies],
         generator: Optional[IrregularEventGenerator],
         relevant_resources: List[RelevantResource],
-    ) -> Union[IrregularEventTemplateDB, OperationTemplateDB, RuleTemplateDB]:
+    ) -> Union[IrregularEventDB, OperationDB, RuleDB]:
         return {
-            TemplateTypeEnum.IRREGULAR_EVENT: IrregularEventTemplateDB(
+            TemplateTypeEnum.IRREGULAR_EVENT: IrregularEventDB(
                 template_meta=self._construct_template_meta(
                     template, relevant_resources
                 ),
@@ -451,13 +450,13 @@ class TemplateRepository:
                 ),
                 body=self._construct_body_db(body),
             ),
-            TemplateTypeEnum.OPERATION: OperationTemplateDB(
+            TemplateTypeEnum.OPERATION: OperationDB(
                 template_meta=self._construct_template_meta(
                     template, relevant_resources
                 ),
                 body=self._construct_body_db(body),
             ),
-            TemplateTypeEnum.RULE: RuleTemplateDB(
+            TemplateTypeEnum.RULE: RuleDB(
                 template_meta=self._construct_template_meta(
                     template, relevant_resources
                 ),

@@ -32,24 +32,12 @@ class CreateResourceTypeRequest(ResourceType):
     pass
 
 
-class CreateResourceTypeResponse(BaseModel):
-    id: int
-
-
 class UpdateResourceTypeAttribute(ResourceTypeAttribute):
     id: int
 
 
 class UpdateResourceTypeRequest(ResourceType):
     attributes: List[UpdateResourceTypeAttribute]
-
-
-class UpdateResourceTypeResponse(BaseModel):
-    id: int
-
-
-class DeleteResourceTypeResponse(BaseModel):
-    id: int
 
 
 class GetResourceTypeResponse(ResourceType):
@@ -77,24 +65,12 @@ class CreateResourceRequest(Resource):
     pass
 
 
-class CreateResourceResponse(BaseModel):
-    id: int
-
-
 class UpdateResourceAttribute(ResourceAttribute):
     id: int
 
 
 class UpdateResourceRequest(Resource):
     attributes: List[UpdateResourceAttribute]
-
-
-class UpdateResourceResponse(BaseModel):
-    id: int
-
-
-class DeleteResourceResponse(BaseModel):
-    id: int
 
 
 class GetResourceResponse(Resource):

@@ -12,7 +12,7 @@ from src.worker.auth import AuthWorker
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(app: FastAPI):   
     setup_routes(app)
 
     rabbitmq_config = RabbitMQStore.get_rabbitmq_config()

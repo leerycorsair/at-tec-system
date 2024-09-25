@@ -12,7 +12,7 @@ services:
       - custom-network
     environment:
       DB_HOST: postgres_simulation
-      DB_PORT: 5433   # Ensure this matches the internal port PostgreSQL is listening on
+      DB_PORT: 5433   
       DB_USER: ${DB_USER}
       DB_PASS: ${DB_PASS}
       DB_NAME: ${DB_NAME}
@@ -29,7 +29,7 @@ services:
     expose:
       - "5433"
     ports:
-      - "5433:5433"  # Expose port 5433 both inside the container and on the host
+      - "5433:5433"  
     environment:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASS}

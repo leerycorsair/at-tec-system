@@ -1,4 +1,3 @@
-from enum import Enum
 from pydantic import BaseModel
 from typing import List
 
@@ -10,22 +9,15 @@ class RelevantResourceDB(BaseModel):
     resource_type_id: int
 
 
-class TemplateTypeEnum(Enum):
-    IRREGULAR_EVENT = "irregular_event"
-    OPERATION = "operation"
-    RULE = "rule"
-
-
 class TemplateMetaDB(BaseModel):
     id: int
     name: str
-    type: TemplateTypeEnum
+    type: str
     rel_resources: List[RelevantResourceDB]
     model_id: int
 
 
 class OperationBodyDB(BaseModel):
-    id: int
     condition: str
     body_before: str
     delay: int
@@ -33,49 +25,38 @@ class OperationBodyDB(BaseModel):
     template_id: int
 
 
-class OperationTemplateDB(BaseModel):
+class OperationDB(BaseModel):
     template_meta: TemplateMetaDB
     body: OperationBodyDB
 
 
 class RuleBodyDB(BaseModel):
-    id: int
     condition: str
     body: str
     template_id: int
 
 
-class RuleTemplateDB(BaseModel):
+class RuleDB(BaseModel):
     template_meta: TemplateMetaDB
     body: RuleBodyDB
 
 
 class IrregularEventBodyDB(BaseModel):
-    id: int
     body: str
     template_id: int
 
 
-class GeneratorTypeEnum(Enum):
-    NORMAL = "normal"
-    PRECISE = "precise"
-    UNIFORM = "uniform"
-    EXPONENTIAL = "exponential"
-    GAUSSIAN = "gaussian"
-    POISSON = "poisson"
-
-
 class IrregularEventGeneratorDB(BaseModel):
-    id: int
-    type: GeneratorTypeEnum
+    type: str
     value: float
     dispersion: float
     template_id: int
 
 
-class IrregularEventTemplateDB(BaseModel):
+class IrregularEventDB(BaseModel):
     template_meta: TemplateMetaDB
     generator: IrregularEventGeneratorDB
+    body: IrregularEventBodyDB
 
 
 class TemplateUsageArgumentDB(BaseModel):
