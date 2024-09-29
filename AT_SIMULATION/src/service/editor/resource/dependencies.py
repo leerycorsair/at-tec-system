@@ -1,6 +1,8 @@
 from typing import List, Protocol
 
 from src.repository.editor.resource.models.models import ResourceDB, ResourceTypeDB
+from src.repository.editor.resource.repository import ResourceRepository
+from src.service.visio.service import VisioService
 
 
 class IResourceRepository(Protocol):
@@ -39,12 +41,27 @@ class IVisioService(Protocol):
         object_id: int,
         object_type: str,
         object_name: str,
-    ) -> int: ...
+    ) -> None: ...
+
+    def get_node_id(self, object_id: int, object_type: str) -> int: ...
 
     def delete_node(
         self,
         object_id: int,
         object_type: str,
-    ) -> int: ...
+    ) -> None: ...
 
-    def create_edge(self, from_id: int, to_id: int) -> int: ...
+    def create_edge(
+        self,
+        from_id: int,
+        to_id: int,
+        model_id: int,
+    ) -> None: ...
+
+
+def get_visio_service() -> IVisioService:
+    return VisioService()
+
+
+def get_resource_repository() -> IResourceRepository:
+    return ResourceRepository()

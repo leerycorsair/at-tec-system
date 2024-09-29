@@ -2,9 +2,13 @@ from typing import List
 from fastapi import Depends
 
 from src.repository.editor.resource.models.models import ResourceDB, ResourceTypeDB
-from src.repository.editor.resource.repository import ResourceRepository
-from src.service.editor.resource.dependencies import IResourceRepository, IVisioService
-from src.service.visio.service import VisioService
+from src.service.editor.resource.dependencies import (
+    IResourceRepository,
+    IVisioService,
+    get_resource_repository,
+    get_visio_service,
+)
+from src.service.helpers import handle_rollback
 
 _resource_type_prefix = "resource_type"
 _resource_prefix = "resource"
@@ -13,8 +17,8 @@ _resource_prefix = "resource"
 class ResourceService:
     def __init__(
         self,
-        resource_rep: IResourceRepository = Depends(ResourceRepository),
-        visio_service: IVisioService = Depends(VisioService),
+        resource_rep: IResourceRepository = Depends(get_resource_repository),
+        visio_service: IVisioService = Depends(get_visio_service),
     ) -> None:
         self._resource_rep = resource_rep
         self._visio_service = visio_service
@@ -40,16 +44,13 @@ class ResourceService:
     def create_resource_type(self, resource_type: ResourceTypeDB) -> int:
         obj_id = self._resource_rep.create_resource_type(resource_type)
 
-        try:
+        with handle_rollback(self._resource_rep.delete_resource_type, obj_id):
             self._visio_service.create_node(
                 obj_id,
                 _resource_type_prefix,
                 resource_type.name,
                 resource_type.model_id,
             )
-        except Exception as e:
-            self._resource_rep.delete_resource_type(obj_id)
-            raise e
 
         return obj_id
 
@@ -65,13 +66,12 @@ class ResourceService:
         original_resource_type = self._resource_rep.get_resource_type(resource_type.id)
         obj_id = self._resource_rep.update_resource_type(resource_type)
 
-        try:
+        with handle_rollback(
+            self._resource_rep.update_resource_type, original_resource_type
+        ):
             self._visio_service.update_node(
                 obj_id, _resource_type_prefix, resource_type.name
             )
-        except Exception as e:
-            self._resource_rep.update_resource_type(original_resource_type)
-            raise e
 
         return obj_id
 
@@ -80,27 +80,31 @@ class ResourceService:
         resource_type = self._resource_rep.get_resource_type(resource_type_id)
         obj_id = self._resource_rep.delete_resource_type(resource_type_id)
 
-        try:
+        with handle_rollback(self._resource_rep.create_resource_type, resource_type):
             self._visio_service.delete_node(obj_id, _resource_type_prefix)
-        except Exception as e:
-            self._resource_rep.create_resource_type(resource_type)
-            raise e
 
         return obj_id
 
     def create_resource(self, resource: ResourceDB) -> int:
         obj_id = self._resource_rep.create_resource(resource)
 
-        try:
-            self._visio_service.create_node(
+        with handle_rollback(self._resource_rep.delete_resource, obj_id):
+            resource_node_id = self._visio_service.create_node(
                 obj_id,
                 _resource_prefix,
                 resource.name,
                 resource.model_id,
             )
-        except Exception as e:
-            self._resource_rep.delete_resource(obj_id)
-            raise e
+
+        resource_type_node_id = self._visio_service.get_node_id(
+            resource.resource_type_id, _resource_type_prefix
+        )
+
+        with handle_rollback(self._visio_service.delete_node, obj_id, _resource_prefix):
+            with handle_rollback(self._resource_rep.delete_resource, obj_id):
+                self._visio_service.create_edge(
+                    resource_type_node_id, resource_node_id, resource.model_id
+                )
 
         return obj_id
 
@@ -116,11 +120,8 @@ class ResourceService:
         original_resource = self._resource_rep.get_resource(resource.id)
         obj_id = self._resource_rep.update_resource(resource)
 
-        try:
+        with handle_rollback(self._resource_rep.update_resource, original_resource):
             self._visio_service.update_node(obj_id, _resource_prefix, resource.name)
-        except Exception as e:
-            self._resource_rep.update_resource(original_resource)
-            raise e
 
         return obj_id
 
@@ -129,10 +130,7 @@ class ResourceService:
         resource = self._resource_rep.get_resource(resource_id)
         obj_id = self._resource_rep.delete_resource(resource_id)
 
-        try:
+        with handle_rollback(self._resource_rep.create_resource, resource):
             self._visio_service.delete_node(obj_id, _resource_prefix)
-        except Exception as e:
-            self._resource_rep.create_resource(resource)
-            raise e
 
         return obj_id
