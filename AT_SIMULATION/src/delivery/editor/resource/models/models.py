@@ -10,11 +10,16 @@ class BaseTypesEnum(Enum):
     ENUM = "enum"
 
 
-class ResourceTypeAttribute(BaseModel):
+class ResourceTypeAttributeRequest(BaseModel):
+    id: Optional[int] = None
     name: str
     type: BaseTypesEnum
     enum_values_set: Optional[List[str]] = None
     default_value: Optional[str] = None
+
+
+class ResourceTypeAttributeResponse(ResourceTypeAttributeRequest):
+    id: int
 
 
 class ResourceTypeTypesEnum(Enum):
@@ -22,61 +27,46 @@ class ResourceTypeTypesEnum(Enum):
     TEMPORAL = "temporal"
 
 
-class ResourceType(BaseModel):
+class ResourceTypeRequest(BaseModel):
+    id: Optional[int] = None
     name: str
     type: ResourceTypeTypesEnum
-    attributes: List[ResourceTypeAttribute]
+    attributes: List[ResourceTypeAttributeRequest]
 
 
-class CreateResourceTypeRequest(ResourceType):
-    pass
-
-
-class UpdateResourceTypeAttribute(ResourceTypeAttribute):
+class ResourceTypeResponse(ResourceTypeRequest):
     id: int
+    attributes: List[ResourceTypeAttributeResponse]
 
 
-class UpdateResourceTypeRequest(ResourceType):
-    attributes: List[UpdateResourceTypeAttribute]
-
-
-class GetResourceTypeResponse(ResourceType):
-    id: int
-
-
-class GetResourceTypesResponse(BaseModel):
-    resource_types: List[GetResourceTypeResponse]
+class ResourceTypesResponse(BaseModel):
+    resource_types: List[ResourceTypeResponse]
     total: int
 
 
-class ResourceAttribute(BaseModel):
+class ResourceAttributeRequest(BaseModel):
+    id: Optional[int] = None
     rta_id: int
     value: str
 
 
-class Resource(BaseModel):
+class ResourceAttributeResponse(ResourceAttributeRequest):
+    id: int
+
+
+class ResourceRequest(BaseModel):
+    id: Optional[int] = None
     name: str
     to_be_traced: bool
-    attributes: List[ResourceAttribute]
+    attributes: List[ResourceAttributeRequest]
     resource_type_id: int
 
 
-class CreateResourceRequest(Resource):
-    pass
-
-
-class UpdateResourceAttribute(ResourceAttribute):
+class ResourceResponse(ResourceRequest):
     id: int
+    attributes: List[ResourceAttributeResponse]
 
 
-class UpdateResourceRequest(Resource):
-    attributes: List[UpdateResourceAttribute]
-
-
-class GetResourceResponse(Resource):
-    id: int
-
-
-class GetResourcesResponse(BaseModel):
-    resources: List[GetResourceResponse]
+class ResourcesResponse(BaseModel):
+    resources: List[ResourceResponse]
     total: int

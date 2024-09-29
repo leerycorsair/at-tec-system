@@ -5,9 +5,9 @@ from src.repository.editor.template.models.models import (
     IrregularEventDB,
     OperationDB,
     RuleDB,
-    TemplateMetaDB,
     TemplateUsageDB,
 )
+from src.service.editor.template.models.models import Templates
 from src.service.editor.template.service import TemplateService
 
 
@@ -51,7 +51,7 @@ class ITemplateService(ABC):
         pass
 
     @abstractmethod
-    async def get_templates(self, model_id: int) -> List[TemplateMetaDB]:
+    async def get_templates(self, model_id: int) -> Templates:
         pass
 
     @abstractmethod

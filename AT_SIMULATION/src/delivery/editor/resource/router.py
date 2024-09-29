@@ -7,24 +7,20 @@ from src.delivery.editor.resource.dependencies import (
     get_resource_service,
 )
 from src.delivery.editor.resource.models.conversions import (
-    create_to_ResourceDB,
-    create_to_ResourceTypeDB,
-    to_GetResourceResponse,
-    to_GetResourceTypeResponse,
-    to_GetResourceTypesResponse,
-    to_GetResourcesResponse,
-    update_to_ResourceDB,
-    update_to_ResourceTypeDB,
+    to_ResourceDB,
+    to_ResourceResponse,
+    to_ResourceTypeDB,
+    to_ResourceTypeResponse,
+    to_ResourceTypesResponse,
+    to_ResourcesResponse,
 )
 from src.delivery.editor.resource.models.models import (
-    CreateResourceRequest,
-    CreateResourceTypeRequest,
-    GetResourceResponse,
-    GetResourceTypeResponse,
-    GetResourceTypesResponse,
-    GetResourcesResponse,
-    UpdateResourceRequest,
-    UpdateResourceTypeRequest,
+    ResourceRequest,
+    ResourceResponse,
+    ResourceTypeRequest,
+    ResourceTypeResponse,
+    ResourceTypesResponse,
+    ResourcesResponse,
 )
 from src.delivery.model.dependencies import get_current_model
 
@@ -36,48 +32,43 @@ router = APIRouter(
 
 @router.post("/types", response_model=ObjectIDResponse)
 async def create_resource_type(
-    body: CreateResourceTypeRequest,
+    body: ResourceTypeRequest,
     model_id: int = Depends(get_current_model),
     resource_service: IResourceService = Depends(get_resource_service),
 ) -> ObjectIDResponse:
     return to_ObjectIDResponse(
-        await resource_service.create_resource_type(
-            create_to_ResourceTypeDB(body, model_id)
-        )
+        await resource_service.create_resource_type(to_ResourceTypeDB(body, model_id))
     )
 
 
-@router.get("/types", response_model=GetResourceTypesResponse)
+@router.get("/types", response_model=ResourceTypesResponse)
 async def get_resource_types(
     model_id: int = Depends(get_current_model),
     resource_service: IResourceService = Depends(get_resource_service),
-) -> GetResourceTypesResponse:
-    return to_GetResourceTypesResponse(
-        await resource_service.get_resource_types(model_id)
-    )
+) -> ResourceTypesResponse:
+    return to_ResourceTypesResponse(await resource_service.get_resource_types(model_id))
 
 
-@router.get("/types/{resource_type_id}", response_model=GetResourceTypeResponse)
+@router.get("/types/{resource_type_id}", response_model=ResourceTypeResponse)
 async def get_resource_type(
     resource_type_id: int,
     model_id: int = Depends(get_current_model),
     resource_service: IResourceService = Depends(get_resource_service),
-) -> GetResourceTypeResponse:
-    return to_GetResourceTypeResponse(
+) -> ResourceTypeResponse:
+    return to_ResourceTypeResponse(
         await resource_service.get_resource_type(resource_type_id, model_id)
     )
 
 
 @router.put("/types/{resource_type_id}", response_model=ObjectIDResponse)
 async def update_resource_type(
-    resource_type_id: int,
-    body: UpdateResourceTypeRequest,
+    body: ResourceTypeRequest,
     model_id: int = Depends(get_current_model),
     resource_service: IResourceService = Depends(get_resource_service),
 ) -> ObjectIDResponse:
     return to_ObjectIDResponse(
         await resource_service.update_resource_type(
-            update_to_ResourceTypeDB(body, model_id, resource_type_id),
+            to_ResourceTypeDB(body, model_id),
         )
     )
 
@@ -95,53 +86,52 @@ async def delete_resource_type(
 
 @router.post("/", response_model=ObjectIDResponse)
 async def create_resource(
-    body: CreateResourceRequest,
+    body: ResourceRequest,
     model_id: int = Depends(get_current_model),
     resource_service: IResourceService = Depends(get_resource_service),
 ) -> ObjectIDResponse:
     return to_ObjectIDResponse(
         await resource_service.create_resource(
-            create_to_ResourceDB(body, model_id),
+            to_ResourceDB(body, model_id),
         )
     )
 
 
-@router.get("/", response_model=GetResourcesResponse)
+@router.get("/", response_model=ResourcesResponse)
 async def get_resources(
     model_id: int = Depends(get_current_model),
     resource_service: IResourceService = Depends(get_resource_service),
-) -> GetResourcesResponse:
-    return to_GetResourcesResponse(
+) -> ResourcesResponse:
+    return to_ResourcesResponse(
         await resource_service.get_resources(model_id),
     )
 
 
-@router.get("/{resource_id}", response_model=GetResourceResponse)
+@router.get("/{resource_id}", response_model=ResourceResponse)
 async def get_resource(
     resource_id: int,
     model_id: int = Depends(get_current_model),
     resource_service: IResourceService = Depends(get_resource_service),
-) -> GetResourceResponse:
-    return to_GetResourceResponse(
+) -> ResourceResponse:
+    return to_ResourceResponse(
         await resource_service.get_resource(resource_id, model_id)
     )
 
 
 @router.put("/{resource_id}", response_model=ObjectIDResponse)
 async def update_resource(
-    resource_id: int,
-    body: UpdateResourceRequest,
+    body: ResourceRequest,
     model_id: int = Depends(get_current_model),
     resource_service: IResourceService = Depends(get_resource_service),
 ) -> ObjectIDResponse:
     return to_ObjectIDResponse(
         await resource_service.create_resource(
-            update_to_ResourceDB(body, model_id, resource_id),
+            to_ResourceDB(body, model_id),
         )
     )
 
 
-@router.delete("/{resource_id}", response_model=int)
+@router.delete("/{resource_id}", response_model=ObjectIDResponse)
 async def delete_resource(
     resource_id: int,
     model_id: int = Depends(get_current_model),

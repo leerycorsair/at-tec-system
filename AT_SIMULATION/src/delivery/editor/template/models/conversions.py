@@ -36,6 +36,7 @@ from src.repository.editor.template.models.models import (
     TemplateUsageArgumentDB,
     TemplateUsageDB,
 )
+from src.service.editor.template.models.models import Templates
 
 
 def to_RelevantResourceDB(
@@ -136,10 +137,19 @@ def to_TemplateMetaResponse(meta: TemplateMetaDB) -> TemplateMetaResponse:
     )
 
 
-def to_TemplatesResponse(metas: List[TemplateMetaDB]) -> TemplatesResponse:
+def to_TemplatesResponse(templates: Templates) -> TemplatesResponse:
     return TemplatesResponse(
-        templates=[to_TemplateMetaResponse(meta) for meta in metas],
-        total=len(metas),
+        irregular_events=[
+            to_IrregularEventResponse(template)
+            for template in templates.irregular_events
+        ],
+        operations=[
+            to_OperationResponse(template) for template in templates.operations
+        ],
+        rules=[to_RuleResponse(template) for template in templates.rules],
+        total=len(templates.rules)
+        + len(templates.operations)
+        + len(templates.irregular_events),
     )
 
 

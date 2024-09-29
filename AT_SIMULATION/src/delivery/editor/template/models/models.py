@@ -31,11 +31,6 @@ class TemplateMetaResponse(TemplateMetaRequest):
     rel_resources: List[RelevantResourceResponse]
 
 
-class TemplatesResponse(BaseModel):
-    templates: List[TemplateMetaResponse]
-    total: int
-
-
 class OperationBody(BaseModel):
     condition: str
     body_before: str
@@ -119,4 +114,11 @@ class TemplateUsageResponse(TemplateUsageRequest):
 
 class TemplateUsagesResponse(BaseModel):
     usages: List[TemplateUsageResponse]
+    total: int
+
+
+class TemplatesResponse(BaseModel):
+    irregular_events: List[IrregularEventResponse]
+    operations: List[OperationResponse]
+    rules: List[RuleResponse]
     total: int
