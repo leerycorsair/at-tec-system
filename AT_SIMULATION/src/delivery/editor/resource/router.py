@@ -125,7 +125,7 @@ async def update_resource(
     resource_service: IResourceService = Depends(get_resource_service),
 ) -> ObjectIDResponse:
     return to_ObjectIDResponse(
-        await resource_service.create_resource(
+        await resource_service.update_resource(
             to_ResourceDB(body, model_id),
         )
     )

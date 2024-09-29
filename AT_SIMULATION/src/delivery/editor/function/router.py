@@ -1,4 +1,3 @@
-from typing import List
 from fastapi import APIRouter, Depends
 from src.delivery.core.models.conversions import to_ObjectIDResponse
 from src.delivery.core.models.models import ObjectIDResponse
@@ -36,7 +35,7 @@ async def create_function(
     )
 
 
-@router.get("/", response_model=List[Function])
+@router.get("/", response_model=FunctionsResponse)
 async def get_functions(
     model_id: int = Depends(get_current_model),
     function_service: IFunctionService = Depends(get_function_service),

@@ -1,69 +1,50 @@
-from abc import ABC, abstractmethod
-from typing import List
+from typing import List, Protocol
 
 from src.repository.editor.resource.models.models import ResourceDB, ResourceTypeDB
 
 
-class IResourceRepository(ABC):
-    @abstractmethod
-    async def create_resource_type(self, resource_type: ResourceTypeDB) -> int:
-        pass
+class IResourceRepository(Protocol):
+    def create_resource_type(self, resource_type: ResourceTypeDB) -> int: ...
 
-    @abstractmethod
-    async def get_resource_type(self, resource_type_id: int) -> ResourceTypeDB:
-        pass
+    def get_resource_type(self, resource_type_id: int) -> ResourceTypeDB: ...
 
-    @abstractmethod
-    async def get_resource_types(self, model_id: int) -> List[ResourceTypeDB]:
-        pass
+    def get_resource_types(self, model_id: int) -> List[ResourceTypeDB]: ...
 
-    @abstractmethod
-    async def update_resource_type(self, resource_type: ResourceTypeDB) -> int:
-        pass
+    def update_resource_type(self, resource_type: ResourceTypeDB) -> int: ...
 
-    @abstractmethod
-    async def delete_resource_type(self, resource_type_id: int) -> int:
-        pass
+    def delete_resource_type(self, resource_type_id: int) -> int: ...
 
-    @abstractmethod
-    async def create_resource(self, resource: ResourceDB) -> int:
-        pass
+    def create_resource(self, resource: ResourceDB) -> int: ...
 
-    @abstractmethod
-    async def get_resource(self, resource_id: int) -> ResourceDB:
-        pass
+    def get_resource(self, resource_id: int) -> ResourceDB: ...
 
-    @abstractmethod
-    async def get_resources(self, model_id: int) -> List[ResourceDB]:
-        pass
+    def get_resources(self, model_id: int) -> List[ResourceDB]: ...
 
-    @abstractmethod
-    async def update_resource(self, resource: ResourceDB) -> int:
-        pass
+    def update_resource(self, resource: ResourceDB) -> int: ...
 
-    @abstractmethod
-    async def delete_resource(self, resource_id: int) -> int:
-        pass
+    def delete_resource(self, resource_id: int) -> int: ...
 
 
-class IVisioService(ABC):
-    @abstractmethod
-    async def create_node(
+class IVisioService(Protocol):
+    def create_node(
         self,
         object_id: int,
         object_type: str,
+        object_name: str,
         model_id: int,
-    ) -> int:
-        pass
+    ) -> int: ...
 
-    @abstractmethod
-    async def update_node(self, object_name: str, object_type: str) -> int:
-        pass
+    def update_node(
+        self,
+        object_id: int,
+        object_type: str,
+        object_name: str,
+    ) -> int: ...
 
-    @abstractmethod
-    async def delete_node(self, object_name: str, object_type: str) -> int:
-        pass
+    def delete_node(
+        self,
+        object_id: int,
+        object_type: str,
+    ) -> int: ...
 
-    @abstractmethod
-    async def create_edge(self, from_id: int, to_id: int) -> int:
-        pass
+    def create_edge(self, from_id: int, to_id: int) -> int: ...
