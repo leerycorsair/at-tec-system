@@ -17,7 +17,7 @@ class FunctionRepository:
     def __init__(self, db_session: Session = Depends(get_db)):
         self.db_session = db_session
 
-    async def create_function(self, function: FunctionDB) -> int:
+    def create_function(self, function: FunctionDB) -> int:
         try:
             new_function = to_Function(function)
 
@@ -38,7 +38,7 @@ class FunctionRepository:
             self.db_session.rollback()
             raise RuntimeError(f"Failed to create function: {e}")
 
-    async def get_function(self, function_id: int) -> Optional[FunctionDB]:
+    def get_function(self, function_id: int) -> Optional[FunctionDB]:
         try:
             function = (
                 self.db_session.query(Function)
@@ -59,7 +59,7 @@ class FunctionRepository:
         except SQLAlchemyError as e:
             raise RuntimeError(f"Failed to get function: {e}")
 
-    async def get_functions(self, model_id: int) -> List[FunctionDB]:
+    def get_functions(self, model_id: int) -> List[FunctionDB]:
         try:
             functions = (
                 self.db_session.query(Function)
@@ -81,7 +81,7 @@ class FunctionRepository:
         except SQLAlchemyError as e:
             raise RuntimeError(f"Failed to get functions: {e}")
 
-    async def update_function(self, function: FunctionDB) -> FunctionDB:
+    def update_function(self, function: FunctionDB) -> int:
         try:
             existing_function = (
                 self.db_session.query(Function)
@@ -120,7 +120,7 @@ class FunctionRepository:
             self.db_session.rollback()
             raise RuntimeError(f"Failed to update function: {e}")
 
-    async def delete_function(self, function_id: int) -> None:
+    def delete_function(self, function_id: int) -> int:
         try:
             function = (
                 self.db_session.query(Function)

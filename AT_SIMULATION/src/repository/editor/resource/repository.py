@@ -28,7 +28,7 @@ class ResourceRepository:
     def __init__(self, db_session: Session = Depends(get_db)):
         self.db_session = db_session
 
-    async def create_resource_type(self, resource_type: ResourceTypeDB) -> int:
+    def create_resource_type(self, resource_type: ResourceTypeDB) -> int:
         try:
             new_resource_type = to_ResourceType(resource_type)
 
@@ -49,7 +49,7 @@ class ResourceRepository:
             self.db_session.rollback()
             raise RuntimeError(f"Failed to create resource type: {e}")
 
-    async def get_resource_type(
+    def get_resource_type(
         self, resource_type_id: int
     ) -> Optional[ResourceTypeDB]:
         try:
@@ -72,7 +72,7 @@ class ResourceRepository:
         except SQLAlchemyError as e:
             raise RuntimeError(f"Failed to get resource type: {e}")
 
-    async def get_resource_types(self, model_id: int) -> List[ResourceTypeDB]:
+    def get_resource_types(self, model_id: int) -> List[ResourceTypeDB]:
         try:
             resource_types = (
                 self.db_session.query(ResourceType)
@@ -94,7 +94,7 @@ class ResourceRepository:
         except SQLAlchemyError as e:
             raise RuntimeError(f"Failed to get resource types: {e}")
 
-    async def update_resource_type(
+    def update_resource_type(
         self, resource_type: ResourceTypeDB
     ) -> ResourceTypeDB:
         try:
@@ -135,7 +135,7 @@ class ResourceRepository:
             self.db_session.rollback()
             raise RuntimeError(f"Failed to update resource type: {e}")
 
-    async def delete_resource_type(self, resource_type_id: int) -> None:
+    def delete_resource_type(self, resource_type_id: int) -> None:
         try:
             resource_type = (
                 self.db_session.query(ResourceType)
@@ -153,7 +153,7 @@ class ResourceRepository:
             self.db_session.rollback()
             raise RuntimeError(f"Failed to delete resource type: {e}")
 
-    async def create_resource(self, resource: ResourceDB) -> int:
+    def create_resource(self, resource: ResourceDB) -> int:
         try:
             new_resource = to_Resource(resource)
 
@@ -174,7 +174,7 @@ class ResourceRepository:
             self.db_session.rollback()
             raise RuntimeError(f"Failed to create resource type: {e}")
 
-    async def get_resource(self, resource_id: int) -> Optional[ResourceDB]:
+    def get_resource(self, resource_id: int) -> Optional[ResourceDB]:
         try:
             resource = (
                 self.db_session.query(Resource)
@@ -195,7 +195,7 @@ class ResourceRepository:
         except SQLAlchemyError as e:
             raise RuntimeError(f"Failed to get resource: {e}")
 
-    async def get_resources(self, model_id: int) -> List[ResourceDB]:
+    def get_resources(self, model_id: int) -> List[ResourceDB]:
         try:
             resources = (
                 self.db_session.query(Resource)
@@ -217,7 +217,7 @@ class ResourceRepository:
         except SQLAlchemyError as e:
             raise RuntimeError(f"Failed to get resources: {e}")
 
-    async def update_resource(self, resource: ResourceDB) -> ResourceDB:
+    def update_resource(self, resource: ResourceDB) -> ResourceDB:
         try:
             existing_resource = (
                 self.db_session.query(Resource)
@@ -255,7 +255,7 @@ class ResourceRepository:
             self.db_session.rollback()
             raise RuntimeError(f"Failed to update resource: {e}")
 
-    async def delete_resource(self, resource_id: int) -> None:
+    def delete_resource(self, resource_id: int) -> None:
         try:
             resource = (
                 self.db_session.query(Resource)

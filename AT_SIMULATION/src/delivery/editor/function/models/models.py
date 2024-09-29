@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Sequence, List, Optional
 from pydantic import BaseModel
 
 
@@ -13,7 +13,7 @@ class FunctionRequest(BaseModel):
     name: str
     ret_type: str
     body: str
-    params: List[FunctionParameterRequest]
+    params: Sequence[FunctionParameterRequest]
 
 
 class FunctionParameterResponse(FunctionParameterRequest):
@@ -22,7 +22,7 @@ class FunctionParameterResponse(FunctionParameterRequest):
 
 class FunctionResponse(FunctionRequest):
     id: int
-    params: List[FunctionParameterResponse]
+    params: Sequence[FunctionParameterResponse]
 
 
 class FunctionsResponse(BaseModel):

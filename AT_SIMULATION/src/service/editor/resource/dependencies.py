@@ -27,6 +27,10 @@ class IResourceRepository(Protocol):
     def delete_resource(self, resource_id: int) -> int: ...
 
 
+def get_resource_repository() -> IResourceRepository:
+    return ResourceRepository()
+
+
 class IVisioService(Protocol):
     def create_node(
         self,
@@ -61,7 +65,3 @@ class IVisioService(Protocol):
 
 def get_visio_service() -> IVisioService:
     return VisioService()
-
-
-def get_resource_repository() -> IResourceRepository:
-    return ResourceRepository()

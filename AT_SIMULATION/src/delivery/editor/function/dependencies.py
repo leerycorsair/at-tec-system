@@ -1,29 +1,18 @@
-from abc import ABC, abstractmethod
-from typing import List
+from typing import List, Protocol
 from src.repository.editor.function.models.models import FunctionDB
 from src.service.editor.function.service import FunctionService
 
 
-class IFunctionService(ABC):
-    @abstractmethod
-    async def create_function(self, function: FunctionDB) -> int:
-        pass
+class IFunctionService(Protocol):
+    def create_function(self, function: FunctionDB) -> int: ...
 
-    @abstractmethod
-    async def get_function(self, function_id: int, model_id: int) -> FunctionDB:
-        pass
+    def get_function(self, function_id: int, model_id: int) -> FunctionDB: ...
 
-    @abstractmethod
-    async def get_functions(self, model_id: int) -> List[FunctionDB]:
-        pass
+    def get_functions(self, model_id: int) -> List[FunctionDB]: ...
 
-    @abstractmethod
-    async def update_function(self, function: FunctionDB) -> int:
-        pass
+    def update_function(self, function: FunctionDB) -> int: ...
 
-    @abstractmethod
-    async def delete_function(self, function_id: int, model_id: int) -> int:
-        pass
+    def delete_function(self, function_id: int, model_id: int) -> int: ...
 
 
 def get_function_service() -> IFunctionService:
