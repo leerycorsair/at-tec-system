@@ -37,7 +37,7 @@ async def create_resource_type(
     resource_service: IResourceService = Depends(get_resource_service),
 ) -> ObjectIDResponse:
     return to_ObjectIDResponse(
-        await resource_service.create_resource_type(to_ResourceTypeDB(body, model_id))
+        resource_service.create_resource_type(to_ResourceTypeDB(body, model_id))
     )
 
 
@@ -46,7 +46,7 @@ async def get_resource_types(
     model_id: int = Depends(get_current_model),
     resource_service: IResourceService = Depends(get_resource_service),
 ) -> ResourceTypesResponse:
-    return to_ResourceTypesResponse(await resource_service.get_resource_types(model_id))
+    return to_ResourceTypesResponse(resource_service.get_resource_types(model_id))
 
 
 @router.get("/types/{resource_type_id}", response_model=ResourceTypeResponse)
@@ -56,7 +56,7 @@ async def get_resource_type(
     resource_service: IResourceService = Depends(get_resource_service),
 ) -> ResourceTypeResponse:
     return to_ResourceTypeResponse(
-        await resource_service.get_resource_type(resource_type_id, model_id)
+        resource_service.get_resource_type(resource_type_id, model_id)
     )
 
 
@@ -67,7 +67,7 @@ async def update_resource_type(
     resource_service: IResourceService = Depends(get_resource_service),
 ) -> ObjectIDResponse:
     return to_ObjectIDResponse(
-        await resource_service.update_resource_type(
+        resource_service.update_resource_type(
             to_ResourceTypeDB(body, model_id),
         )
     )
@@ -80,7 +80,7 @@ async def delete_resource_type(
     resource_service: IResourceService = Depends(get_resource_service),
 ) -> ObjectIDResponse:
     return to_ObjectIDResponse(
-        await resource_service.delete_resource_type(resource_type_id, model_id)
+        resource_service.delete_resource_type(resource_type_id, model_id)
     )
 
 
@@ -91,7 +91,7 @@ async def create_resource(
     resource_service: IResourceService = Depends(get_resource_service),
 ) -> ObjectIDResponse:
     return to_ObjectIDResponse(
-        await resource_service.create_resource(
+        resource_service.create_resource(
             to_ResourceDB(body, model_id),
         )
     )
@@ -103,7 +103,7 @@ async def get_resources(
     resource_service: IResourceService = Depends(get_resource_service),
 ) -> ResourcesResponse:
     return to_ResourcesResponse(
-        await resource_service.get_resources(model_id),
+        resource_service.get_resources(model_id),
     )
 
 
@@ -113,9 +113,7 @@ async def get_resource(
     model_id: int = Depends(get_current_model),
     resource_service: IResourceService = Depends(get_resource_service),
 ) -> ResourceResponse:
-    return to_ResourceResponse(
-        await resource_service.get_resource(resource_id, model_id)
-    )
+    return to_ResourceResponse(resource_service.get_resource(resource_id, model_id))
 
 
 @router.put("/{resource_id}", response_model=ObjectIDResponse)
@@ -125,7 +123,7 @@ async def update_resource(
     resource_service: IResourceService = Depends(get_resource_service),
 ) -> ObjectIDResponse:
     return to_ObjectIDResponse(
-        await resource_service.update_resource(
+        resource_service.update_resource(
             to_ResourceDB(body, model_id),
         )
     )
@@ -137,6 +135,4 @@ async def delete_resource(
     model_id: int = Depends(get_current_model),
     resource_service: IResourceService = Depends(get_resource_service),
 ) -> ObjectIDResponse:
-    return to_ObjectIDResponse(
-        await resource_service.delete_resource(resource_id, model_id)
-    )
+    return to_ObjectIDResponse(resource_service.delete_resource(resource_id, model_id))
