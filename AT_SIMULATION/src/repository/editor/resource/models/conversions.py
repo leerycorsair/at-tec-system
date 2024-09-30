@@ -57,8 +57,8 @@ def to_ResourceTypeAttributeDB(attr: ResourceTypeAttribute) -> ResourceTypeAttri
 def to_Resource(resource: ResourceDB) -> Resource:
     return Resource(
         name=resource.name,
-        type=resource.type,
         to_be_traced=resource.to_be_traced,
+        resource_type_id=resource.resource_type_id,
         model_id=resource.model_id,
     )
 
@@ -69,7 +69,7 @@ def to_ResourceDB(
     return ResourceDB(
         id=resource.id,
         name=resource.name,
-        type=resource.resource_type_id,
+        resource_type_id=resource.resource_type_id,
         to_be_traced=resource.to_be_traced,
         attributes=[to_ResourceAttributeDB(attr) for attr in attributes],
         model_id=resource.model_id,
@@ -91,4 +91,5 @@ def to_ResourceAttributeDB(attr: ResourceAttribute) -> ResourceAttributeDB:
         id=attr.id,
         rta_id=attr.rta_id,
         value=attr.value,
+        resource_id=attr.resource_id,
     )
