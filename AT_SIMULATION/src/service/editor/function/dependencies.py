@@ -16,8 +16,10 @@ class IFunctionRepository(Protocol):
 
     def delete_function(self, function_id: int) -> int: ...
 
-def get_function_repository()-> IFunctionRepository:
+
+def get_function_repository() -> IFunctionRepository:
     return FunctionRepository()
+
 
 class IVisioService(Protocol):
     def create_node(
@@ -35,19 +37,10 @@ class IVisioService(Protocol):
         object_name: str,
     ) -> None: ...
 
-    def get_node_id(self, object_id: int, object_type: str) -> int: ...
-
     def delete_node(
         self,
         object_id: int,
         object_type: str,
-    ) -> None: ...
-
-    def create_edge(
-        self,
-        from_id: int,
-        to_id: int,
-        model_id: int,
     ) -> None: ...
 
 
