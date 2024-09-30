@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List
 from fastapi import Depends
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
@@ -36,9 +36,9 @@ class FunctionRepository:
 
         except SQLAlchemyError as e:
             self.db_session.rollback()
-            raise RuntimeError(f"Failed to create function: {e}")
+            raise RuntimeError(f"Failed to create function: {e}") from e
 
-    def get_function(self, function_id: int) -> Optional[FunctionDB]:
+    def get_function(self, function_id: int) -> FunctionDB:
         try:
             function = (
                 self.db_session.query(Function)
@@ -46,7 +46,7 @@ class FunctionRepository:
                 .first()
             )
             if not function:
-                return None
+                raise RuntimeError("Function not found")
 
             parameters = (
                 self.db_session.query(FunctionParameter)
@@ -57,7 +57,7 @@ class FunctionRepository:
             return to_FunctionDB(function, parameters)
 
         except SQLAlchemyError as e:
-            raise RuntimeError(f"Failed to get function: {e}")
+            raise RuntimeError(f"Failed to get function: {e}") from e
 
     def get_functions(self, model_id: int) -> List[FunctionDB]:
         try:
@@ -79,7 +79,7 @@ class FunctionRepository:
             return functions_db
 
         except SQLAlchemyError as e:
-            raise RuntimeError(f"Failed to get functions: {e}")
+            raise RuntimeError(f"Failed to get functions: {e}") from e
 
     def update_function(self, function: FunctionDB) -> int:
         try:
@@ -114,11 +114,11 @@ class FunctionRepository:
 
             self.db_session.commit()
 
-            return function
+            return function.id
 
         except SQLAlchemyError as e:
             self.db_session.rollback()
-            raise RuntimeError(f"Failed to update function: {e}")
+            raise RuntimeError(f"Failed to update function: {e}") from e
 
     def delete_function(self, function_id: int) -> int:
         try:
@@ -134,6 +134,8 @@ class FunctionRepository:
             self.db_session.delete(function)
             self.db_session.commit()
 
+            return function_id
+
         except SQLAlchemyError as e:
             self.db_session.rollback()
-            raise RuntimeError(f"Failed to delete function: {e}")
+            raise RuntimeError(f"Failed to delete function: {e}") from e
