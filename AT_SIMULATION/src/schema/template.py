@@ -72,7 +72,7 @@ class TemplateUsage(Base):
     )
 
 
-class TemplateUsageArg(Base):
+class TemplateUsageArgument(Base):
     __tablename__ = "template_usage_args"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
