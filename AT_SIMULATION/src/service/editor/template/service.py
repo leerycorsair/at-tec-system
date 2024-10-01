@@ -1,4 +1,4 @@
-from typing import Any, Callable, Dict, List, Union
+from typing import Dict, List 
 from fastapi import Depends
 from src.repository.editor.template.models.models import (
     IrregularEventDB,
@@ -103,16 +103,12 @@ class TemplateService:
         update_func,
         node_prefix: str,
     ) -> int:
-        self._check_template_rights(
-            template.meta.id, template.meta.model_id
-        )
+        self._check_template_rights(template.meta.id, template.meta.model_id)
         original_template = get_func(template.meta.id)
         obj_id = update_func(template)
 
         with handle_rollback(update_func, original_template):
-            self._visio_service.update_node(
-                obj_id, node_prefix, template.meta.name
-            )
+            self._visio_service.update_node(obj_id, node_prefix, template.meta.name)
 
         return obj_id
 
@@ -148,34 +144,8 @@ class TemplateService:
         )
 
     def delete_template(self, template_id: int, model_id: int) -> int:
-        _get_funcs: Dict[
-            str, Callable[[int], Union[IrregularEventDB, OperationDB, RuleDB]]
-        ] = {
-            "irregular_event": self._template_rep.get_irregular_event,
-            "operation": self._template_rep.get_operation,
-            "rule": self._template_rep.get_rule,
-        }
-
-        _create_funcs: Dict[str, Callable[[Any], int]] = {
-            "irregular_event": self._template_rep.create_irregular_event,
-            "operation": self._template_rep.create_operation,
-            "rule": self._template_rep.create_rule,
-        }
-
         self._check_template_rights(template_id, model_id)
-        template_meta = self._template_rep.get_template_meta(template_id)
-
-        get_func = _get_funcs.get(template_meta.type)
-        create_func = _create_funcs.get(template_meta.type)
-        node_prefix = self._node_prefixes.get(template_meta.type)
-
-        template = get_func(template_meta.id)  # type: ignore
-        obj_id = self._template_rep.delete_template(template_meta.id)
-
-        with handle_rollback(create_func, template):
-            self._visio_service.delete_node(obj_id, node_prefix)  # type: ignore
-
-        return obj_id
+        return self._template_rep.delete_template(template_id)
 
     def create_template_usage(self, template_usage: TemplateUsageDB) -> int:
         obj_id = self._template_rep.create_template_usage(template_usage)
@@ -208,7 +178,7 @@ class TemplateService:
                 self._visio_service.create_edge(
                     usage_node_id, resource_node_id, template_usage.model_id
                 )
-                
+
         return obj_id
 
     def get_template_usage(
@@ -238,10 +208,4 @@ class TemplateService:
 
     def delete_template_usage(self, template_usage_id: int, model_id: int) -> int:
         self._check_template_usage_rights(template_usage_id, model_id)
-        template_usage = self._template_rep.get_template_usage(template_usage_id)
-        obj_id = self._template_rep.delete_template_usage(template_usage_id)
-
-        with handle_rollback(self._template_rep.create_template_usage, template_usage):
-            self._visio_service.delete_node(obj_id, _template_usage_prefix)
-
-        return obj_id
+        return self._template_rep.delete_template_usage(template_usage_id)

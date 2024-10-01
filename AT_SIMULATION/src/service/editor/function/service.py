@@ -66,10 +66,4 @@ class FunctionService:
 
     def delete_function(self, function_id: int, model_id: int) -> int:
         self._check_function_rights(function_id, model_id)
-        function = self._function_rep.get_function(function_id)
-        obj_id = self._function_rep.delete_function(function_id)
-
-        with handle_rollback(self._function_rep.create_function, function):
-            self._visio_service.delete_node(obj_id, _function_prefix)
-
-        return obj_id
+        return self._function_rep.delete_function(function_id)

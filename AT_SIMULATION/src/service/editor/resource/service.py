@@ -77,13 +77,7 @@ class ResourceService:
 
     def delete_resource_type(self, resource_type_id: int, model_id: int) -> int:
         self._check_resource_type_rights(resource_type_id, model_id)
-        resource_type = self._resource_rep.get_resource_type(resource_type_id)
-        obj_id = self._resource_rep.delete_resource_type(resource_type_id)
-
-        with handle_rollback(self._resource_rep.create_resource_type, resource_type):
-            self._visio_service.delete_node(obj_id, _resource_type_prefix)
-
-        return obj_id
+        return self._resource_rep.delete_resource_type(resource_type_id)
 
     def create_resource(self, resource: ResourceDB) -> int:
         obj_id = self._resource_rep.create_resource(resource)
@@ -127,10 +121,4 @@ class ResourceService:
 
     def delete_resource(self, resource_id: int, model_id: int) -> int:
         self._check_resource_rights(resource_id, model_id)
-        resource = self._resource_rep.get_resource(resource_id)
-        obj_id = self._resource_rep.delete_resource(resource_id)
-
-        with handle_rollback(self._resource_rep.create_resource, resource):
-            self._visio_service.delete_node(obj_id, _resource_prefix)
-
-        return obj_id
+        return self._resource_rep.delete_resource(resource_id)
