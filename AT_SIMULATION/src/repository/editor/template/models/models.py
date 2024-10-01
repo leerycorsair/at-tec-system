@@ -26,7 +26,7 @@ class OperationBodyDB(BaseModel):
 
 
 class OperationDB(BaseModel):
-    template_meta: TemplateMetaDB
+    meta: TemplateMetaDB
     body: OperationBodyDB
 
 
@@ -37,7 +37,7 @@ class RuleBodyDB(BaseModel):
 
 
 class RuleDB(BaseModel):
-    template_meta: TemplateMetaDB
+    meta: TemplateMetaDB
     body: RuleBodyDB
 
 
@@ -54,7 +54,7 @@ class IrregularEventGeneratorDB(BaseModel):
 
 
 class IrregularEventDB(BaseModel):
-    template_meta: TemplateMetaDB
+    meta: TemplateMetaDB
     generator: IrregularEventGeneratorDB
     body: IrregularEventBodyDB
 

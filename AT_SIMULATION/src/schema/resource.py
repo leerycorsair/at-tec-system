@@ -1,4 +1,6 @@
+import enum
 from sqlalchemy import (
+    JSON,
     Boolean,
     Column,
     ForeignKey,
@@ -7,9 +9,9 @@ from sqlalchemy import (
     String,
     UniqueConstraint,
 )
-from src.schema.base import Base
+from sqlalchemy.dialects.postgresql import ARRAY
 
-import enum
+from src.schema.base import Base
 
 
 class ResourceTypeTypeEnum(enum.Enum):
@@ -41,7 +43,8 @@ class ResourceTypeAttribute(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String, nullable=False)
     type = Column(String, nullable=False)
-    default_value = Column(String, nullable=True)
+    default_value = Column(JSON, nullable=True)
+    enum_values_set = Column(ARRAY(String), nullable=True)
 
     resource_type_id = Column(Integer, ForeignKey("resource_types.id"), nullable=False)
 

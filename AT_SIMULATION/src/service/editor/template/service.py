@@ -63,8 +63,8 @@ class TemplateService:
             self._visio_service.create_node(
                 obj_id,
                 node_prefix,
-                template.template_meta.name,
-                template.template_meta.model_id,
+                template.meta.name,
+                template.meta.model_id,
             )
 
         return obj_id
@@ -104,14 +104,14 @@ class TemplateService:
         node_prefix: str,
     ) -> int:
         self._check_template_rights(
-            template.template_meta.id, template.template_meta.model_id
+            template.meta.id, template.meta.model_id
         )
-        original_template = get_func(template.template_meta.id)
+        original_template = get_func(template.meta.id)
         obj_id = update_func(template)
 
         with handle_rollback(update_func, original_template):
             self._visio_service.update_node(
-                obj_id, node_prefix, template.template_meta.name
+                obj_id, node_prefix, template.meta.name
             )
 
         return obj_id

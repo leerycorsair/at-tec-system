@@ -42,9 +42,9 @@ class TemplateRepository:
     ) -> int:
         try:
             new_template = Template(
-                name=template_data.template_meta.name,
-                type=template_data.template_meta.type,
-                model_id=template_data.template_meta.model_id,
+                name=template_data.meta.name,
+                type=template_data.meta.type,
+                model_id=template_data.meta.model_id,
             )
 
             self.db_session.add(new_template)
@@ -198,11 +198,11 @@ class TemplateRepository:
         generator_model: Optional[Type[IrregularEventGenerator]] = None,
     ) -> int:
         try:
-            template = self._get_template_base(template_data.template_meta.id)
+            template = self._get_template_base(template_data.meta.id)
             if not template:
                 raise RuntimeError(f"Template not found")
 
-            template.name = template_data.template_meta.name
+            template.name = template_data.meta.name
             self.db_session.commit()
 
             body = self._get_body(template.id, body_model)
@@ -442,7 +442,7 @@ class TemplateRepository:
     ) -> Union[IrregularEventDB, OperationDB, RuleDB]:
         return {
             TemplateTypeEnum.IRREGULAR_EVENT: IrregularEventDB(
-                template_meta=self._construct_template_meta(
+                meta=self._construct_template_meta(
                     template, relevant_resources
                 ),
                 generator=(
@@ -451,13 +451,13 @@ class TemplateRepository:
                 body=self._construct_body_db(body),
             ),
             TemplateTypeEnum.OPERATION: OperationDB(
-                template_meta=self._construct_template_meta(
+                meta=self._construct_template_meta(
                     template, relevant_resources
                 ),
                 body=self._construct_body_db(body),
             ),
             TemplateTypeEnum.RULE: RuleDB(
-                template_meta=self._construct_template_meta(
+                meta=self._construct_template_meta(
                     template, relevant_resources
                 ),
                 body=self._construct_body_db(body),

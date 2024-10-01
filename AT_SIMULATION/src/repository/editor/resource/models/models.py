@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Optional, Union
 from pydantic import BaseModel
 
 
@@ -6,7 +6,7 @@ class ResourceTypeAttributeDB(BaseModel):
     id: int
     name: str
     type: str
-    default_value: Optional[str] = None
+    default_value: Optional[Union[int, float, bool, str]] = None
     enum_values_set: Optional[List[str]] = None
     resource_type_id: int
 

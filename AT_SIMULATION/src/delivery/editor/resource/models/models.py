@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from enum import Enum
-from typing import List, Optional
+from typing import List, Optional, Union
 
 
 class BaseTypesEnum(Enum):
@@ -15,7 +15,7 @@ class ResourceTypeAttributeRequest(BaseModel):
     name: str
     type: BaseTypesEnum
     enum_values_set: Optional[List[str]] = None
-    default_value: Optional[str] = None
+    default_value: Optional[Union[int, float, bool, str]] = None
 
 
 class ResourceTypeAttributeResponse(ResourceTypeAttributeRequest):

@@ -89,10 +89,9 @@ class TemplateUsageArg(Base):
 class IrregularEventBody(Base):
     __tablename__ = "irregular_event_bodies"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
     body = Column(Text, nullable=False)
 
-    template_id = Column(Integer, ForeignKey("templates.id"), nullable=False)
+    template_id = Column(Integer, ForeignKey("templates.id"), primary_key=True, nullable=False)
 
 
 class IrregularEventGeneratorTypeEnum(enum.Enum):
@@ -108,31 +107,28 @@ class IrregularEventGeneratorTypeEnum(enum.Enum):
 class IrregularEventGenerator(Base):
     __tablename__ = "irregular_event_generator"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
     type = Column(Enum(IrregularEventGeneratorTypeEnum), nullable=False)
     value = Column(Float, nullable=False)
     dispersion = Column(Float, nullable=False)
-
-    template_id = Column(Integer, ForeignKey("templates.id"), nullable=False)
+    
+    template_id = Column(Integer, ForeignKey("templates.id"), primary_key=True, nullable=False)
 
 
 class OperationBodies(Base):
     __tablename__ = "operation_bodies"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
     condition = Column(Text, nullable=False)
     body_before = Column(Text, nullable=False)
     delay = Column(Integer, nullable=False)
     body_after = Column(Text, nullable=False)
 
-    template_id = Column(Integer, ForeignKey("templates.id"), nullable=False)
+    template_id = Column(Integer, ForeignKey("templates.id"), primary_key=True, nullable=False)
 
 
 class RuleBodies(Base):
     __tablename__ = "rule_bodies"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
     condition = Column(Text, nullable=False)
     body = Column(Text, nullable=False)
 
-    template_id = Column(Integer, ForeignKey("templates.id"), nullable=False)
+    template_id = Column(Integer, ForeignKey("templates.id"), primary_key=True, nullable=False)

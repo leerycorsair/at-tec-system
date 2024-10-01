@@ -72,7 +72,7 @@ def to_IrregularEventDB(
     model_id: int,
 ) -> IrregularEventDB:
     return IrregularEventDB(
-        template_meta=to_TemplateMetaDB(template.meta, model_id),
+        meta=to_TemplateMetaDB(template.meta, model_id),
         generator=IrregularEventGeneratorDB(
             type=template.generator.type.value,
             value=template.generator.value,
@@ -91,7 +91,7 @@ def to_OperationDB(
     model_id: int,
 ) -> OperationDB:
     return OperationDB(
-        template_meta=to_TemplateMetaDB(template.meta, model_id),
+        meta=to_TemplateMetaDB(template.meta, model_id),
         body=OperationBodyDB(
             condition=template.body.condition,
             body_before=template.body.body_before,
@@ -107,7 +107,7 @@ def to_RuleDB(
     model_id: int,
 ) -> RuleDB:
     return RuleDB(
-        template_meta=to_TemplateMetaDB(template.meta, model_id),
+        meta=to_TemplateMetaDB(template.meta, model_id),
         body=RuleBodyDB(
             condition=template.body.condition,
             body=template.body.body,
@@ -155,7 +155,7 @@ def to_TemplatesResponse(templates: Templates) -> TemplatesResponse:
 
 def to_IrregularEventResponse(template: IrregularEventDB) -> IrregularEventResponse:
     return IrregularEventResponse(
-        meta=to_TemplateMetaResponse(template.template_meta),
+        meta=to_TemplateMetaResponse(template.meta),
         generator=IrregularEventGenerator(
             type=GeneratorTypeEnum(template.generator.type),
             value=template.generator.value,
@@ -169,7 +169,7 @@ def to_IrregularEventResponse(template: IrregularEventDB) -> IrregularEventRespo
 
 def to_OperationResponse(template: OperationDB) -> OperationResponse:
     return OperationResponse(
-        meta=to_TemplateMetaResponse(template.template_meta),
+        meta=to_TemplateMetaResponse(template.meta),
         body=OperationBody(
             condition=template.body.condition,
             body_before=template.body.body_before,
@@ -181,7 +181,7 @@ def to_OperationResponse(template: OperationDB) -> OperationResponse:
 
 def to_RuleResponse(template: RuleDB) -> RuleResponse:
     return RuleResponse(
-        meta=to_TemplateMetaResponse(template.template_meta),
+        meta=to_TemplateMetaResponse(template.meta),
         body=RuleBody(
             condition=template.body.condition,
             body=template.body.body,
