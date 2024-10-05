@@ -1,10 +1,13 @@
 from typing import List
 from src.repository.editor.template.models.models import (
     IrregularEventBodyDB,
+    IrregularEventDB,
     IrregularEventGeneratorDB,
     OperationBodyDB,
+    OperationDB,
     RelevantResourceDB,
     RuleBodyDB,
+    RuleDB,
     TemplateMetaDB,
     TemplateUsageArgumentDB,
     TemplateUsageDB,
@@ -114,17 +117,76 @@ def to_TemplateUsageDB(
     )
 
 
-def to_IrregularEventDB():
-    pass
+def to_IrregularEventDB(
+    meta: Template,
+    rel_resources: List[RelevantResource],
+    body: IrregularEventBody,
+    generator: IrregularEventGenerator,
+) -> IrregularEventDB:
+    return IrregularEventDB(
+        meta=to_TemplateMetaDB(meta, rel_resources),
+        generator=IrregularEventGeneratorDB(
+            type=generator.type,
+            value=generator.value,
+            dispersion=generator.dispersion,
+            template_id=generator.template_id,
+        ),
+        body=IrregularEventBody(
+            body=body.body,
+            template_id=body.template_id,
+        ),
+    )
 
 
-def to_OperationDB():
-    pass
+def to_OperationDB(
+    meta: Template,
+    rel_resources: List[RelevantResource],
+    body: OperationBody,
+) -> OperationDB:
+    return OperationDB(
+        meta=to_TemplateMetaDB(meta, rel_resources),
+        body=OperationBodyDB(
+            condition=body.condition,
+            body_before=body.body_before,
+            delay=body.delay,
+            body_after=body.body_after,
+            template_id=body.template_id,
+        ),
+    )
 
 
-def to_RuleDB():
-    pass
+def to_RuleDB(
+    meta: Template,
+    rel_resources: List[RelevantResource],
+    body: RuleBody,
+) -> RuleDB:
+    return RuleDB(
+        meta=to_TemplateMetaDB(meta, rel_resources),
+        body=RuleBodyDB(
+            condition=body.condition,
+            body=body.body,
+            template_id=body.template_id,
+        ),
+    )
 
 
-def to_TemplateMetaDB():
-    pass
+def to_RelevantResourceDB(res: RelevantResource) -> RelevantResourceDB:
+    return RelevantResourceDB(
+        id=res.id,
+        name=res.name,
+        template_id=res.template_id,
+        resource_type_id=res.resource_type_id,
+    )
+
+
+def to_TemplateMetaDB(
+    meta: Template,
+    rel_resources: List[RelevantResource],
+) -> TemplateMetaDB:
+    return TemplateMetaDB(
+        id=meta.id,
+        name=meta.name,
+        type=meta.type,
+        rel_resources=[to_RelevantResourceDB(res) for res in rel_resources],
+        model_id=meta.model_id,
+    )

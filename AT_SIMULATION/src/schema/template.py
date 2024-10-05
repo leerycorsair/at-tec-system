@@ -91,7 +91,9 @@ class IrregularEventBody(Base):
 
     body = Column(Text, nullable=False)
 
-    template_id = Column(Integer, ForeignKey("templates.id"), primary_key=True, nullable=False)
+    template_id = Column(
+        Integer, ForeignKey("templates.id"), primary_key=True, nullable=False
+    )
 
 
 class IrregularEventGeneratorTypeEnum(enum.Enum):
@@ -110,8 +112,10 @@ class IrregularEventGenerator(Base):
     type = Column(Enum(IrregularEventGeneratorTypeEnum), nullable=False)
     value = Column(Float, nullable=False)
     dispersion = Column(Float, nullable=False)
-    
-    template_id = Column(Integer, ForeignKey("templates.id"), primary_key=True, nullable=False)
+
+    template_id = Column(
+        Integer, ForeignKey("templates.id"), primary_key=True, nullable=False
+    )
 
 
 class OperationBody(Base):
@@ -122,7 +126,9 @@ class OperationBody(Base):
     delay = Column(Integer, nullable=False)
     body_after = Column(Text, nullable=False)
 
-    template_id = Column(Integer, ForeignKey("templates.id"), primary_key=True, nullable=False)
+    template_id = Column(
+        Integer, ForeignKey("templates.id"), primary_key=True, nullable=False
+    )
 
 
 class RuleBody(Base):
@@ -131,4 +137,6 @@ class RuleBody(Base):
     condition = Column(Text, nullable=False)
     body = Column(Text, nullable=False)
 
-    template_id = Column(Integer, ForeignKey("templates.id"), primary_key=True, nullable=False)
+    template_id = Column(
+        Integer, ForeignKey("templates.id"), primary_key=True, nullable=False
+    )
