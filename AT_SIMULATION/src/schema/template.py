@@ -105,7 +105,7 @@ class IrregularEventGeneratorTypeEnum(enum.Enum):
 
 
 class IrregularEventGenerator(Base):
-    __tablename__ = "irregular_event_generator"
+    __tablename__ = "irregular_event_generators"
 
     type = Column(Enum(IrregularEventGeneratorTypeEnum), nullable=False)
     value = Column(Float, nullable=False)
@@ -114,7 +114,7 @@ class IrregularEventGenerator(Base):
     template_id = Column(Integer, ForeignKey("templates.id"), primary_key=True, nullable=False)
 
 
-class OperationBodies(Base):
+class OperationBody(Base):
     __tablename__ = "operation_bodies"
 
     condition = Column(Text, nullable=False)
@@ -125,7 +125,7 @@ class OperationBodies(Base):
     template_id = Column(Integer, ForeignKey("templates.id"), primary_key=True, nullable=False)
 
 
-class RuleBodies(Base):
+class RuleBody(Base):
     __tablename__ = "rule_bodies"
 
     condition = Column(Text, nullable=False)

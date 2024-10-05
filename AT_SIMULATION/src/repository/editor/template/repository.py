@@ -1,352 +1,188 @@
-from typing import List, Optional, Type, Union
+from typing import Callable, List, Optional, Tuple, Any, TypeVar
 from fastapi import Depends
 from sqlalchemy.orm import Session
-from sqlalchemy.exc import SQLAlchemyError
 
+from src.repository.editor.template.conversions import (
+    to_IrregularEventBody,
+    to_IrregularEventDB,
+    to_IrregularEventGenerator,
+    to_OperationBody,
+    to_OperationDB,
+    to_RelevantResource,
+    to_RuleBody,
+    to_RuleDB,
+    to_Template,
+    to_TemplateMetaDB,
+    to_TemplateUsage,
+    to_TemplateUsageArgument,
+    to_TemplateUsageDB,
+)
+from src.repository.helper import handle_sqlalchemy_errors
 from src.repository.editor.template.models.models import (
-    IrregularEventBodyDB,
-    IrregularEventGeneratorDB,
     IrregularEventDB,
-    OperationBodyDB,
     OperationDB,
     RelevantResourceDB,
-    RuleBodyDB,
     RuleDB,
     TemplateMetaDB,
     TemplateUsageDB,
-    TemplateUsageArgumentDB,
 )
 from src.store.postgres.session import get_db
 from src.schema.template import (
-    Template,
     RelevantResource,
+    Template,
+    TemplateTypeEnum,
     TemplateUsage,
-    IrregularEventBody,
+    OperationBody,
+    RuleBody,
     IrregularEventGenerator,
-    OperationBodies,
-    RuleBodies,
+    TemplateUsageArgument,
+    IrregularEventBody,
 )
+
+T = TypeVar("T", IrregularEventDB, OperationDB, RuleDB)
 
 
 class TemplateRepository:
     def __init__(self, db_session: Session = Depends(get_db)):
         self.db_session = db_session
 
-    async def create_template(
-        self,
-        template_data: Union[
-            IrregularEventDB, OperationDB, RuleDB
-        ],
-        body_model: Type[Union[IrregularEventBody, OperationBodies, RuleBodies]],
-        generator_model: Optional[Type[IrregularEventGenerator]] = None,
-    ) -> int:
-        try:
-            new_template = Template(
-                name=template_data.meta.name,
-                type=template_data.meta.type,
-                model_id=template_data.meta.model_id,
-            )
+    def create_irregular_event(self, template: IrregularEventDB) -> int:
+        return self._create_template(
+            template,
+            to_IrregularEventBody,
+            to_IrregularEventGenerator,
+        )
 
-            self.db_session.add(new_template)
-            self.db_session.commit()
-            self.db_session.refresh(new_template)
+    @handle_sqlalchemy_errors
+    def create_operation(self, template: OperationDB) -> int:
+        return self._create_template(template, to_OperationBody)
 
-            if generator_model:
-                new_generator = generator_model(
-                    type=template_data.generator.type,
-                    value=template_data.generator.value,
-                    dispersion=template_data.generator.dispersion,
-                    template_id=new_template.id,
-                )
-                self.db_session.add(new_generator)
+    @handle_sqlalchemy_errors
+    def create_rule(self, template: RuleDB) -> int:
+        return self._create_template(template, to_RuleBody)
 
-            new_body = body_model(
-                condition=(
-                    template_data.body.condition
-                    if hasattr(template_data.body, "condition")
-                    else None
-                ),
-                body_before=(
-                    template_data.body.body_before
-                    if hasattr(template_data.body, "body_before")
-                    else None
-                ),
-                delay=(
-                    template_data.body.delay
-                    if hasattr(template_data.body, "delay")
-                    else None
-                ),
-                body=template_data.body.body,
-                body_after=(
-                    template_data.body.body_after
-                    if hasattr(template_data.body, "body_after")
-                    else None
-                ),
-                template_id=new_template.id,
-            )
+    def get_irregular_event(self, template_id: int) -> IrregularEventDB:
+        return self._get_template(
+            template_id,
+            IrregularEventBody,
+            to_IrregularEventDB,
+            IrregularEventGenerator,
+        )
 
-            self.db_session.add(new_body)
-            self.db_session.commit()
-            return new_template.id
+    @handle_sqlalchemy_errors
+    def get_operation(self, template_id: int) -> OperationDB:
+        return self._get_template(template_id, OperationBody, to_OperationDB)
 
-        except SQLAlchemyError as e:
-            self.db_session.rollback()
-            raise RuntimeError(f"Failed to create template: {e}")
+    @handle_sqlalchemy_errors
+    def get_rule(self, template_id: int) -> RuleDB:
+        return self._get_template(template_id, RuleBody, to_RuleDB)
 
-    async def get_template(
-        self,
-        template_id: int,
-        body_model: Type[Union[IrregularEventBody, OperationBodies, RuleBodies]],
-        generator_model: Optional[Type[IrregularEventGenerator]] = None,
-    ) -> Optional[Union[IrregularEventDB, OperationDB, RuleDB]]:
-        try:
-            template = self._get_template_base(template_id)
-            if not template:
-                return None
+    @handle_sqlalchemy_errors
+    def update_irregular_event(self, template: IrregularEventDB) -> int:
+        return self._update_template(
+            template, to_IrregularEventBody, to_IrregularEventGenerator
+        )
 
-            body = self._get_body(template_id, body_model)
-            generator = (
-                self._get_generator(template_id, generator_model)
-                if generator_model
-                else None
-            )
-            relevant_resources = self._get_relevant_resources(template_id)
+    @handle_sqlalchemy_errors
+    def update_operation(self, template: OperationDB) -> int:
+        return self._update_template(template, to_OperationBody)
 
-            return self._construct_template_db(
-                template, body, generator, relevant_resources
-            )
+    @handle_sqlalchemy_errors
+    def update_rule(self, template: RuleDB) -> int:
+        return self._update_template(template, to_RuleBody)
 
-        except SQLAlchemyError as e:
-            raise RuntimeError(f"Failed to get template: {e}")
+    @handle_sqlalchemy_errors
+    def get_irregular_events(self, model_id: int) -> List[IrregularEventDB]:
+        return self._get_templates(
+            model_id, self.get_irregular_event, "irregular_event"
+        )
 
-    async def get_irregular_event_templates(self) -> List[IrregularEventDB]:
-        try:
-            templates = (
-                self.db_session.query(Template)
-                .filter(Template.type == TemplateTypeEnum.IRREGULAR_EVENT)
-                .all()
-            )
+    @handle_sqlalchemy_errors
+    def get_operations(self, model_id: int) -> List[OperationDB]:
+        return self._get_templates(model_id, self.get_operation, "operation")
 
-            result = []
-            for template in templates:
-                body = self._get_body(template.id, IrregularEventBody)
-                generator = self._get_generator(template.id, IrregularEventGenerator)
-                relevant_resources = self._get_relevant_resources(template.id)
-                result.append(
-                    self._construct_template_db(
-                        template, body, generator, relevant_resources
-                    )
-                )
+    @handle_sqlalchemy_errors
+    def get_rules(self, model_id: int) -> List[RuleDB]:
+        return self._get_templates(model_id, self.get_rule, "rule")
 
-            return result
+    @handle_sqlalchemy_errors
+    def get_template_meta(self, template_id: int) -> TemplateMetaDB:
+        template_meta, rel_resources = self._get_meta(template_id)
+        return to_TemplateMetaDB(template_meta, rel_resources)
 
-        except SQLAlchemyError as e:
-            raise RuntimeError(f"Failed to get irregular event templates: {e}")
+    @handle_sqlalchemy_errors
+    def delete_template(self, template_id: int) -> int:
+        template_meta = (
+            self.db_session.query(Template).filter(Template.id == template_id).first()
+        )
+        if not template_meta:
+            raise RuntimeError("Template does not exist")
 
-    async def get_operation_templates(self) -> List[OperationDB]:
-        try:
-            templates = (
-                self.db_session.query(Template)
-                .filter(Template.type == TemplateTypeEnum.OPERATION)
-                .all()
-            )
+        self.db_session.delete(template_meta)
+        self.db_session.commit()
 
-            result = []
-            for template in templates:
-                body = self._get_body(template.id, OperationBodies)
-                relevant_resources = self._get_relevant_resources(template.id)
-                result.append(
-                    self._construct_template_db(
-                        template, body, None, relevant_resources
-                    )
-                )
+        return template_id
 
-            return result
-
-        except SQLAlchemyError as e:
-            raise RuntimeError(f"Failed to get operation templates: {e}")
-
-    async def get_rule_templates(self) -> List[RuleDB]:
-        try:
-            templates = (
-                self.db_session.query(Template)
-                .filter(Template.type == TemplateTypeEnum.RULE)
-                .all()
-            )
-
-            result = []
-            for template in templates:
-                body = self._get_body(template.id, RuleBodies)
-                relevant_resources = self._get_relevant_resources(template.id)
-                result.append(
-                    self._construct_template_db(
-                        template, body, None, relevant_resources
-                    )
-                )
-
-            return result
-
-        except SQLAlchemyError as e:
-            raise RuntimeError(f"Failed to get rule templates: {e}")
-
-    async def update_template(
-        self,
-        template_data: Union[
-            IrregularEventDB, OperationDB, RuleDB
-        ],
-        body_model: Type[Union[IrregularEventBody, OperationBodies, RuleBodies]],
-        generator_model: Optional[Type[IrregularEventGenerator]] = None,
-    ) -> int:
-        try:
-            template = self._get_template_base(template_data.meta.id)
-            if not template:
-                raise RuntimeError(f"Template not found")
-
-            template.name = template_data.meta.name
-            self.db_session.commit()
-
-            body = self._get_body(template.id, body_model)
-            if generator_model:
-                generator = self._get_generator(template.id, generator_model)
-                generator.type = template_data.generator.type
-                generator.value = template_data.generator.value
-                generator.dispersion = template_data.generator.dispersion
-
-            body.condition = (
-                template_data.body.condition
-                if hasattr(template_data.body, "condition")
-                else None
-            )
-            body.body_before = (
-                template_data.body.body_before
-                if hasattr(template_data.body, "body_before")
-                else None
-            )
-            body.delay = (
-                template_data.body.delay
-                if hasattr(template_data.body, "delay")
-                else None
-            )
-            body.body = template_data.body.body
-            body.body_after = (
-                template_data.body.body_after
-                if hasattr(template_data.body, "body_after")
-                else None
-            )
-
-            self.db_session.commit()
-            return template.id
-
-        except SQLAlchemyError as e:
-            self.db_session.rollback()
-            raise RuntimeError(f"Failed to update template: {e}")
-
-    async def delete_template(self, template_id: int) -> None:
-        try:
-            template = self._get_template_base(template_id)
-            if not template:
-                raise RuntimeError("Template not found")
-
-            self.db_session.delete(template)
-            self.db_session.commit()
-
-        except SQLAlchemyError as e:
-            self.db_session.rollback()
-            raise RuntimeError(f"Failed to delete template: {e}")
-
-    async def create_template_usage(self, template_usage: TemplateUsageDB) -> int:
-        try:
-            new_template_usage = TemplateUsage(
-                name=template_usage.name,
-                template_id=template_usage.template_id,
-                model_id=template_usage.model_id,
-            )
+    @handle_sqlalchemy_errors
+    def create_template_usage(self, template_usage: TemplateUsageDB) -> int:
+        with self.db_session.begin():
+            new_template_usage = to_TemplateUsage(template_usage)
 
             self.db_session.add(new_template_usage)
             self.db_session.commit()
             self.db_session.refresh(new_template_usage)
 
             new_usage_arguments = [
-                TemplateUsageArgumentDB(
-                    relevant_resource_id=arg.relevant_resource_id,
-                    template_usage_id=new_template_usage.id,
-                    resource_id=arg.resource_id,
-                )
+                to_TemplateUsageArgument(arg, new_template_usage.id)
                 for arg in template_usage.arguments
             ]
 
             self.db_session.add_all(new_usage_arguments)
             self.db_session.commit()
-            return new_template_usage.id
 
-        except SQLAlchemyError as e:
-            self.db_session.rollback()
-            raise RuntimeError(f"Failed to create template usage: {e}")
+        return new_template_usage.id
 
-    async def get_template_usage(
-        self, template_usage_id: int
-    ) -> Optional[TemplateUsageDB]:
-        try:
-            template_usage = (
-                self.db_session.query(TemplateUsage)
-                .filter(TemplateUsage.id == template_usage_id)
-                .first()
-            )
-            if not template_usage:
-                return None
+    @handle_sqlalchemy_errors
+    def get_template_usage(self, template_usage_id: int) -> TemplateUsageDB:
+        template_usage = (
+            self.db_session.query(TemplateUsage)
+            .filter(TemplateUsage.id == template_usage_id)
+            .first()
+        )
+        if not template_usage:
+            raise RuntimeError("Template usage does not exist")
 
+        arguments = (
+            self.db_session.query(TemplateUsageArgument)
+            .filter(TemplateUsageArgument.template_usage_id == template_usage.id)
+            .all()
+        )
+
+        return to_TemplateUsageDB(template_usage, arguments)
+
+    @handle_sqlalchemy_errors
+    def get_template_usages(self, model_id: int) -> List[TemplateUsageDB]:
+        template_usages = (
+            self.db_session.query(TemplateUsage)
+            .filter(TemplateUsage.model_id == model_id)
+            .all()
+        )
+
+        template_usages_db = []
+        for usage in template_usages:
             arguments = (
-                self.db_session.query(TemplateUsageArgumentDB)
-                .filter(TemplateUsageArgumentDB.template_usage_id == template_usage.id)
+                self.db_session.query(TemplateUsageArgument)
+                .filter(TemplateUsageArgument.template_usage_id == usage.id)
                 .all()
             )
 
-            return TemplateUsageDB(
-                id=template_usage.id,
-                name=template_usage.name,
-                template_id=template_usage.template_id,
-                model_id=template_usage.model_id,
-                arguments=arguments,
-            )
+            template_usages_db.append(to_TemplateUsageDB(usage, arguments))
 
-        except SQLAlchemyError as e:
-            raise RuntimeError(f"Failed to get template usage: {e}")
+        return template_usages_db
 
-    async def get_template_usages(self, model_id: int) -> List[TemplateUsageDB]:
-        try:
-            template_usages = (
-                self.db_session.query(TemplateUsage)
-                .filter(TemplateUsage.model_id == model_id)
-                .all()
-            )
-
-            template_usages_db = []
-            for usage in template_usages:
-                arguments = (
-                    self.db_session.query(TemplateUsageArgumentDB)
-                    .filter(TemplateUsageArgumentDB.template_usage_id == usage.id)
-                    .all()
-                )
-
-                template_usages_db.append(
-                    TemplateUsageDB(
-                        id=usage.id,
-                        name=usage.name,
-                        template_id=usage.template_id,
-                        model_id=usage.model_id,
-                        arguments=arguments,
-                    )
-                )
-
-            return template_usages_db
-
-        except SQLAlchemyError as e:
-            raise RuntimeError(f"Failed to get template usages: {e}")
-
-    async def update_template_usage(
-        self, template_usage: TemplateUsageDB
-    ) -> TemplateUsageDB:
-        try:
+    @handle_sqlalchemy_errors
+    def update_template_usage(self, template_usage: TemplateUsageDB) -> int:
+        with self.db_session.begin():
             existing_template_usage = (
                 self.db_session.query(TemplateUsage)
                 .filter(TemplateUsage.id == template_usage.id)
@@ -360,8 +196,8 @@ class TemplateRepository:
 
             for arg in template_usage.arguments:
                 existing_arg = (
-                    self.db_session.query(TemplateUsageArgumentDB)
-                    .filter(TemplateUsageArgumentDB.id == arg.id)
+                    self.db_session.query(TemplateUsageArgument)
+                    .filter(TemplateUsageArgument.id == arg.id)
                     .first()
                 )
 
@@ -369,152 +205,184 @@ class TemplateRepository:
                     existing_arg.relevant_resource_id = arg.relevant_resource_id
                     existing_arg.resource_id = arg.resource_id
                 else:
-                    new_arg = TemplateUsageArgumentDB(
-                        relevant_resource_id=arg.relevant_resource_id,
-                        template_usage_id=existing_template_usage.id,
-                        resource_id=arg.resource_id,
-                    )
+                    new_arg = to_TemplateUsageArgument(arg, existing_template_usage.id)
                     self.db_session.add(new_arg)
 
             self.db_session.commit()
 
-            return template_usage
+        return template_usage.id
 
-        except SQLAlchemyError as e:
-            self.db_session.rollback()
-            raise RuntimeError(f"Failed to update template usage: {e}")
+    @handle_sqlalchemy_errors
+    def delete_template_usage(self, template_usage_id: int) -> int:
+        template_usage = (
+            self.db_session.query(TemplateUsage)
+            .filter(TemplateUsage.id == template_usage_id)
+            .first()
+        )
+        if not template_usage:
+            raise RuntimeError("Template usage not found")
 
-    async def delete_template_usage(self, template_usage_id: int) -> None:
-        try:
-            template_usage = (
-                self.db_session.query(TemplateUsage)
-                .filter(TemplateUsage.id == template_usage_id)
-                .first()
-            )
-            if not template_usage:
-                raise RuntimeError("Template usage not found")
+        self.db_session.delete(template_usage)
+        self.db_session.commit()
 
-            self.db_session.delete(template_usage)
-            self.db_session.commit()
+        return template_usage_id
 
-        except SQLAlchemyError as e:
-            self.db_session.rollback()
-            raise RuntimeError(f"Failed to delete template usage: {e}")
+    def _get_templates(
+        self, model_id: int, get_func: Callable[[int], T], template_type: str
+    ) -> List[T]:
+        template_ids = self._get_template_ids(model_id, template_type)
 
-    def _get_template_base(self, template_id: int) -> Optional[Template]:
-        return (
+        results = []
+        for template_id in template_ids:
+            results.append(get_func(template_id))
+
+        return results
+
+    def _create_template_meta(self, meta: TemplateMetaDB) -> Template:
+        new_template = to_Template(meta)
+        self.db_session.add(new_template)
+        self.db_session.flush()
+        self.db_session.refresh(new_template)
+        self._create_relevant_resources(new_template.id, meta.rel_resources)
+
+        return new_template
+
+    def _create_relevant_resources(
+        self, template_id: int, rel_resources: List[RelevantResourceDB]
+    ) -> None:
+        relevant_resources = [
+            to_RelevantResource(res, template_id) for res in rel_resources
+        ]
+        self.db_session.add_all(relevant_resources)
+
+    def _get_meta(self, template_id: int) -> Tuple[Template, List[RelevantResource]]:
+        template_meta = (
             self.db_session.query(Template).filter(Template.id == template_id).first()
         )
+        if not template_meta:
+            raise RuntimeError("Template does not exist")
 
-    def _get_body(
-        self,
-        template_id: int,
-        body_model: Type[Union[IrregularEventBody, OperationBodies, RuleBodies]],
-    ) -> Optional[Union[IrregularEventBody, OperationBodies, RuleBodies]]:
-        return (
-            self.db_session.query(body_model)
-            .filter(body_model.template_id == template_id)
-            .first()
-        )
-
-    def _get_generator(
-        self, template_id: int, generator_model: Type[IrregularEventGenerator]
-    ) -> Optional[IrregularEventGenerator]:
-        return (
-            self.db_session.query(generator_model)
-            .filter(generator_model.template_id == template_id)
-            .first()
-        )
-
-    def _get_relevant_resources(self, template_id: int) -> List[RelevantResource]:
-        return (
+        rel_resources = (
             self.db_session.query(RelevantResource)
             .filter(RelevantResource.template_id == template_id)
             .all()
         )
 
-    def _construct_template_db(
+        return template_meta, rel_resources
+
+    def _update_relevant_resources(
+        self, template_id: int, rel_resources: List[RelevantResourceDB]
+    ) -> None:
+        self._delete_template_relevant_resources(template_id)
+        self._create_relevant_resources(template_id, rel_resources)
+
+    def _delete_template_relevant_resources(self, template_id: int) -> None:
+        (
+            self.db_session.query(RelevantResource)
+            .filter(RelevantResource.template_id == template_id)
+            .delete(synchronize_session=False)
+        )
+
+    def _update_meta(self, meta: TemplateMetaDB) -> Template:
+        update_meta, _ = self._get_meta(meta.id)
+        self._delete_template_parts(update_meta.id, TemplateTypeEnum(update_meta.type))
+
+        update_meta.name = meta.name
+        update_meta.type = meta.type
+        self.db_session.commit()
+
+        self._update_relevant_resources(meta.id, meta.rel_resources)
+
+        return update_meta
+
+    def _delete_template_parts(
+        self, template_id: int, template_type: TemplateTypeEnum
+    ) -> None:
+        match template_type:
+            case TemplateTypeEnum.IRREGULAR_EVENT:
+                self._delete_template_part(template_id, IrregularEventBody)
+                self._delete_template_part(template_id, IrregularEventGenerator)
+            case TemplateTypeEnum.OPERATION:
+                self._delete_template_part(template_id, OperationBody)
+            case TemplateTypeEnum.RULE:
+                self._delete_template_part(template_id, RuleBody)
+
+    def _delete_template_part(self, template_id: int, part_table: Any) -> None:
+        (
+            self.db_session.query(part_table)
+            .filter(part_table.template_id == template_id)
+            .delete(synchronize_session=False)
+        )
+
+    def _get_template_ids(self, model_id: int, template_type: str) -> List[int]:
+        return [
+            template_id
+            for template_id, in (
+                self.db_session.query(Template.id)
+                .filter(Template.model_id == model_id, Template.type == template_type)
+                .all()
+            )
+        ]
+
+    def _get_template_part(self, template_id: int, part_table: Any) -> Any:
+        part = (
+            self.db_session.query(part_table)
+            .filter(part_table.template_id == template_id)
+            .first()
+        )
+        if not part:
+            raise RuntimeError(f"{part_table.__name__} does not exist")
+        return part
+
+    def _update_template(
         self,
-        template: Template,
-        body: Union[IrregularEventBody, OperationBodies, RuleBodies],
-        generator: Optional[IrregularEventGenerator],
-        relevant_resources: List[RelevantResource],
-    ) -> Union[IrregularEventDB, OperationDB, RuleDB]:
-        return {
-            TemplateTypeEnum.IRREGULAR_EVENT: IrregularEventDB(
-                meta=self._construct_template_meta(
-                    template, relevant_resources
-                ),
-                generator=(
-                    self._construct_generator_db(generator) if generator else None
-                ),
-                body=self._construct_body_db(body),
-            ),
-            TemplateTypeEnum.OPERATION: OperationDB(
-                meta=self._construct_template_meta(
-                    template, relevant_resources
-                ),
-                body=self._construct_body_db(body),
-            ),
-            TemplateTypeEnum.RULE: RuleDB(
-                meta=self._construct_template_meta(
-                    template, relevant_resources
-                ),
-                body=self._construct_body_db(body),
-            ),
-        }[template.type]
+        template: T,
+        body_func: Callable[[Any, int], Any],
+        generator_func: Optional[Callable[[Any, int], Any]] = None,
+    ) -> int:
+        with self.db_session.begin():
+            template_meta = self._update_meta(template.meta)
 
-    def _construct_template_meta(
-        self, template: Template, relevant_resources: List[RelevantResource]
-    ) -> TemplateMetaDB:
-        return TemplateMetaDB(
-            id=template.id,
-            name=template.name,
-            type=template.type,
-            rel_resources=[
-                RelevantResourceDB(
-                    id=res.id,
-                    name=res.name,
-                    template_id=res.template_id,
-                    resource_type_id=res.resource_type_id,
-                )
-                for res in relevant_resources
-            ],
-        )
+            if generator_func:
+                new_generator = generator_func(template.generator, template_meta.id)
+                self.db_session.add(new_generator)
 
-    def _construct_generator_db(
-        self, generator: IrregularEventGenerator
-    ) -> IrregularEventGeneratorDB:
-        return IrregularEventGeneratorDB(
-            id=generator.id,
-            type=generator.type,
-            value=generator.value,
-            dispersion=generator.dispersion,
-            template_id=generator.template_id,
-        )
+            new_body = body_func(template.body, template_meta.id)
+            self.db_session.add(new_body)
 
-    def _construct_body_db(
-        self, body: Union[IrregularEventBody, OperationBodies, RuleBodies]
-    ) -> Union[IrregularEventBodyDB, OperationBodyDB, RuleBodyDB]:
-        if isinstance(body, IrregularEventBody):
-            return IrregularEventBodyDB(
-                id=body.id,
-                body=body.body,
-                template_id=body.template_id,
-            )
-        elif isinstance(body, OperationBodies):
-            return OperationBodyDB(
-                id=body.id,
-                condition=body.condition,
-                body_before=body.body_before,
-                delay=body.delay,
-                body_after=body.body_after,
-                template_id=body.template_id,
-            )
-        elif isinstance(body, RuleBodies):
-            return RuleBodyDB(
-                id=body.id,
-                condition=body.condition,
-                body=body.body,
-                template_id=body.template_id,
-            )
+        return template_meta.id
+
+    def _create_template(
+        self,
+        template: T,
+        body_func: Callable[[Any, int], Any],
+        generator_func: Optional[Callable[[Any, int], Any]] = None,
+    ) -> int:
+        with self.db_session.begin():
+            new_template = self._create_template_meta(template.meta)
+
+            if generator_func:
+                new_generator = generator_func(template.generator, new_template.id)
+                self.db_session.add(new_generator)
+
+            new_body = body_func(template.body, new_template.id)
+            self.db_session.add(new_body)
+
+        return new_template.id
+
+    def _get_template(
+        self,
+        template_id: int,
+        body_class: Any,
+        conversion_func: Callable,
+        generator_class: Any = None,
+    ) -> T:
+        template_meta, rel_resources = self._get_meta(template_id)
+        body = self._get_template_part(template_id, body_class)
+
+        generator = None
+        if generator_class:
+            generator = self._get_template_part(template_id, generator_class)
+            return conversion_func(template_meta, rel_resources, body, generator)
+
+        return conversion_func(template_meta, rel_resources, body)
