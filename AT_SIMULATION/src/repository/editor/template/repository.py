@@ -2,7 +2,7 @@ from typing import Callable, List, Optional, Tuple, Any, TypeVar
 from fastapi import Depends
 from sqlalchemy.orm import Session
 
-from src.repository.editor.template.conversions import (
+from src.repository.editor.template.models.conversions import (
     to_IrregularEventBody,
     to_IrregularEventDB,
     to_IrregularEventGenerator,
