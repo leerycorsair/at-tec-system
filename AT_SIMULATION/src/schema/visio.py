@@ -47,10 +47,10 @@ class Node(Base):
     __tablename__ = "nodes"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    node_type = Column(Enum(NodeType), nullable=False)
-    object_name = Column(String, nullable=False)
     object_table = Column(Enum(TableType), nullable=False)
+    object_name = Column(String, nullable=False)
     object_id = Column(Integer, nullable=False)
+    node_type = Column(Enum(NodeType), nullable=False)
     pos_x = Column(Integer, nullable=False)
     pos_y = Column(Integer, nullable=False)
     width = Column(Integer, nullable=False)
