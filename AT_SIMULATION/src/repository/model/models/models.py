@@ -1,18 +1,10 @@
 from datetime import datetime
+from typing import Optional
 from pydantic import BaseModel
-
-
-class CreateModelParamsDB(BaseModel):
-    name: str
-    user_id: int
 
 
 class ModelMetaDB(BaseModel):
     id: int
     name: str
     user_id: int
-    created_at: datetime
-
-
-class UpdateModelParamsDB(BaseModel):
-    name: str
+    created_at: Optional[datetime] = None
