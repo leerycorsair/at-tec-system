@@ -1,14 +1,11 @@
-from abc import ABC, abstractmethod
-from typing import List
+from typing import List, Protocol
 from fastapi import Depends, Header, HTTPException, Security
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from src.client.auth_client import AuthClientSingleton
 
 
 from src.repository.model.models.models import (
-    CreateModelParamsDB,
     ModelMetaDB,
-    UpdateModelParamsDB,
 )
 from src.service.model.service import ModelService
 
@@ -16,34 +13,16 @@ from src.service.model.service import ModelService
 bearer_scheme = HTTPBearer()
 
 
-class IModelService(ABC):
-    @abstractmethod
-    async def check_rights(self, model_id: int, user_id: int) -> bool:
-        pass
+class IModelService(Protocol):
+    def check_model_rights(self, model_id: int, user_id: int) -> None: ...
 
-    @abstractmethod
-    async def create_model(
-        self, user_id: int, params: CreateModelParamsDB
-    ) -> ModelMetaDB:
-        pass
+    def create_model(self, model: ModelMetaDB) -> int: ...
 
-    # @abstractmethod
-    # async def get_model(self, model_id: int) -> service.Model:
-    #     pass
+    def get_models(self, user_id: int) -> List[ModelMetaDB]: ...
 
-    @abstractmethod
-    async def get_models(self, user_id: int) -> List[ModelMetaDB]:
-        pass
+    def update_model(self, model: ModelMetaDB) -> int: ...
 
-    @abstractmethod
-    async def update_model(
-        self, model_id: int, params: UpdateModelParamsDB
-    ) -> ModelMetaDB:
-        pass
-
-    @abstractmethod
-    async def delete_model(self, model_id: int) -> ModelMetaDB:
-        pass
+    def delete_model(self, model_id: int, user_id: int) -> int: ...
 
 
 def get_model_service() -> IModelService:
@@ -67,18 +46,10 @@ async def get_current_user(
 async def get_current_model(
     model_id: int = Header(...),
     user_id: int = Depends(get_current_user),
-    model_service: ModelService = Depends(),
-):
+    model_service: IModelService = Depends(),
+) -> int:
     if not model_id:
         raise HTTPException(status_code=400, detail="model_id header is missing")
 
-    return await model_service.check_rights(model_id, user_id)
-
-
-async def check_model_rights(
-    model_id: int,
-    user_id: int = Depends(get_current_user),
-    model_service: ModelService = Depends(),
-):
-    await model_service.check_rights(model_id, user_id)
+    model_service.check_model_rights(model_id, user_id)
     return model_id
