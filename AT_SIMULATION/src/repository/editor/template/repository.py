@@ -61,6 +61,7 @@ class TemplateRepository:
     def create_rule(self, template: RuleDB) -> int:
         return self._create_template(template, to_RuleBody)
 
+    @handle_sqlalchemy_errors
     def get_irregular_event(self, template_id: int) -> IrregularEventDB:
         return self._get_template(
             template_id,
@@ -112,52 +113,32 @@ class TemplateRepository:
 
     @handle_sqlalchemy_errors
     def delete_template(self, template_id: int) -> int:
-        template_meta = (
-            self.db_session.query(Template).filter(Template.id == template_id).first()
-        )
-        if not template_meta:
-            raise RuntimeError("Template does not exist")
+        with self.db_session.begin():
+            template_meta = (
+                self.db_session.query(Template)
+                .filter(Template.id == template_id)
+                .first()
+            )
+            if not template_meta:
+                raise RuntimeError("Template does not exist")
 
-        self.db_session.delete(template_meta)
-        self.db_session.commit()
-
+            self.db_session.delete(template_meta)
         return template_id
 
     @handle_sqlalchemy_errors
     def create_template_usage(self, template_usage: TemplateUsageDB) -> int:
         with self.db_session.begin():
             new_template_usage = to_TemplateUsage(template_usage)
-
             self.db_session.add(new_template_usage)
-            self.db_session.commit()
+            self.db_session.flush()
             self.db_session.refresh(new_template_usage)
-
-            new_usage_arguments = [
-                to_TemplateUsageArgument(arg, new_template_usage.id)
-                for arg in template_usage.arguments
-            ]
-
-            self.db_session.add_all(new_usage_arguments)
-            self.db_session.commit()
-
+            self._process_arguments(template_usage, new_template_usage.id)
         return new_template_usage.id
 
     @handle_sqlalchemy_errors
     def get_template_usage(self, template_usage_id: int) -> TemplateUsageDB:
-        template_usage = (
-            self.db_session.query(TemplateUsage)
-            .filter(TemplateUsage.id == template_usage_id)
-            .first()
-        )
-        if not template_usage:
-            raise RuntimeError("Template usage does not exist")
-
-        arguments = (
-            self.db_session.query(TemplateUsageArgument)
-            .filter(TemplateUsageArgument.template_usage_id == template_usage.id)
-            .all()
-        )
-
+        template_usage = self._get_template_usage_by_id(template_usage_id)
+        arguments = self._get_arguments_by_usage_id(template_usage.id)
         return to_TemplateUsageDB(template_usage, arguments)
 
     @handle_sqlalchemy_errors
@@ -175,7 +156,6 @@ class TemplateRepository:
                 .filter(TemplateUsageArgument.template_usage_id == usage.id)
                 .all()
             )
-
             template_usages_db.append(to_TemplateUsageDB(usage, arguments))
 
         return template_usages_db
@@ -183,49 +163,50 @@ class TemplateRepository:
     @handle_sqlalchemy_errors
     def update_template_usage(self, template_usage: TemplateUsageDB) -> int:
         with self.db_session.begin():
-            existing_template_usage = (
-                self.db_session.query(TemplateUsage)
-                .filter(TemplateUsage.id == template_usage.id)
-                .first()
-            )
-            if not existing_template_usage:
-                raise RuntimeError("Template usage not found")
-
+            existing_template_usage = self._get_template_usage_by_id(template_usage.id)
             existing_template_usage.name = template_usage.name
-            self.db_session.commit()
-
-            for arg in template_usage.arguments:
-                existing_arg = (
-                    self.db_session.query(TemplateUsageArgument)
-                    .filter(TemplateUsageArgument.id == arg.id)
-                    .first()
-                )
-
-                if existing_arg:
-                    existing_arg.relevant_resource_id = arg.relevant_resource_id
-                    existing_arg.resource_id = arg.resource_id
-                else:
-                    new_arg = to_TemplateUsageArgument(arg, existing_template_usage.id)
-                    self.db_session.add(new_arg)
-
-            self.db_session.commit()
-
+            self._process_arguments(template_usage, existing_template_usage.id)
         return template_usage.id
 
     @handle_sqlalchemy_errors
     def delete_template_usage(self, template_usage_id: int) -> int:
+        with self.db_session.begin():
+            template_usage = self._get_template_usage_by_id(template_usage_id)
+            self.db_session.delete(template_usage)
+        return template_usage_id
+
+    def _get_template_usage_by_id(self, template_usage_id: int) -> TemplateUsage:
         template_usage = (
-            self.db_session.query(TemplateUsage)
-            .filter(TemplateUsage.id == template_usage_id)
-            .first()
+            self.db_session.query(TemplateUsage).filter_by(id=template_usage_id).first()
         )
         if not template_usage:
             raise RuntimeError("Template usage not found")
+        return template_usage
 
-        self.db_session.delete(template_usage)
-        self.db_session.commit()
+    def _get_arguments_by_usage_id(
+        self, template_usage_id: int
+    ) -> List[TemplateUsageArgument]:
+        return (
+            self.db_session.query(TemplateUsageArgument)
+            .filter_by(template_usage_id=template_usage_id)
+            .all()
+        )
 
-        return template_usage_id
+    def _process_arguments(
+        self, template_usage: TemplateUsageDB, usage_id: int
+    ) -> None:
+        for arg in template_usage.arguments:
+            existing_arg = (
+                self.db_session.query(TemplateUsageArgument)
+                .filter_by(id=arg.id)
+                .first()
+            )
+            if existing_arg:
+                existing_arg.relevant_resource_id = arg.relevant_resource_id
+                existing_arg.resource_id = arg.resource_id
+            else:
+                new_arg = to_TemplateUsageArgument(arg, usage_id)
+                self.db_session.add(new_arg)
 
     def _get_templates(
         self, model_id: int, get_func: Callable[[int], T], template_type: str

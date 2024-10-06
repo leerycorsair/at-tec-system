@@ -1,4 +1,4 @@
-from src.repository.model.models.models import ModelMetaDB
+from src.repository.model.models.models import CreateModelParamsDB, ModelMetaDB
 from src.schema.model import Model
 
 
@@ -8,4 +8,11 @@ def to_ModelMetaDB(model: Model) -> ModelMetaDB:
         name=model.name,
         user_id=model.user_id,
         created_at=model.created_at,
+    )
+
+
+def to_Model(model: CreateModelParamsDB) -> Model:
+    return Model(
+        name=model.name,
+        user_id=model.user_id,
     )

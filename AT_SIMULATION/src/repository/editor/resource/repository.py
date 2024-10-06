@@ -44,34 +44,33 @@ class ResourceRepository:
 
     @handle_sqlalchemy_errors
     def get_resource_type(self, resource_type_id: int) -> ResourceTypeDB:
-        with self.db_session.begin():
-            resource_type = self._get_resource_by_id(resource_type_id)
-            if not resource_type:
-                raise RuntimeError("Resource type does not exist")
-            attributes = self._get_attributes_by_resource_id(resource_type_id)
+        resource_type = self._get_resource_by_id(resource_type_id)
+        if not resource_type:
+            raise RuntimeError("Resource type does not exist")
+        attributes = self._get_attributes_by_resource_type_id(resource_type_id)
         return to_ResourceTypeDB(resource_type, attributes)
 
     @handle_sqlalchemy_errors
     def get_resource_types(self, model_id: int) -> List[ResourceTypeDB]:
-        with self.db_session.begin():
-            resource_types = (
-                self.db_session.query(ResourceType)
-                .filter(ResourceType.model_id == model_id)
-                .all()
-            )
+        resource_types = (
+            self.db_session.query(ResourceType)
+            .filter(ResourceType.model_id == model_id)
+            .all()
+        )
 
-            resource_types_db = [
-                to_ResourceTypeDB(
-                    resource_type, self._get_attributes_by_resource_id(resource_type.id)
-                )
-                for resource_type in resource_types
-            ]
+        resource_types_db = [
+            to_ResourceTypeDB(
+                resource_type,
+                self._get_attributes_by_resource_type_id(resource_type.id),
+            )
+            for resource_type in resource_types
+        ]
         return resource_types_db
 
     @handle_sqlalchemy_errors
     def update_resource_type(self, resource_type: ResourceTypeDB) -> int:
         with self.db_session.begin():
-            existing_resource_type = self._get_resource_by_id(resource_type.id)
+            existing_resource_type = self._get_resource_type_by_id(resource_type.id)
             if not existing_resource_type:
                 raise RuntimeError("Resource type not found")
 
@@ -100,10 +99,9 @@ class ResourceRepository:
     @handle_sqlalchemy_errors
     def delete_resource_type(self, resource_type_id: int) -> int:
         with self.db_session.begin():
-            resource_type = self._get_resource_by_id(resource_type_id)
+            resource_type = self._get_resource_type_by_id(resource_type_id)
             if not resource_type:
                 raise RuntimeError("Resource type not found")
-
             self.db_session.delete(resource_type)
         return resource_type_id
 
@@ -123,28 +121,22 @@ class ResourceRepository:
 
     @handle_sqlalchemy_errors
     def get_resource(self, resource_id: int) -> ResourceDB:
-        with self.db_session.begin():
-            resource = self._get_resource_by_id(resource_id)
-            if not resource:
-                raise RuntimeError("Resource not found")
-            attributes = self._get_attributes_by_resource_id(resource.id)
+        resource = self._get_resource_by_id(resource_id)
+        if not resource:
+            raise RuntimeError("Resource not found")
+        attributes = self._get_attributes_by_resource_id(resource.id)
         return to_ResourceDB(resource, attributes)
 
     @handle_sqlalchemy_errors
     def get_resources(self, model_id: int) -> List[ResourceDB]:
-        with self.db_session.begin():
-            resources = (
-                self.db_session.query(Resource)
-                .filter(Resource.model_id == model_id)
-                .all()
-            )
+        resources = (
+            self.db_session.query(Resource).filter(Resource.model_id == model_id).all()
+        )
 
-            resources_db = [
-                to_ResourceDB(
-                    resource, self._get_attributes_by_resource_id(resource.id)
-                )
-                for resource in resources
-            ]
+        resources_db = [
+            to_ResourceDB(resource, self._get_attributes_by_resource_id(resource.id))
+            for resource in resources
+        ]
         return resources_db
 
     @handle_sqlalchemy_errors
@@ -180,7 +172,6 @@ class ResourceRepository:
             resource = self._get_resource_by_id(resource_id)
             if not resource:
                 raise RuntimeError("Resource not found")
-
             self.db_session.delete(resource)
         return resource_id
 
@@ -189,11 +180,27 @@ class ResourceRepository:
             self.db_session.query(Resource).filter(Resource.id == resource_id).first()
         )
 
+    def _get_resource_type_by_id(self, resource_type_id: int) -> ResourceType:
+        return (
+            self.db_session.query(ResourceType)
+            .filter(ResourceType.id == resource_type_id)
+            .first()
+        )
+
     def _get_attributes_by_resource_id(
         self, resource_id: int
     ) -> List[ResourceAttribute]:
         return (
             self.db_session.query(ResourceAttribute)
             .filter(ResourceAttribute.resource_id == resource_id)
+            .all()
+        )
+
+    def _get_attributes_by_resource_type_id(
+        self, resource_type_id: int
+    ) -> List[ResourceTypeAttribute]:
+        return (
+            self.db_session.query(ResourceTypeAttribute)
+            .filter(ResourceTypeAttribute.resource_type_id == resource_type_id)
             .all()
         )

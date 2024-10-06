@@ -35,28 +35,22 @@ class FunctionRepository:
 
     @handle_sqlalchemy_errors
     def get_function(self, function_id: int) -> FunctionDB:
-        with self.db_session.begin():
-            function = self._get_function_by_id(function_id)
-            if not function:
-                raise RuntimeError("Function not found")
-            parameters = self._get_parameters_by_function_id(function_id)
+        function = self._get_function_by_id(function_id)
+        if not function:
+            raise RuntimeError("Function not found")
+        parameters = self._get_parameters_by_function_id(function_id)
         return to_FunctionDB(function, parameters)
 
     @handle_sqlalchemy_errors
     def get_functions(self, model_id: int) -> List[FunctionDB]:
-        with self.db_session.begin():
-            functions = (
-                self.db_session.query(Function)
-                .filter(Function.model_id == model_id)
-                .all()
-            )
+        functions = (
+            self.db_session.query(Function).filter(Function.model_id == model_id).all()
+        )
 
-            functions_db = [
-                to_FunctionDB(
-                    function, self._get_parameters_by_function_id(function.id)
-                )
-                for function in functions
-            ]
+        functions_db = [
+            to_FunctionDB(function, self._get_parameters_by_function_id(function.id))
+            for function in functions
+        ]
         return functions_db
 
     @handle_sqlalchemy_errors
