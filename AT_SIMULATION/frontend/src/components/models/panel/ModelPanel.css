@@ -1,0 +1,7 @@
+.model-panel.closed {
+    height: calc(100vh - 203px);
+}
+
+.model-panel .ant-menu-title-content {
+    width: 100%;
+}

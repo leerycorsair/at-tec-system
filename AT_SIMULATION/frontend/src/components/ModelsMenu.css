@@ -1,0 +1,17 @@
+.sider-model-menu {
+    height: calc(100vh - 262px);
+    overflow-y: scroll;
+    min-width: 250px;
+    margin-bottom: 10px;
+}
+
+.sider-model-menu .ant-menu-title-content {
+    width: 100%;
+}
+
+.sider-model-menu-wrapper {
+    padding: 10px;
+    padding-top: 0px;
+    min-width: 270px;
+    display: block;
+}
