@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 
 from src.dto.db.user import DTOUserDB
 from src.service.interface import UserServiceInterface
@@ -21,10 +21,13 @@ router = APIRouter(
 async def sign_in(
     body: SignInRequest, user_service: UserServiceInterface = Depends(UserService)
 ):
-    token = user_service.generate_token(
-        body.login,
-        body.password,
-    )
+    try:
+        token = user_service.generate_token(
+            body.login,
+            body.password,
+        )
+    except ValueError:
+        raise HTTPException(status_code=401, detail="Login failed")
     return SignInResponse(token=token)
 
 
