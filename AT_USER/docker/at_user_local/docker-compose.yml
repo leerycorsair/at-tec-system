@@ -19,6 +19,7 @@ services:
       SERVER_PORT: ${SERVER_PORT}
       RABBITMQ_HOST: ${RABBITMQ_HOST}
       RABBITMQ_PORT: ${RABBITMQ_PORT}
+      DEBUG: ${DEBUG:-false}
     depends_on:
       postgres_user:
         condition: service_healthy
