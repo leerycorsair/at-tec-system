@@ -72,7 +72,7 @@ export default () => {
         const frameId = window.sessionStorage.getItem("frameId");
         if (frameId) {
             const parentOrigin = window.sessionStorage.getItem("parentOrigin") || "*";
-            window.parent.postMessage({ frameId, url: window.location.href }, parentOrigin);
+            window.parent.postMessage({ type: "urlUpdate", frameId, url: window.location.href }, parentOrigin);
         }
     }, [location]);
 
