@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { createFrameActionAsyncThunk } from "../frameActor";
 import { API_URL, getHeaders, LOAD_STATUSES, MOCKING } from "../../GLOBAL";
 
 export const loadResources = createAsyncThunk("resources/load", async (modelId) => {
@@ -73,7 +74,7 @@ export const loadResources = createAsyncThunk("resources/load", async (modelId) 
     return { items: json.resources, modelId };
 });
 
-export const createResource = createAsyncThunk("resources/create", async ({ modelId, resource }) => {
+export const createResource = createFrameActionAsyncThunk("resources/create", async ({ modelId, resource }) => {
     const url = `${API_URL}/api/editor/resources/`;
     const headers = getHeaders({ "model-id": modelId });
 
@@ -99,7 +100,7 @@ export const createResource = createAsyncThunk("resources/create", async ({ mode
     return json;
 });
 
-export const updateResource = createAsyncThunk("resources/update", async ({ modelId, resource }) => {
+export const updateResource = createFrameActionAsyncThunk("resources/update", async ({ modelId, resource }) => {
     const url = `${API_URL}/api/editor/resources/${resource.id}/`;
     const headers = getHeaders({ "model-id": modelId });
 
@@ -122,7 +123,7 @@ export const updateResource = createAsyncThunk("resources/update", async ({ mode
     return json;
 });
 
-export const deleteResource = createAsyncThunk("resources/delete", async ({ modelId, resourceId }) => {
+export const deleteResource = createFrameActionAsyncThunk("resources/delete", async ({ modelId, resourceId }) => {
     const url = `${API_URL}/api/editor/resources/${resourceId}/`;
     const headers = getHeaders({ "model-id": modelId });
 

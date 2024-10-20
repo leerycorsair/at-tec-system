@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { createFrameActionAsyncThunk } from "../frameActor";
 import { API_URL, getHeaders, LOAD_STATUSES, MOCKING } from "../../GLOBAL";
 
 export const loadTemplates = createAsyncThunk("templates/load", async (modelId) => {
@@ -87,7 +88,7 @@ export const loadTemplates = createAsyncThunk("templates/load", async (modelId) 
     return { items: json.irregular_events.concat(json.operations.concat(json.rules)), modelId };
 });
 
-export const createTemplate = createAsyncThunk("templates/create", async ({ modelId, template }) => {
+export const createTemplate = createFrameActionAsyncThunk("templates/create", async ({ modelId, template }) => {
     const url = `${API_URL}/api/editor/templates/${template.meta.type}/`;
     const headers = getHeaders({ "model-id": modelId });
     if (MOCKING) {
@@ -113,7 +114,7 @@ export const createTemplate = createAsyncThunk("templates/create", async ({ mode
     return json;
 });
 
-export const updateTemplate = createAsyncThunk("templates/update", async ({ modelId, template }) => {
+export const updateTemplate = createFrameActionAsyncThunk("templates/update", async ({ modelId, template }) => {
     const url = `${API_URL}/api/editor/templates/${template.meta.id}/${template.meta.type}/`;
     const headers = getHeaders({ "model-id": modelId });
 
@@ -136,7 +137,7 @@ export const updateTemplate = createAsyncThunk("templates/update", async ({ mode
     return json;
 });
 
-export const deleteTemplate = createAsyncThunk("templates/delete", async ({ modelId, templateId }) => {
+export const deleteTemplate = createFrameActionAsyncThunk("templates/delete", async ({ modelId, templateId }) => {
     const url = `${API_URL}/api/editor/templates/${templateId}/`;
     const headers = getHeaders({ "model-id": modelId });
 

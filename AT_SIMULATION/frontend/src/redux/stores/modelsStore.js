@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { createFrameActionAsyncThunk } from "../frameActor";
 import { API_URL, getHeaders, LOAD_STATUSES, MOCKING } from "../../GLOBAL";
 
 export const loadModels = createAsyncThunk("models/load", async () => {
@@ -29,7 +30,7 @@ export const loadModels = createAsyncThunk("models/load", async () => {
     return json.models;
 });
 
-export const createModel = createAsyncThunk("models/create", async (model) => {
+export const createModel = createFrameActionAsyncThunk("models/create", async (model) => {
     const url = `${API_URL}/api/models/`;
     const headers = getHeaders();
     if (MOCKING) {
@@ -48,7 +49,7 @@ export const createModel = createAsyncThunk("models/create", async (model) => {
     return json;
 });
 
-export const deleteModel = createAsyncThunk("models/delete", async (modelId) => {
+export const deleteModel = createFrameActionAsyncThunk("models/delete", async (modelId) => {
     const url = `${API_URL}/api/models/${modelId}/`;
     const headers = getHeaders();
     

@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { createFrameActionAsyncThunk } from "../frameActor";
 import { API_URL, getHeaders, LOAD_STATUSES, MOCKING } from "../../GLOBAL";
 
 export const loadFuncs = createAsyncThunk("funcs/load", async (modelId) => {
@@ -35,7 +36,7 @@ export const loadFuncs = createAsyncThunk("funcs/load", async (modelId) => {
     return { items: json.functions, modelId };
 });
 
-export const createFunc = createAsyncThunk("funcs/create", async ({ modelId, func }) => {
+export const createFunc = createFrameActionAsyncThunk("funcs/create", async ({ modelId, func }) => {
     const url = `${API_URL}/api/editor/functions/`;
     const headers = getHeaders({ "model-id": modelId });
 
@@ -62,7 +63,7 @@ export const createFunc = createAsyncThunk("funcs/create", async ({ modelId, fun
     return json;
 });
 
-export const updateFunc = createAsyncThunk("funcs/update", async ({ modelId, func }) => {
+export const updateFunc = createFrameActionAsyncThunk("funcs/update", async ({ modelId, func }) => {
     const url = `${API_URL}/api/editor/functions/${func.id}/`;
     const headers = getHeaders({ "model-id": modelId });
 
@@ -85,7 +86,7 @@ export const updateFunc = createAsyncThunk("funcs/update", async ({ modelId, fun
     return json;
 });
 
-export const deleteFunc = createAsyncThunk("funcs/delete", async ({ modelId, funcId }) => {
+export const deleteFunc = createFrameActionAsyncThunk("funcs/delete", async ({ modelId, funcId }) => {
     const url = `${API_URL}/api/editor/functions/${funcId}/`;
     const headers = getHeaders({ "model-id": modelId });
 
