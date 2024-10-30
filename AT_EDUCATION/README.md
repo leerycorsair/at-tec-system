@@ -2,7 +2,6 @@
 
 Микросервис оценки обучаемого АТ-ТЕХНОЛОГИЯ
 
-#
 
 ![scheme](education.svg)
 
@@ -30,7 +29,7 @@
 3. Какие реакции будут.
 
 
-## Модель даннных 
+## Представление данных
 
 Входными данными являются события, которые приходят от системы Имитационного моделирования / Редактора базы знаний:
 
@@ -48,7 +47,6 @@ Event
 Логика верхнего уровня:
 
 ```python
-
 class EventManager: 
     TaskManager
 
@@ -80,37 +78,39 @@ class TaskManager:
 
 ```
 
-Как будем описывать задания:
-
+Как будем описывать задания, которые должен выполнить обучаемый:
 ```
 Task:
-    id: int
-    event_name: str
-    event_params: NIL | JSON
-    on_success: int
-    on_failure: int
-    skills_ids: [int] 
-```
-
-```
-Scenario:
-    scenario_name: str
-    task_id:int
-    parent_id: [int]
-    dependencies: [int]
-    status: TODO | DONE | IN_PROGRESS  
+    id: int # идентификатор
+    event_name: str # название события 
+    description: str # описание задания 
+    event_params: NIL | JSON # параметры события
+    on_success: int # баллы при успешном выполнения
+    on_failure: int # баллы, которые будут снижать оценку
+    skills_ids: [int] # с какими умениями связано задание
 ```
 
 
+Как будем описывать части сценария (чтобы добавить примеры, которые у нас уже есть):
+```
+ScenarioPart:
+    id: int # идентификатор
+    scenario_name: str # название сценария
+    task_id:int # идентификатор связанного задания
+    parent_id: [int] # родительские задания
+    status: TODO | DONE | IN_PROGRESS # текущий статус  
+```
+
+Как будем описывать умения:
 ```
 Skill:
-    id: int
-    name: str
-    scenario_id: NIL | int
-    tasks_ids: [int]
-    scenario_name: NIL | str 
+    id: int # идентификатор
+    name: str # название умения
+    tasks_ids: [int] # задания
+    scenario_name: NIL | str # название сценария
 ```
 
+Как будем описывать реакции на события (подсказки/оповещения):
 ```
 Reaction:
     id: int
