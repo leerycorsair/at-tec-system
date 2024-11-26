@@ -2,6 +2,7 @@ from typing import List, Protocol
 
 from src.repository.editor.function.models.models import FunctionDB
 from src.repository.editor.function.repository import FunctionRepository
+from src.repository.visio.models.models import NodeTypesEnum
 from src.service.visio.service import VisioService
 
 
@@ -23,25 +24,12 @@ def get_function_repository() -> IFunctionRepository:
 
 class IVisioService(Protocol):
     def create_node(
-        self,
-        object_id: int,
-        object_type: str,
-        object_name: str,
-        model_id: int,
+        self, object_id: int, object_name: str, node_type: NodeTypesEnum, model_id: int
     ) -> int: ...
 
-    def update_node(
-        self,
-        object_id: int,
-        object_type: str,
-        object_name: str,
-    ) -> None: ...
-
-    def delete_node(
-        self,
-        object_id: int,
-        object_type: str,
-    ) -> None: ...
+    def update_node_name(
+        self, object_id: int, object_name: str, node_type: NodeTypesEnum
+    ) -> int: ...
 
 
 def get_visio_service() -> IVisioService:

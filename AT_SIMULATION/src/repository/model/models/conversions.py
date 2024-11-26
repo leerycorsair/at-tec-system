@@ -11,7 +11,7 @@ def to_ModelMetaDB(model: Model) -> ModelMetaDB:
     )
 
 
-def to_Model(model) -> Model:
+def to_Model(model: ModelMetaDB) -> Model:
     return Model(
         name=model.name,
         user_id=model.user_id,

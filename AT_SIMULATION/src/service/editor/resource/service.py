@@ -2,6 +2,7 @@ from typing import List
 from fastapi import Depends
 
 from src.repository.editor.resource.models.models import ResourceDB, ResourceTypeDB
+from src.repository.visio.models.models import NodeTypesEnum
 from src.service.editor.resource.dependencies import (
     IResourceRepository,
     IVisioService,
@@ -9,9 +10,6 @@ from src.service.editor.resource.dependencies import (
     get_visio_service,
 )
 from src.service.helpers import handle_rollback
-
-_resource_type_prefix = "resource_type"
-_resource_prefix = "resource"
 
 
 class ResourceService:
@@ -47,8 +45,8 @@ class ResourceService:
         with handle_rollback(self._resource_rep.delete_resource_type, obj_id):
             self._visio_service.create_node(
                 obj_id,
-                _resource_type_prefix,
                 resource_type.name,
+                NodeTypesEnum.RESOURCE_TYPE,
                 resource_type.model_id,
             )
 
@@ -69,8 +67,8 @@ class ResourceService:
         with handle_rollback(
             self._resource_rep.update_resource_type, original_resource_type
         ):
-            self._visio_service.update_node(
-                obj_id, _resource_type_prefix, resource_type.name
+            self._visio_service.update_node_name(
+                obj_id, resource_type.name, NodeTypesEnum.RESOURCE_TYPE
             )
 
         return obj_id
@@ -85,19 +83,21 @@ class ResourceService:
         with handle_rollback(self._resource_rep.delete_resource, obj_id):
             resource_node_id = self._visio_service.create_node(
                 obj_id,
-                _resource_prefix,
                 resource.name,
+                NodeTypesEnum.RESOURCE,
                 resource.model_id,
             )
 
-        resource_type_node_id = self._visio_service.get_node_id(
-            resource.resource_type_id, _resource_type_prefix
+        resource_type_node = self._visio_service.get_node(
+            resource.resource_type_id, NodeTypesEnum.RESOURCE_TYPE
         )
 
-        with handle_rollback(self._visio_service.delete_node, obj_id, _resource_prefix):
+        with handle_rollback(
+            self._visio_service.delete_node, obj_id, NodeTypesEnum.RESOURCE
+        ):
             with handle_rollback(self._resource_rep.delete_resource, obj_id):
                 self._visio_service.create_edge(
-                    resource_type_node_id, resource_node_id, resource.model_id
+                    resource_type_node.id, resource_node_id, resource.model_id
                 )
 
         return obj_id
@@ -115,7 +115,9 @@ class ResourceService:
         obj_id = self._resource_rep.update_resource(resource)
 
         with handle_rollback(self._resource_rep.update_resource, original_resource):
-            self._visio_service.update_node(obj_id, _resource_prefix, resource.name)
+            self._visio_service.update_node_name(
+                obj_id, resource.name, NodeTypesEnum.RESOURCE
+            )
 
         return obj_id
 

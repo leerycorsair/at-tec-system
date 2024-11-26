@@ -7,6 +7,7 @@ from src.repository.editor.template.models.models import (
     TemplateUsageDB,
 )
 from src.repository.editor.template.repository import TemplateRepository
+from src.repository.visio.models.models import NodeDB, NodeTypesEnum
 from src.service.visio.service import VisioService
 
 
@@ -56,34 +57,18 @@ def get_template_repository() -> ITemplateRepository:
 
 class IVisioService(Protocol):
     def create_node(
-        self,
-        object_id: int,
-        object_type: str,
-        object_name: str,
-        model_id: int,
+        self, object_id: int, object_name: str, node_type: NodeTypesEnum, model_id: int
     ) -> int: ...
 
-    def update_node(
-        self,
-        object_id: int,
-        object_type: str,
-        object_name: str,
-    ) -> None: ...
+    def update_node_name(
+        self, object_id: int, object_name: str, node_type: NodeTypesEnum
+    ) -> int: ...
 
-    def get_node_id(self, object_id: int, object_type: str) -> int: ...
+    def get_node(self, object_id: int, node_type: NodeTypesEnum) -> NodeDB: ...
 
-    def delete_node(
-        self,
-        object_id: int,
-        object_type: str,
-    ) -> None: ...
+    def delete_node(self, object_id: int, node_type: NodeTypesEnum) -> int: ...
 
-    def create_edge(
-        self,
-        from_id: int,
-        to_id: int,
-        model_id: int,
-    ) -> None: ...
+    def create_edge(self, from_id: int, to_id: int, model_id: int) -> int: ...
 
 
 def get_visio_service() -> IVisioService:

@@ -9,6 +9,7 @@ from src.repository.editor.template.models.models import (
     RuleBodyDB,
     RuleDB,
     TemplateMetaDB,
+    TemplateTypeEnum,
     TemplateUsageArgumentDB,
     TemplateUsageDB,
 )
@@ -186,7 +187,7 @@ def to_TemplateMetaDB(
     return TemplateMetaDB(
         id=meta.id,
         name=meta.name,
-        type=meta.type,
+        type=TemplateTypeEnum(meta.type),
         rel_resources=[to_RelevantResourceDB(res) for res in rel_resources],
         model_id=meta.model_id,
     )

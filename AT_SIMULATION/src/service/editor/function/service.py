@@ -2,6 +2,7 @@ from typing import List
 
 from fastapi import Depends
 from src.repository.editor.function.models.models import FunctionDB
+from src.repository.visio.models.models import NodeTypesEnum
 from src.service.editor.function.dependencies import (
     IFunctionRepository,
     IVisioService,
@@ -9,9 +10,6 @@ from src.service.editor.function.dependencies import (
     get_visio_service,
 )
 from src.service.helpers import handle_rollback
-
-
-_function_prefix = "function"
 
 
 class FunctionService:
@@ -36,8 +34,8 @@ class FunctionService:
         with handle_rollback(self._function_rep.delete_function, obj_id):
             self._visio_service.create_node(
                 obj_id,
-                _function_prefix,
                 function.name,
+                NodeTypesEnum.FUNCTION,
                 function.model_id,
             )
 
@@ -56,10 +54,10 @@ class FunctionService:
         obj_id = self._function_rep.update_function(function)
 
         with handle_rollback(self.update_function, original_function):
-            self._visio_service.update_node(
+            self._visio_service.update_node_name(
                 obj_id,
-                _function_prefix,
                 function.name,
+                NodeTypesEnum.FUNCTION,
             )
 
         return obj_id

@@ -1,3 +1,4 @@
+from enum import Enum
 from pydantic import BaseModel
 from typing import List
 
@@ -8,11 +9,15 @@ class RelevantResourceDB(BaseModel):
     template_id: int
     resource_type_id: int
 
+class TemplateTypeEnum(str, Enum):
+    IRREGULAR_EVENT = "irregular_event"
+    OPERATION = "operation"
+    RULE = "rule"
 
 class TemplateMetaDB(BaseModel):
     id: int
     name: str
-    type: str
+    type: TemplateTypeEnum
     rel_resources: List[RelevantResourceDB]
     model_id: int
 

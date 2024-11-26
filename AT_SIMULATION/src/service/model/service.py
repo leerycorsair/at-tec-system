@@ -21,6 +21,7 @@ class ModelService:
         return self._model_rep.create_model(model)
 
     def get_models(self, user_id: int) -> List[ModelMetaDB]:
+        print(self._model_rep)
         return self._model_rep.get_models(user_id)
 
     def update_model(self, model: ModelMetaDB) -> int:
