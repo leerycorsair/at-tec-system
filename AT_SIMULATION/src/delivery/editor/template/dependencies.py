@@ -1,10 +1,16 @@
 from typing import List, Protocol
 
+from fastapi import Depends
+
 from src.repository.editor.template.models.models import (
     IrregularEventDB,
     OperationDB,
     RuleDB,
     TemplateUsageDB,
+)
+from src.service.editor.template.dependencies import (
+    get_template_repository,
+    get_visio_service,
 )
 from src.service.editor.template.models.models import Templates
 from src.service.editor.template.service import TemplateService
@@ -48,7 +54,8 @@ class ITemplateService(Protocol):
     def delete_template_usage(self, template_usage_id: int, model_id: int) -> int: ...
 
 
-def get_template_service() -> ITemplateService:
-    return TemplateService()
-
-
+def get_template_service(
+    template_rep=Depends(get_template_repository),
+    visio_service=Depends(get_visio_service),
+) -> ITemplateService:
+    return TemplateService(template_rep, visio_service)

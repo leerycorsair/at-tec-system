@@ -1,9 +1,15 @@
 from typing import List, Protocol
 
+from fastapi import Depends
+
 from src.repository.editor.resource.models.models import ResourceDB, ResourceTypeDB
 from src.repository.editor.resource.repository import ResourceRepository
 from src.repository.visio.models.models import NodeDB, NodeTypesEnum
+from src.service.visio.dependencies import get_visio_repository
 from src.service.visio.service import VisioService
+from sqlalchemy.orm import Session
+
+from src.storage.postgres.session import get_db
 
 
 class IResourceRepository(Protocol):
@@ -28,8 +34,8 @@ class IResourceRepository(Protocol):
     def delete_resource(self, resource_id: int) -> int: ...
 
 
-def get_resource_repository() -> IResourceRepository:
-    return ResourceRepository()
+def get_resource_repository(session: Session = Depends(get_db)) -> IResourceRepository:
+    return ResourceRepository(session)
 
 
 class IVisioService(Protocol):
@@ -48,5 +54,5 @@ class IVisioService(Protocol):
     def create_edge(self, from_id: int, to_id: int, model_id: int) -> int: ...
 
 
-def get_visio_service() -> IVisioService:
-    return VisioService()
+def get_visio_service(visio_rep=Depends(get_visio_repository)) -> IVisioService:
+    return VisioService(visio_rep)

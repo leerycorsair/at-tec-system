@@ -1,13 +1,10 @@
 from typing import List
 
-from fastapi import Depends
 from src.repository.editor.function.models.models import FunctionDB
 from src.repository.visio.models.models import NodeTypesEnum
 from src.service.editor.function.dependencies import (
     IFunctionRepository,
     IVisioService,
-    get_function_repository,
-    get_visio_service,
 )
 from src.service.helpers import handle_rollback
 
@@ -15,8 +12,8 @@ from src.service.helpers import handle_rollback
 class FunctionService:
     def __init__(
         self,
-        function_rep: IFunctionRepository = Depends(get_function_repository),
-        visio_service: IVisioService = Depends(get_visio_service),
+        function_rep: IFunctionRepository,
+        visio_service: IVisioService,
     ) -> None:
         self._function_rep = function_rep
         self._visio_service = visio_service

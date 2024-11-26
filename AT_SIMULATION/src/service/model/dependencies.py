@@ -2,6 +2,7 @@ from typing import List, Protocol
 
 from fastapi import Depends
 
+from sqlalchemy.orm import Session
 from src.repository.model.models.models import ModelMetaDB
 from src.repository.model.repository import ModelRepository
 from src.storage.postgres.session import get_db
@@ -19,5 +20,5 @@ class IModelRepository(Protocol):
     def delete_model(self, model_id: int) -> int: ...
 
 
-def get_model_repository(session = Depends(get_db)) -> IModelRepository:
+def get_model_repository(session: Session = Depends(get_db)) -> IModelRepository:
     return ModelRepository(session)

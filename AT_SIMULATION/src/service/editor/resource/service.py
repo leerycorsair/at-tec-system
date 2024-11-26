@@ -1,13 +1,10 @@
 from typing import List
-from fastapi import Depends
 
 from src.repository.editor.resource.models.models import ResourceDB, ResourceTypeDB
 from src.repository.visio.models.models import NodeTypesEnum
 from src.service.editor.resource.dependencies import (
     IResourceRepository,
     IVisioService,
-    get_resource_repository,
-    get_visio_service,
 )
 from src.service.helpers import handle_rollback
 
@@ -15,8 +12,8 @@ from src.service.helpers import handle_rollback
 class ResourceService:
     def __init__(
         self,
-        resource_rep: IResourceRepository = Depends(get_resource_repository),
-        visio_service: IVisioService = Depends(get_visio_service),
+        resource_rep: IResourceRepository,
+        visio_service: IVisioService,
     ) -> None:
         self._resource_rep = resource_rep
         self._visio_service = visio_service

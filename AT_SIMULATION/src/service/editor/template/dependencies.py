@@ -1,4 +1,6 @@
 from typing import List, Protocol
+
+from fastapi import Depends
 from src.repository.editor.template.models.models import (
     IrregularEventDB,
     OperationDB,
@@ -8,7 +10,11 @@ from src.repository.editor.template.models.models import (
 )
 from src.repository.editor.template.repository import TemplateRepository
 from src.repository.visio.models.models import NodeDB, NodeTypesEnum
+from src.service.visio.dependencies import get_visio_repository
 from src.service.visio.service import VisioService
+from sqlalchemy.orm import Session
+
+from src.storage.postgres.session import get_db
 
 
 class ITemplateRepository(Protocol):
@@ -51,8 +57,8 @@ class ITemplateRepository(Protocol):
     def delete_template_usage(self, template_usage_id: int) -> int: ...
 
 
-def get_template_repository() -> ITemplateRepository:
-    return TemplateRepository()
+def get_template_repository(session: Session = Depends(get_db)) -> ITemplateRepository:
+    return TemplateRepository(session)
 
 
 class IVisioService(Protocol):
@@ -71,5 +77,5 @@ class IVisioService(Protocol):
     def create_edge(self, from_id: int, to_id: int, model_id: int) -> int: ...
 
 
-def get_visio_service() -> IVisioService:
-    return VisioService()
+def get_visio_service(visio_rep=Depends(get_visio_repository)) -> IVisioService:
+    return VisioService(visio_rep)

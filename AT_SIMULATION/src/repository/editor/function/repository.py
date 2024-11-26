@@ -1,5 +1,4 @@
 from typing import List
-from fastapi import Depends
 from sqlalchemy.orm import Session
 
 from src.repository.editor.function.models.conversions import (
@@ -8,13 +7,12 @@ from src.repository.editor.function.models.conversions import (
     to_FunctionParameter,
 )
 from src.repository.helper import handle_sqlalchemy_errors
-from src.storage.postgres.session import get_db
 from src.repository.editor.function.models.models import FunctionDB
 from src.schema.function import Function, FunctionParameter
 
 
 class FunctionRepository:
-    def __init__(self, db_session: Session = Depends(get_db)):
+    def __init__(self, db_session: Session):
         self.db_session = db_session
 
     @handle_sqlalchemy_errors

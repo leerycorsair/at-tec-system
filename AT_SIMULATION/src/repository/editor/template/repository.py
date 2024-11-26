@@ -1,5 +1,4 @@
 from typing import Callable, List, Optional, Tuple, Any, TypeVar
-from fastapi import Depends
 from sqlalchemy.orm import Session
 
 from src.repository.editor.template.models.conversions import (
@@ -26,7 +25,6 @@ from src.repository.editor.template.models.models import (
     TemplateMetaDB,
     TemplateUsageDB,
 )
-from src.store.postgres.session import get_db
 from src.schema.template import (
     RelevantResource,
     Template,
@@ -43,7 +41,7 @@ T = TypeVar("T", IrregularEventDB, OperationDB, RuleDB)
 
 
 class TemplateRepository:
-    def __init__(self, db_session: Session = Depends(get_db)):
+    def __init__(self, db_session: Session):
         self.db_session = db_session
 
     def create_irregular_event(self, template: IrregularEventDB) -> int:

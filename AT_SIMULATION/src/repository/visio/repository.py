@@ -1,5 +1,4 @@
 from typing import List
-from fastapi import Depends
 from sqlalchemy.orm import Session
 
 
@@ -12,11 +11,10 @@ from src.repository.visio.models.conversions import (
 )
 from src.repository.visio.models.models import EdgeDB, NodeDB, NodeTablesEnum
 from src.schema.visio import Edge, Node
-from src.storage.postgres.session import get_db
 
 
 class VisioRepository:
-    def __init__(self, db_session: Session = Depends(get_db)):
+    def __init__(self, db_session: Session):
         self.db_session = db_session
 
     @handle_sqlalchemy_errors

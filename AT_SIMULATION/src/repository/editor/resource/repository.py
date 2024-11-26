@@ -1,5 +1,4 @@
 from typing import List
-from fastapi import Depends
 from sqlalchemy.orm import Session
 
 from src.repository.editor.resource.models.conversions import (
@@ -21,11 +20,9 @@ from src.schema.resource import (
     Resource,
     ResourceAttribute,
 )
-from src.store.postgres.session import get_db
-
 
 class ResourceRepository:
-    def __init__(self, db_session: Session = Depends(get_db)):
+    def __init__(self, db_session: Session):
         self.db_session = db_session
 
     @handle_sqlalchemy_errors

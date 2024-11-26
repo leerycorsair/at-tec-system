@@ -1,15 +1,14 @@
-from fastapi import Depends
 from src.repository.visio.models.conversions import to_NodeTablesEnum_from_node_type
 from src.repository.visio.models.models import NodeDB, NodeTypesEnum
 from src.service.visio.conversions import to_EdgeDB, to_NodeDB
-from src.service.visio.dependencies import IVisioRepository, get_visio_repository
+from src.service.visio.dependencies import IVisioRepository
 
 
 class VisioService:
 
     def __init__(
         self,
-        visio_rep: IVisioRepository = Depends(get_visio_repository),
+        visio_rep: IVisioRepository,
     ) -> None:
         self._visio_rep = visio_rep
 

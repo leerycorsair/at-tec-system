@@ -1,5 +1,4 @@
 from typing import List
-from fastapi import Depends
 from src.repository.editor.template.models.models import (
     IrregularEventDB,
     OperationDB,
@@ -11,8 +10,6 @@ from src.repository.visio.models.models import NodeTypesEnum
 from src.service.editor.template.dependencies import (
     ITemplateRepository,
     IVisioService,
-    get_template_repository,
-    get_visio_service,
 )
 from src.service.editor.template.models.models import Templates
 from src.service.helpers import handle_rollback
@@ -33,8 +30,8 @@ class TemplateService:
 
     def __init__(
         self,
-        template_rep: ITemplateRepository = Depends(get_template_repository),
-        visio_service: IVisioService = Depends(get_visio_service),
+        template_rep: ITemplateRepository,
+        visio_service: IVisioService,
     ) -> None:
         self._template_rep = template_rep
         self._visio_service = visio_service
