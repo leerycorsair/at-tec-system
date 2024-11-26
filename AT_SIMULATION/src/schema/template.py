@@ -14,9 +14,9 @@ import enum
 
 
 class TemplateTypeEnum(enum.Enum):
-    IRREGULAR_EVENT = "irregular_event"
-    OPERATION = "operation"
-    RULE = "rule"
+    IRREGULAR_EVENT = "IRREGULAR_EVENT"
+    OPERATION = "OPERATION"
+    RULE = "RULE"
 
 
 class Template(Base):
@@ -97,13 +97,12 @@ class IrregularEventBody(Base):
 
 
 class IrregularEventGeneratorTypeEnum(enum.Enum):
-    NORMAL = "normal"
-    PRECISE = "precise"
-    RANDOM = "random"
-    UNIFORM = "uniform"
-    EXPONENTIAL = "exponential"
-    GAUSSIAN = "gaussian"
-    POISSON = "poisson"
+    NORMAL = "NORMAL"
+    PRECISE = "PRECISE"
+    UNIFORM = "UNIFORM"
+    EXPONENTIAL = "EXPONENTIAL"
+    GAUSSIAN = "GAUSSIAN"
+    POISSON = "POISSON"
 
 
 class IrregularEventGenerator(Base):

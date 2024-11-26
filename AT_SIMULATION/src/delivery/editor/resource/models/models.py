@@ -4,10 +4,10 @@ from typing import List, Optional, Union
 
 
 class BaseTypesEnum(Enum):
-    INT = "int"
-    FLOAT = "float"
-    BOOL = "bool"
-    ENUM = "enum"
+    INT = "INT"
+    FLOAT = "FLOAT"
+    BOOL = "BOOL"
+    ENUM = "ENUM"
 
 
 class ResourceTypeAttributeRequest(BaseModel):
@@ -23,8 +23,8 @@ class ResourceTypeAttributeResponse(ResourceTypeAttributeRequest):
 
 
 class ResourceTypeTypesEnum(Enum):
-    CONSTANT = "constant"
-    TEMPORAL = "temporal"
+    CONSTANT = "CONSTANT"
+    TEMPORAL = "TEMPORAL"
 
 
 class ResourceTypeRequest(BaseModel):

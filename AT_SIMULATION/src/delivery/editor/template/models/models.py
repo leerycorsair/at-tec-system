@@ -66,12 +66,12 @@ class IrregularEventBody(BaseModel):
 
 
 class GeneratorTypeEnum(str, Enum):
-    NORMAL = "normal"
-    PRECISE = "precise"
-    UNIFORM = "uniform"
-    EXPONENTIAL = "exponential"
-    GAUSSIAN = "gaussian"
-    POISSON = "poisson"
+    NORMAL = "NORMAL"
+    PRECISE = "PRECISE"
+    UNIFORM = "UNIFORM"
+    EXPONENTIAL = "EXPONENTIAL"
+    GAUSSIAN = "GAUSSIAN"
+    POISSON = "POISSON"
 
 
 class IrregularEventGenerator(BaseModel):

@@ -11,6 +11,7 @@ from src.repository.visio.models.conversions import (
 )
 from src.repository.visio.models.models import EdgeDB, NodeDB, NodeTablesEnum
 from src.schema.visio import Edge, Node
+from src.storage.postgres.session import session_scope
 
 
 class VisioRepository:
@@ -19,20 +20,19 @@ class VisioRepository:
 
     @handle_sqlalchemy_errors
     def create_node(self, node: NodeDB) -> int:
-        with self.db_session.begin():
+        with session_scope(self.db_session) as session:
             new_node = to_Node(node)
-            self.db_session.add(new_node)
-            self.db_session.flush()
+            session.add(new_node)
+            session.flush()
 
         return new_node.id
 
     @handle_sqlalchemy_errors
     def update_node(self, node: NodeDB) -> int:
-        with self.db_session.begin():
+        with session_scope(self.db_session) as session:
             existing_node = self._get_node(node.object_table, node.object_id)
             if not existing_node:
                 raise RuntimeError("Node not found")
-
             existing_node.object_name = node.object_name
             existing_node.node_type = node.node_type
             existing_node.pos_x = node.pos_x
@@ -40,7 +40,7 @@ class VisioRepository:
             existing_node.height = node.height
             existing_node.width = node.width
             existing_node.color = node.color
-
+            session.commit()
         return existing_node.id
 
     @handle_sqlalchemy_errors
@@ -49,12 +49,11 @@ class VisioRepository:
 
     @handle_sqlalchemy_errors
     def delete_node(self, object_table: NodeTablesEnum, object_id: int) -> int:
-        with self.db_session.begin():
+        with session_scope(self.db_session) as session:
             node = self._get_node(object_table, object_id)
             if not node:
                 raise RuntimeError("Node not found")
-
-            self.db_session.delete(node)
+            session.delete(node)
         return node.id
 
     @handle_sqlalchemy_errors
@@ -66,10 +65,10 @@ class VisioRepository:
 
     @handle_sqlalchemy_errors
     def create_edge(self, edge: EdgeDB) -> int:
-        with self.db_session.begin():
+        with session_scope(self.db_session) as session:
             new_edge = to_Edge(edge)
-            self.db_session.add(new_edge)
-            self.db_session.flush()
+            session.add(new_edge)
+            session.flush()
         return new_edge.id
 
     @handle_sqlalchemy_errors
@@ -80,8 +79,11 @@ class VisioRepository:
         return edges_db
 
     def _get_node(self, object_table: NodeTablesEnum, object_id: int) -> Node:
-        return (
+        node = (
             self.db_session.query(Node)
             .filter(Node.object_table == object_table and Node.object_id == object_id)
             .first()
         )
+        if not node:
+            raise ValueError("Node does not exist")
+        return node

@@ -15,15 +15,15 @@ class NodeTablesEnum(Enum):
 
 
 class NodeTypesEnum(str, Enum):
-    RESOURCE_TYPE = "resource_type"
-    RESOURCE = "resource"
-    FUNCTION = "function"
-    IRREGULAR_EVENT_U = "irregular_event_usage"
-    IRREGULAR_EVENT_T = "irregular_event_template"
-    OPERATION_U = "operation_usage"
-    OPERATION_T = "operation_template"
-    RULE_U = "rule_usage"
-    RULE_T = "rule_template"
+    RESOURCE_TYPE = "RESOURCE_TYPE"
+    RESOURCE = "RESOURCE"
+    FUNCTION = "FUNCTION"
+    IRREGULAR_EVENT_U = "IRREGULAR_EVENT_USAGE"
+    IRREGULAR_EVENT_T = "IRREGULAR_EVENT_TEMPLATE"
+    OPERATION_U = "OPERATION_USAGE"
+    OPERATION_T = "OPERATION_TEMPLATE"
+    RULE_U = "RULE_USAGE"
+    RULE_T = "RULE_TEMPLATE"
 
 
 class NodeDB(BaseModel):

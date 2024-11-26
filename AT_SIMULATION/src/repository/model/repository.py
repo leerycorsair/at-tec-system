@@ -5,7 +5,6 @@ from src.repository.helper import handle_sqlalchemy_errors
 from src.repository.model.models.conversions import to_Model, to_ModelMetaDB
 from src.repository.model.models.models import ModelMetaDB
 from src.schema.model import Model
-from src.storage.postgres.session import session_scope
 
 
 class ModelRepository:
@@ -14,10 +13,10 @@ class ModelRepository:
 
     @handle_sqlalchemy_errors
     def create_model(self, model: ModelMetaDB) -> int:
-        with session_scope(self.db_session) as session:
-            new_model = to_Model(model)
-            session.add(new_model)
-            session.refresh(new_model)
+        new_model = to_Model(model)
+        self.db_session.add(new_model)
+        self.db_session.commit()
+        self.db_session.refresh(new_model)
         return new_model.id
 
     @handle_sqlalchemy_errors
@@ -32,20 +31,16 @@ class ModelRepository:
 
     @handle_sqlalchemy_errors
     def update_model(self, model: ModelMetaDB) -> int:
-        with session_scope(self.db_session) as session:
-            model = self._get_model_by_id(model.id)
-            model.name = model.name
-            session.commit()
-        return model.id
+        existing_model = self._get_model_by_id(model.id)
+        existing_model.name = model.name  
+        self.db_session.commit()
+        return existing_model.id
 
     @handle_sqlalchemy_errors
     def delete_model(self, model_id: int) -> int:
-        with session_scope(self.db_session) as session:
-            model = self._get_model_by_id(model_id)
-            if model:
-                session.delete(model)
-            else:
-                raise ValueError(f"Model with id {model_id} not found.")
+        model = self._get_model_by_id(model_id)
+        self.db_session.delete(model)
+        self.db_session.commit()
         return model_id
 
     def _get_model_by_id(self, model_id: int) -> Model:

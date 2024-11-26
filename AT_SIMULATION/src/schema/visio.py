@@ -21,18 +21,18 @@ import enum
 
 
 class NodeType(enum.Enum):
-    RESOURCE = "resource"
-    RESOURCE_TYPE = "resource_type"
-    FUNCTION = "function"
+    RESOURCE = "RESOURCE"
+    RESOURCE_TYPE = "RESOURCE_TYPE"
+    FUNCTION = "FUNCTION"
 
-    RULE_TEMPLATE = "rule_template"
-    RULE_TEMPLATE_USAGE = "rule_template_usage"
+    RULE_TEMPLATE = "RULE_TEMPLATE"
+    RULE_TEMPLATE_USAGE = "RULE_TEMPLATE_USAGE"
 
-    OPERATION_TEMPLATE = "operation_template"
-    OPERATION_TEMPLATE_USAGE = "operation_template_usage"
+    OPERATION_TEMPLATE = "OPERATION_TEMPLATE"
+    OPERATION_TEMPLATE_USAGE = "OPERATION_TEMPLATE_USAGE"
 
-    IRREGULAR_TEMPLATE = "irregular_template"
-    IRREGULAR_TEMPLATE_USAGE = "irregular_template_usage"
+    IRREGULAR_TEMPLATE = "IRREGULAR_TEMPLATE"
+    IRREGULAR_TEMPLATE_USAGE = "IRREGULAR_TEMPLATE_USAGE"
 
 
 class TableType(enum.Enum):
@@ -40,14 +40,14 @@ class TableType(enum.Enum):
     RESOURCE_TYPES = "resource_types"
     FUNCTIONS = "functions"
     TEMPLATES = "templates"
-    TEMPLATE_USAGES = "tempalate_usages"
+    TEMPLATE_USAGES = "template_usages"
 
 
 class Node(Base):
     __tablename__ = "nodes"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    object_table = Column(Enum(TableType), nullable=False)
+    object_table = Column(String, nullable=False)
     object_name = Column(String, nullable=False)
     object_id = Column(Integer, nullable=False)
     node_type = Column(Enum(NodeType), nullable=False)

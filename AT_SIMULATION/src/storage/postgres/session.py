@@ -5,8 +5,20 @@ from typing import Generator
 from contextlib import contextmanager
 
 
-engine = create_engine(PostgresStore.get_database_config().url, echo=False)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+engine = create_engine(PostgresStore.get_database_config().url, echo=True)
+SessionLocal = sessionmaker(autoflush=False, bind=engine)
+
+
+def get_db() -> Generator[Session, None, None]:
+    db = SessionLocal()
+    try:
+        yield db
+        db.commit()
+    except Exception as e:
+        db.rollback()
+        raise e
+    finally:
+        db.close()
 
 
 @contextmanager
@@ -19,14 +31,6 @@ def session_scope(session: Session):
         raise
     finally:
         session.close()
-
-
-def get_db() -> Generator[Session, None, None]:
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 
 def dispose_engine():

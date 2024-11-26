@@ -15,8 +15,8 @@ from src.schema.base import Base
 
 
 class ResourceTypeTypeEnum(enum.Enum):
-    CONSTANT = "constant"
-    TEMPORAL = "temporal"
+    CONSTANT = "CONSTANT"
+    TEMPORAL = "TEMPORAL"
 
 
 class ResourceType(Base):
