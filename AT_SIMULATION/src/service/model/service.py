@@ -1,14 +1,13 @@
 from typing import List
-from fastapi import Depends
 
 from src.repository.model.models.models import ModelMetaDB
-from src.service.model.dependencies import IModelRepository, get_model_repository
+from src.service.model.dependencies import IModelRepository
 
 
 class ModelService:
     def __init__(
         self,
-        model_rep: IModelRepository = Depends(get_model_repository),
+        model_rep: IModelRepository,
     ) -> None:
         self._model_rep = model_rep
 

@@ -8,7 +8,7 @@ from src.repository.editor.function.models.conversions import (
     to_FunctionParameter,
 )
 from src.repository.helper import handle_sqlalchemy_errors
-from src.store.postgres.session import get_db
+from src.storage.postgres.session import get_db
 from src.repository.editor.function.models.models import FunctionDB
 from src.schema.function import Function, FunctionParameter
 
@@ -91,9 +91,12 @@ class FunctionRepository:
         return function_id
 
     def _get_function_by_id(self, function_id: int) -> Function:
-        return (
+        function = (
             self.db_session.query(Function).filter(Function.id == function_id).first()
         )
+        if not function:
+            raise ValueError("Function does not exist")
+        return function
 
     def _get_parameters_by_function_id(
         self, function_id: int

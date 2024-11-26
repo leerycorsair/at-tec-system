@@ -12,7 +12,7 @@ from src.repository.visio.models.conversions import (
 )
 from src.repository.visio.models.models import EdgeDB, NodeDB, NodeTablesEnum
 from src.schema.visio import Edge, Node
-from src.store.postgres.session import get_db
+from src.storage.postgres.session import get_db
 
 
 class VisioRepository:

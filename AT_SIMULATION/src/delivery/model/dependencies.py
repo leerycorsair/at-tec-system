@@ -7,6 +7,7 @@ from src.client.auth_client import AuthClientSingleton
 from src.repository.model.models.models import (
     ModelMetaDB,
 )
+from src.service.model.dependencies import IModelRepository, get_model_repository
 from src.service.model.service import ModelService
 
 
@@ -25,8 +26,8 @@ class IModelService(Protocol):
     def delete_model(self, model_id: int, user_id: int) -> int: ...
 
 
-def get_model_service() -> IModelService:
-    return ModelService()
+def get_model_service(model_rep:IModelRepository=Depends(get_model_repository)) -> IModelService:
+    return ModelService(model_rep)
 
 
 async def get_current_user(
@@ -46,7 +47,7 @@ async def get_current_user(
 async def get_current_model(
     model_id: int = Header(...),
     user_id: int = Depends(get_current_user),
-    model_service: IModelService = Depends(),
+    model_service: IModelService = Depends(get_model_service),
 ) -> int:
     if not model_id:
         raise HTTPException(status_code=400, detail="model_id header is missing")
