@@ -52,7 +52,7 @@ _object_tables = {
 
 
 def to_NodeTablesEnum_from_node_type(node_type: NodeTypesEnum) -> NodeTablesEnum:
-    return _object_tables.get(node_type)
+    return NodeTablesEnum(_object_tables.get(node_type))
 
 
 def to_NodeDB(node: Node) -> NodeDB:
@@ -74,7 +74,7 @@ def to_NodeDB(node: Node) -> NodeDB:
 def to_Edge(edge: EdgeDB) -> Edge:
     return Edge(
         from_node=edge.from_node,
-        no_node=edge.to_node,
+        to_node=edge.to_node,
         model_id=edge.model_id,
     )
 
