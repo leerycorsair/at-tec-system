@@ -35,14 +35,6 @@ class NodeType(enum.Enum):
     IRREGULAR_TEMPLATE_USAGE = "IRREGULAR_TEMPLATE_USAGE"
 
 
-class TableType(enum.Enum):
-    RESOURCES = "resources"
-    RESOURCE_TYPES = "resource_types"
-    FUNCTIONS = "functions"
-    TEMPLATES = "templates"
-    TEMPLATE_USAGES = "template_usages"
-
-
 class Node(Base):
     __tablename__ = "nodes"
 
