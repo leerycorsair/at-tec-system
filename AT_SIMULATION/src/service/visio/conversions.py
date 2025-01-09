@@ -52,8 +52,9 @@ def to_NodeDB(
 
 
 def to_EdgeDB(from_id: int, to_id: int, model_id: int) -> EdgeDB:
-    return to_EdgeDB(
-        from_id=from_id,
-        to_id=to_id,
+    return EdgeDB(
+        id=0,
+        from_node=from_id,
+        to_node=to_id,
         model_id=model_id,
     )
