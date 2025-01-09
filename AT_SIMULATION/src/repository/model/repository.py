@@ -15,8 +15,7 @@ class ModelRepository:
     def create_model(self, model: ModelMetaDB) -> int:
         new_model = to_Model(model)
         self.db_session.add(new_model)
-        self.db_session.commit()
-        self.db_session.refresh(new_model)
+        self.db_session.flush()
         return new_model.id
 
     @handle_sqlalchemy_errors
@@ -33,14 +32,12 @@ class ModelRepository:
     def update_model(self, model: ModelMetaDB) -> int:
         existing_model = self._get_model_by_id(model.id)
         existing_model.name = model.name  
-        self.db_session.commit()
         return existing_model.id
 
     @handle_sqlalchemy_errors
     def delete_model(self, model_id: int) -> int:
         model = self._get_model_by_id(model_id)
         self.db_session.delete(model)
-        self.db_session.commit()
         return model_id
 
     def _get_model_by_id(self, model_id: int) -> Model:
