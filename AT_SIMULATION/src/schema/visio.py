@@ -10,7 +10,7 @@ from sqlalchemy import (
 )
 
 from sqlalchemy.engine import Connection
-
+from sqlalchemy.orm import relationship
 from src.schema.function import Function
 from src.schema.resource import Resource, ResourceType
 from src.schema.template import Template, TemplateUsage
@@ -57,7 +57,20 @@ class Node(Base):
     height = Column(Integer, nullable=False)
     color = Column(String, nullable=False)
 
-    model_id = Column(Integer, ForeignKey("models.id"), nullable=False)
+    model_id = Column(
+        Integer, ForeignKey("models.id", ondelete="CASCADE"), nullable=False
+    )
+    
+    edges_from = relationship(
+        "Edge", 
+        cascade="all, delete-orphan", 
+        foreign_keys="[Edge.from_node]"
+    )
+    edges_to = relationship(
+        "Edge", 
+        cascade="all, delete-orphan", 
+        foreign_keys="[Edge.to_node]"
+    )
 
     __table_args__ = (
         UniqueConstraint(
@@ -92,6 +105,9 @@ class Edge(Base):
     from_node = Column(Integer, ForeignKey("nodes.id"), nullable=False)
     to_node = Column(Integer, ForeignKey("nodes.id"), nullable=False)
     model_id = Column(Integer, ForeignKey("models.id"), nullable=False)
+
+    from_node_relation = relationship("Node", foreign_keys=[from_node], cascade="all, delete")
+    to_node_relation = relationship("Node", foreign_keys=[to_node], cascade="all, delete")
 
     __table_args__ = (
         CheckConstraint(
