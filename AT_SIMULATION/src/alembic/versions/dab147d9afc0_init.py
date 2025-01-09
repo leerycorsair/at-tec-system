@@ -1,8 +1,8 @@
 """init
 
-Revision ID: 4feea5ff15f3
+Revision ID: dab147d9afc0
 Revises: 
-Create Date: 2024-11-26 23:01:40.719911
+Create Date: 2025-01-10 01:51:04.392057
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision: str = '4feea5ff15f3'
+revision: str = 'dab147d9afc0'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -31,7 +31,7 @@ def upgrade() -> None:
     )
     op.create_table('functions',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
-    sa.Column('name', sa.Integer(), nullable=False),
+    sa.Column('name', sa.String(), nullable=False),
     sa.Column('ret_type', sa.String(), nullable=False),
     sa.Column('body', sa.Text(), nullable=False),
     sa.Column('model_id', sa.Integer(), nullable=False),
@@ -41,7 +41,7 @@ def upgrade() -> None:
     )
     op.create_table('nodes',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
-    sa.Column('object_table', sa.Enum('RESOURCES', 'RESOURCE_TYPES', 'FUNCTIONS', 'TEMPLATES', 'TEMPLATE_USAGES', name='tabletype'), nullable=False),
+    sa.Column('object_table', sa.String(), nullable=False),
     sa.Column('object_name', sa.String(), nullable=False),
     sa.Column('object_id', sa.Integer(), nullable=False),
     sa.Column('node_type', sa.Enum('RESOURCE', 'RESOURCE_TYPE', 'FUNCTION', 'RULE_TEMPLATE', 'RULE_TEMPLATE_USAGE', 'OPERATION_TEMPLATE', 'OPERATION_TEMPLATE_USAGE', 'IRREGULAR_TEMPLATE', 'IRREGULAR_TEMPLATE_USAGE', name='nodetype'), nullable=False),
