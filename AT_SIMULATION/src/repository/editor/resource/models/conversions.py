@@ -82,7 +82,7 @@ def to_ResourceAttribute(
     return ResourceAttribute(
         value=attr.value,
         resource_id=resource_id,
-        rta_id=attr.id,
+        rta_id=attr.rta_id,
     )
 
 
