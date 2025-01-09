@@ -17,18 +17,18 @@ class FunctionRepository:
 
     @handle_sqlalchemy_errors
     def create_function(self, function: FunctionDB) -> int:
-        with self.db_session.begin():
-            new_function = to_Function(function)
+        new_function = to_Function(function)
 
-            self.db_session.add(new_function)
-            self.db_session.flush()
+        self.db_session.add(new_function)
+        self.db_session.flush()
 
-            new_function_parameters = [
-                to_FunctionParameter(param, new_function.id)
-                for param in function.params
-            ]
+        new_function_parameters = [
+            to_FunctionParameter(param, new_function.id)
+            for param in function.params
+        ]
 
-            self.db_session.add_all(new_function_parameters)
+        self.db_session.add_all(new_function_parameters)
+        
         return new_function.id
 
     @handle_sqlalchemy_errors
@@ -53,29 +53,34 @@ class FunctionRepository:
 
     @handle_sqlalchemy_errors
     def update_function(self, function: FunctionDB) -> int:
-        with self.db_session.begin():
-            existing_function = self._get_function_by_id(function.id)
-            if not existing_function:
-                raise RuntimeError("Function not found")
+        existing_function = self._get_function_by_id(function.id)
+        if not existing_function:
+            raise RuntimeError("Function not found")
 
-            existing_function.name = function.name
-            existing_function.ret_type = function.ret_type
-            existing_function.body = function.body
-            existing_function.model_id = function.model_id
+        existing_function.name = function.name
+        existing_function.ret_type = function.ret_type
+        existing_function.body = function.body
+        existing_function.model_id = function.model_id
 
-            existing_parameters = {
-                param.id: param
-                for param in self.db_session.query(FunctionParameter)
-                .filter(FunctionParameter.function_id == function.id)
-                .all()
-            }
+        existing_parameters = {
+            param.id: param
+            for param in self.db_session.query(FunctionParameter)
+            .filter(FunctionParameter.function_id == function.id)
+            .all()
+        }
+        existing_parameter_ids = set(existing_parameters.keys())  
 
-            for param in function.params:
-                if param.id in existing_parameters:
-                    existing_parameters[param.id].name = param.name
-                    existing_parameters[param.id].type = param.type
-                else:
-                    self.db_session.add(to_FunctionParameter(param, function.id))
+        for param in function.params:
+            if param.id in existing_parameters:
+                existing_parameters[param.id].name = param.name
+                existing_parameters[param.id].type = param.type
+            else:
+                self.db_session.add(to_FunctionParameter(param, function.id))
+        
+        for param_id in existing_parameter_ids:
+            param_to_delete = existing_parameters[param_id]
+            self.db_session.delete(param_to_delete)
+                
         return function.id
 
     @handle_sqlalchemy_errors
@@ -86,6 +91,7 @@ class FunctionRepository:
                 raise RuntimeError("Function not found")
 
             self.db_session.delete(function)
+            
         return function_id
 
     def _get_function_by_id(self, function_id: int) -> Function:
