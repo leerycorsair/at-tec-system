@@ -110,16 +110,15 @@ class ResourceRepository:
 
     @handle_sqlalchemy_errors
     def create_resource(self, resource: ResourceDB) -> int:
-        with session_scope(self.db_session) as session:
-            new_resource = to_Resource(resource)
-            session.add(new_resource)
-            session.flush()
+        new_resource = to_Resource(resource)
+        self.db_session.add(new_resource)
+        self.db_session.flush()
 
-            new_resource_attributes = [
-                to_ResourceAttribute(attr, new_resource.id)
-                for attr in resource.attributes
-            ]
-            session.add_all(new_resource_attributes)
+        new_resource_attributes = [
+            to_ResourceAttribute(attr, new_resource.id)
+            for attr in resource.attributes
+        ]
+        self.db_session.add_all(new_resource_attributes)
             
         return new_resource.id
 
@@ -129,6 +128,7 @@ class ResourceRepository:
         if not resource:
             raise RuntimeError("Resource not found")
         attributes = self._get_attributes_by_resource_id(resource.id)
+        
         return to_ResourceDB(resource, attributes)
 
     @handle_sqlalchemy_errors
@@ -145,39 +145,37 @@ class ResourceRepository:
 
     @handle_sqlalchemy_errors
     def update_resource(self, resource: ResourceDB) -> int:
-        with session_scope(self.db_session) as session:
-            existing_resource = self._get_resource_by_id(resource.id)
-            if not existing_resource:
-                raise RuntimeError("Resource not found")
+        existing_resource = self._get_resource_by_id(resource.id)
+        if not existing_resource:
+            raise RuntimeError("Resource not found")
 
-            existing_resource.name = resource.name
-            existing_resource.to_be_traced = resource.to_be_traced
-            existing_resource.resource_type_id = resource.resource_type_id
-            existing_resource.model_id = resource.model_id
+        existing_resource.name = resource.name
+        existing_resource.to_be_traced = resource.to_be_traced
+        existing_resource.resource_type_id = resource.resource_type_id
+        existing_resource.model_id = resource.model_id
 
-            existing_attributes = {
-                attr.id: attr
-                for attr in session.query(ResourceAttribute)
-                .filter(ResourceAttribute.resource_id == resource.id)
-                .all()
-            }
+        existing_attributes = {
+            attr.id: attr
+            for attr in self.db_session.query(ResourceAttribute)
+            .filter(ResourceAttribute.resource_id == resource.id)
+            .all()
+        }
 
-            for attr in resource.attributes:
-                if attr.id in existing_attributes:
-                    existing_attributes[attr.id].value = attr.value
-                else:
-                    session.add(to_ResourceAttribute(attr, resource.id))
-            session.commit()
+        for attr in resource.attributes:
+            if attr.id in existing_attributes:
+                existing_attributes[attr.id].value = attr.value
+            else:
+                raise RuntimeError("Resource attribute not found")
 
         return resource.id
 
     @handle_sqlalchemy_errors
     def delete_resource(self, resource_id: int) -> int:
-        with session_scope(self.db_session) as session:
-            resource = self._get_resource_by_id(resource_id)
-            if not resource:
-                raise RuntimeError("Resource not found")
-            session.delete(resource)
+        resource = self._get_resource_by_id(resource_id)
+        if not resource:
+            raise RuntimeError("Resource not found")
+        self.db_session.delete(resource)
+            
         return resource_id
 
     def _get_resource_by_id(self, resource_id: int) -> Resource:
