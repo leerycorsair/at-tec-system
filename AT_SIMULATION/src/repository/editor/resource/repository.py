@@ -20,8 +20,6 @@ from src.schema.resource import (
     Resource,
     ResourceAttribute,
 )
-from src.storage.postgres.session import session_scope
-
 
 class ResourceRepository:
     def __init__(self, db_session: Session):
@@ -75,7 +73,6 @@ class ResourceRepository:
         existing_resource_type.type = resource_type.type
         existing_resource_type.model_id = resource_type.model_id
 
-        
         existing_attributes = {
             attr.id: attr
             for attr in self.db_session.query(ResourceTypeAttribute)
@@ -92,11 +89,11 @@ class ResourceRepository:
             else:
                 self.db_session.add(to_ResourceTypeAttribute(attr, resource_type.id))
             existing_attribute_ids.remove(attr.id)
-        
+
         for attr_id in existing_attribute_ids:
             attr_to_delete = existing_attributes[attr_id]
             self.db_session.delete(attr_to_delete)
-        
+
         return resource_type.id
 
     @handle_sqlalchemy_errors
@@ -105,7 +102,7 @@ class ResourceRepository:
         if not resource_type:
             raise RuntimeError("Resource type not found")
         self.db_session.delete(resource_type)
-        
+
         return resource_type_id
 
     @handle_sqlalchemy_errors
@@ -115,11 +112,10 @@ class ResourceRepository:
         self.db_session.flush()
 
         new_resource_attributes = [
-            to_ResourceAttribute(attr, new_resource.id)
-            for attr in resource.attributes
+            to_ResourceAttribute(attr, new_resource.id) for attr in resource.attributes
         ]
         self.db_session.add_all(new_resource_attributes)
-            
+
         return new_resource.id
 
     @handle_sqlalchemy_errors
@@ -128,7 +124,7 @@ class ResourceRepository:
         if not resource:
             raise RuntimeError("Resource not found")
         attributes = self._get_attributes_by_resource_id(resource.id)
-        
+
         return to_ResourceDB(resource, attributes)
 
     @handle_sqlalchemy_errors
@@ -175,7 +171,7 @@ class ResourceRepository:
         if not resource:
             raise RuntimeError("Resource not found")
         self.db_session.delete(resource)
-            
+
         return resource_id
 
     def _get_resource_by_id(self, resource_id: int) -> Resource:
