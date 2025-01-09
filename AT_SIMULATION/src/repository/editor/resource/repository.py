@@ -42,7 +42,7 @@ class ResourceRepository:
 
     @handle_sqlalchemy_errors
     def get_resource_type(self, resource_type_id: int) -> ResourceTypeDB:
-        resource_type = self._get_resource_by_id(resource_type_id)
+        resource_type = self._get_resource_type_by_id(resource_type_id)
         if not resource_type:
             raise RuntimeError("Resource type does not exist")
         attributes = self._get_attributes_by_resource_type_id(resource_type_id)
