@@ -9,6 +9,7 @@ from sqlalchemy import (
     UniqueConstraint,
 )
 from src.schema.base import Base
+from sqlalchemy.orm import relationship
 
 import enum
 
@@ -27,6 +28,14 @@ class Template(Base):
     type = Column(Enum(TemplateTypeEnum), nullable=False)
 
     model_id = Column(Integer, ForeignKey("models.id"), nullable=False)
+    relevant_resources = relationship("RelevantResource", cascade="all, delete")
+    template_usages = relationship("TemplateUsage", cascade="all, delete")
+    irregular_event_bodies = relationship("IrregularEventBody", cascade="all, delete")
+    irregular_event_generators = relationship(
+        "IrregularEventGenerator", cascade="all, delete"
+    )
+    operation_bodies = relationship("OperationBody", cascade="all, delete")
+    rule_bodies = relationship("RuleBody", cascade="all, delete")
 
     __table_args__ = (
         UniqueConstraint(

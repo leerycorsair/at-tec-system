@@ -1,15 +1,17 @@
 from sqlalchemy import Column, ForeignKey, Integer, String, Text, UniqueConstraint
 from src.schema.base import Base
+from sqlalchemy.orm import relationship
 
 
 class Function(Base):
     __tablename__ = "functions"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(Integer, nullable=False)
+    name = Column(String, nullable=False)
     ret_type = Column(String, nullable=False)
     body = Column(Text, nullable=False)
 
+    parameters = relationship("FunctionParameter", cascade="all, delete-orphan")
     model_id = Column(Integer, ForeignKey("models.id"), nullable=False)
 
     __table_args__ = (

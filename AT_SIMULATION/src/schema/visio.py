@@ -57,19 +57,13 @@ class Node(Base):
     height = Column(Integer, nullable=False)
     color = Column(String, nullable=False)
 
-    model_id = Column(
-        Integer, ForeignKey("models.id", ondelete="CASCADE"), nullable=False
-    )
-    
+    model_id = Column(Integer, ForeignKey("models.id"), nullable=False)
+
     edges_from = relationship(
-        "Edge", 
-        cascade="all, delete-orphan", 
-        foreign_keys="[Edge.from_node]"
+        "Edge", cascade="all, delete-orphan", foreign_keys="[Edge.from_node]"
     )
     edges_to = relationship(
-        "Edge", 
-        cascade="all, delete-orphan", 
-        foreign_keys="[Edge.to_node]"
+        "Edge", cascade="all, delete-orphan", foreign_keys="[Edge.to_node]"
     )
 
     __table_args__ = (
@@ -82,7 +76,7 @@ class Node(Base):
     )
 
 
-def delete_associated_node(connection: Connection, target):
+def delete_associated_node(mapper, connection: Connection, target):
     connection.execute(
         Node.__table__.delete()
         .where(Node.object_table == target.__tablename__)
@@ -106,8 +100,12 @@ class Edge(Base):
     to_node = Column(Integer, ForeignKey("nodes.id"), nullable=False)
     model_id = Column(Integer, ForeignKey("models.id"), nullable=False)
 
-    from_node_relation = relationship("Node", foreign_keys=[from_node], cascade="all, delete")
-    to_node_relation = relationship("Node", foreign_keys=[to_node], cascade="all, delete")
+    from_node_relation = relationship(
+        "Node", foreign_keys=[from_node], cascade="all, delete"
+    )
+    to_node_relation = relationship(
+        "Node", foreign_keys=[to_node], cascade="all, delete"
+    )
 
     __table_args__ = (
         CheckConstraint(

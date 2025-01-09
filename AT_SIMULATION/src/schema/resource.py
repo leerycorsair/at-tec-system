@@ -10,7 +10,7 @@ from sqlalchemy import (
     UniqueConstraint,
 )
 from sqlalchemy.dialects.postgresql import ARRAY
-
+from sqlalchemy.orm import relationship
 from src.schema.base import Base
 
 
@@ -26,6 +26,8 @@ class ResourceType(Base):
     name = Column(String, nullable=False)
     type = Column(Enum(ResourceTypeTypeEnum), nullable=False)
 
+    attributes = relationship("ResourceTypeAttribute", cascade="all, delete-orphan")
+    resources = relationship("Resource", cascade="all, delete-orphan")
     model_id = Column(Integer, ForeignKey("models.id"), nullable=False)
 
     __table_args__ = (
@@ -64,6 +66,7 @@ class Resource(Base):
     name = Column(String, nullable=False)
     to_be_traced = Column(Boolean, nullable=False)
 
+    attributes = relationship("ResourceAttribute", cascade="all, delete-orphan")
     resource_type_id = Column(Integer, ForeignKey("resource_types.id"), nullable=False)
     model_id = Column(Integer, ForeignKey("models.id"), nullable=False)
 
