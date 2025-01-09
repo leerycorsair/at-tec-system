@@ -67,39 +67,45 @@ class ResourceRepository:
 
     @handle_sqlalchemy_errors
     def update_resource_type(self, resource_type: ResourceTypeDB) -> int:
-        with session_scope(self.db_session) as session:
-            existing_resource_type = self._get_resource_type_by_id(resource_type.id)
-            if not existing_resource_type:
-                raise RuntimeError("Resource type not found")
+        existing_resource_type = self._get_resource_type_by_id(resource_type.id)
+        if not existing_resource_type:
+            raise RuntimeError("Resource type not found")
 
-            existing_resource_type.name = resource_type.name
-            existing_resource_type.type = resource_type.type
-            existing_resource_type.model_id = resource_type.model_id
+        existing_resource_type.name = resource_type.name
+        existing_resource_type.type = resource_type.type
+        existing_resource_type.model_id = resource_type.model_id
 
-            existing_attributes = {
-                attr.id: attr
-                for attr in session.query(ResourceTypeAttribute)
-                .filter(ResourceTypeAttribute.resource_type_id == resource_type.id)
-                .all()
-            }
+        
+        existing_attributes = {
+            attr.id: attr
+            for attr in self.db_session.query(ResourceTypeAttribute)
+            .filter(ResourceTypeAttribute.resource_type_id == resource_type.id)
+            .all()
+        }
+        existing_attribute_ids = set(existing_attributes.keys())
 
-            for attr in resource_type.attributes:
-                if attr.id in existing_attributes:
-                    existing_attributes[attr.id].name = attr.name
-                    existing_attributes[attr.id].type = attr.type
-                    existing_attributes[attr.id].default_value = attr.default_value
-                else:
-                    session.add(to_ResourceTypeAttribute(attr, resource_type.id))
-            session.commit()
+        for attr in resource_type.attributes:
+            if attr.id in existing_attributes:
+                existing_attributes[attr.id].name = attr.name
+                existing_attributes[attr.id].type = attr.type
+                existing_attributes[attr.id].default_value = attr.default_value
+            else:
+                self.db_session.add(to_ResourceTypeAttribute(attr, resource_type.id))
+            existing_attribute_ids.remove(attr.id)
+        
+        for attr_id in existing_attribute_ids:
+            attr_to_delete = existing_attributes[attr_id]
+            self.db_session.delete(attr_to_delete)
+        
         return resource_type.id
 
     @handle_sqlalchemy_errors
     def delete_resource_type(self, resource_type_id: int) -> int:
-        with session_scope(self.db_session) as session:
-            resource_type = self._get_resource_type_by_id(resource_type_id)
-            if not resource_type:
-                raise RuntimeError("Resource type not found")
-            session.delete(resource_type)
+        resource_type = self._get_resource_type_by_id(resource_type_id)
+        if not resource_type:
+            raise RuntimeError("Resource type not found")
+        self.db_session.delete(resource_type)
+        
         return resource_type_id
 
     @handle_sqlalchemy_errors
@@ -114,6 +120,7 @@ class ResourceRepository:
                 for attr in resource.attributes
             ]
             session.add_all(new_resource_attributes)
+            
         return new_resource.id
 
     @handle_sqlalchemy_errors
