@@ -227,7 +227,7 @@ async def delete_template(
         return InternalServiceError(e)
 
 
-@router.post("", response_model=CommonResponse[ObjectIDResponse | None])
+@router.post("/usages", response_model=CommonResponse[ObjectIDResponse | None])
 async def create_usage(
     body: TemplateUsageRequest,
     model_id: int = Depends(get_current_model),
@@ -245,7 +245,7 @@ async def create_usage(
         return InternalServiceError(e)
 
 
-@router.get("", response_model=CommonResponse[TemplateUsagesResponse | None])
+@router.get("/usages", response_model=CommonResponse[TemplateUsagesResponse | None])
 async def get_usages(
     model_id: int = Depends(get_current_model),
     template_service: ITemplateService = Depends(get_template_service),
@@ -258,7 +258,7 @@ async def get_usages(
         return InternalServiceError(e)
 
 
-@router.get("/{usage_id}", response_model=CommonResponse[TemplateUsageResponse | None])
+@router.get("/usages/{usage_id}", response_model=CommonResponse[TemplateUsageResponse | None])
 async def get_usage(
     usage_id: int,
     model_id: int = Depends(get_current_model),
@@ -274,7 +274,7 @@ async def get_usage(
         return InternalServiceError(e)
 
 
-@router.put("/{usage_id}", response_model=CommonResponse[ObjectIDResponse | None])
+@router.put("/usages/{usage_id}", response_model=CommonResponse[ObjectIDResponse | None])
 async def update_usage(
     body: TemplateUsageRequest,
     model_id: int = Depends(get_current_model),
@@ -292,7 +292,7 @@ async def update_usage(
         return InternalServiceError(e)
 
 
-@router.delete("/{usage_id}", response_model=CommonResponse[ObjectIDResponse | None])
+@router.delete("/usages/{usage_id}", response_model=CommonResponse[ObjectIDResponse | None])
 async def delete_usage(
     usage_id: int,
     model_id: int = Depends(get_current_model),
