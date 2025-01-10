@@ -111,26 +111,23 @@ class TemplateRepository:
 
     @handle_sqlalchemy_errors
     def delete_template(self, template_id: int) -> int:
-        with self.db_session.begin():
-            template_meta = (
-                self.db_session.query(Template)
-                .filter(Template.id == template_id)
-                .first()
-            )
-            if not template_meta:
-                raise RuntimeError("Template does not exist")
+        template_meta = (
+            self.db_session.query(Template)
+            .filter(Template.id == template_id)
+            .first()
+        )
+        if not template_meta:
+            raise RuntimeError("Template does not exist")
 
-            self.db_session.delete(template_meta)
+        self.db_session.delete(template_meta)
         return template_id
 
     @handle_sqlalchemy_errors
     def create_template_usage(self, template_usage: TemplateUsageDB) -> int:
-        with self.db_session.begin():
-            new_template_usage = to_TemplateUsage(template_usage)
-            self.db_session.add(new_template_usage)
-            self.db_session.flush()
-            self.db_session.refresh(new_template_usage)
-            self._process_arguments(template_usage, new_template_usage.id)
+        new_template_usage = to_TemplateUsage(template_usage)
+        self.db_session.add(new_template_usage)
+        self.db_session.flush()
+        self._process_arguments(template_usage, new_template_usage.id)
         return new_template_usage.id
 
     @handle_sqlalchemy_errors
@@ -160,17 +157,15 @@ class TemplateRepository:
 
     @handle_sqlalchemy_errors
     def update_template_usage(self, template_usage: TemplateUsageDB) -> int:
-        with self.db_session.begin():
-            existing_template_usage = self._get_template_usage_by_id(template_usage.id)
-            existing_template_usage.name = template_usage.name
-            self._process_arguments(template_usage, existing_template_usage.id)
+        existing_template_usage = self._get_template_usage_by_id(template_usage.id)
+        existing_template_usage.name = template_usage.name
+        self._process_arguments(template_usage, existing_template_usage.id)
         return template_usage.id
 
     @handle_sqlalchemy_errors
     def delete_template_usage(self, template_usage_id: int) -> int:
-        with self.db_session.begin():
-            template_usage = self._get_template_usage_by_id(template_usage_id)
-            self.db_session.delete(template_usage)
+        template_usage = self._get_template_usage_by_id(template_usage_id)
+        self.db_session.delete(template_usage)
         return template_usage_id
 
     def _get_template_usage_by_id(self, template_usage_id: int) -> TemplateUsage:
@@ -221,7 +216,6 @@ class TemplateRepository:
         new_template = to_Template(meta)
         self.db_session.add(new_template)
         self.db_session.flush()
-        self.db_session.refresh(new_template)
         self._create_relevant_resources(new_template.id, meta.rel_resources)
 
         return new_template
@@ -319,15 +313,14 @@ class TemplateRepository:
         body_func: Callable[[Any, int], Any],
         generator_func: Optional[Callable[[Any, int], Any]] = None,
     ) -> int:
-        with self.db_session.begin():
-            template_meta = self._update_meta(template.meta)
+        template_meta = self._update_meta(template.meta)
 
-            if generator_func:
-                new_generator = generator_func(template.generator, template_meta.id)
-                self.db_session.add(new_generator)
+        if generator_func:
+            new_generator = generator_func(template.generator, template_meta.id)
+            self.db_session.add(new_generator)
 
-            new_body = body_func(template.body, template_meta.id)
-            self.db_session.add(new_body)
+        new_body = body_func(template.body, template_meta.id)
+        self.db_session.add(new_body)
 
         return template_meta.id
 
@@ -337,15 +330,14 @@ class TemplateRepository:
         body_func: Callable[[Any, int], Any],
         generator_func: Optional[Callable[[Any, int], Any]] = None,
     ) -> int:
-        with self.db_session.begin():
-            new_template = self._create_template_meta(template.meta)
+        new_template = self._create_template_meta(template.meta)
 
-            if generator_func:
-                new_generator = generator_func(template.generator, new_template.id)
-                self.db_session.add(new_generator)
+        if generator_func:
+            new_generator = generator_func(template.generator, new_template.id)
+            self.db_session.add(new_generator)
 
-            new_body = body_func(template.body, new_template.id)
-            self.db_session.add(new_body)
+        new_body = body_func(template.body, new_template.id)
+        self.db_session.add(new_body)
 
         return new_template.id
 
