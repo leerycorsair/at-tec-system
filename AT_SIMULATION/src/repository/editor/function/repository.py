@@ -85,12 +85,10 @@ class FunctionRepository:
 
     @handle_sqlalchemy_errors
     def delete_function(self, function_id: int) -> int:
-        with self.db_session.begin():
-            function = self._get_function_by_id(function_id)
-            if not function:
-                raise RuntimeError("Function not found")
-
-            self.db_session.delete(function)
+        function = self._get_function_by_id(function_id)
+        if not function:
+            raise RuntimeError("Function not found")
+        self.db_session.delete(function)
             
         return function_id
 
