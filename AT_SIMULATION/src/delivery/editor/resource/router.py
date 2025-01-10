@@ -1,7 +1,11 @@
 from fastapi import APIRouter, Depends
 
-from src.delivery.core.models.conversions import to_ObjectIDResponse
-from src.delivery.core.models.models import ObjectIDResponse
+from src.delivery.core.models.conversions import (
+    InternalServiceError,
+    SuccessResponse,
+    to_ObjectIDResponse,
+)
+from src.delivery.core.models.models import CommonResponse, ObjectIDResponse
 from src.delivery.editor.resource.dependencies import (
     IResourceService,
     get_resource_service,
@@ -30,15 +34,20 @@ router = APIRouter(
 )
 
 
-@router.post("/types", response_model=ObjectIDResponse)
+@router.post("/types", response_model=CommonResponse[ObjectIDResponse | None])
 async def create_resource_type(
     body: ResourceTypeRequest,
     model_id: int = Depends(get_current_model),
     resource_service: IResourceService = Depends(get_resource_service),
 ) -> ObjectIDResponse:
-    return to_ObjectIDResponse(
-        resource_service.create_resource_type(to_ResourceTypeDB(body, model_id))
-    )
+    try:
+        return SuccessResponse(
+            to_ObjectIDResponse(
+                resource_service.create_resource_type(to_ResourceTypeDB(body, model_id))
+            )
+        )
+    except RuntimeError as e:
+        return InternalServiceError(e)
 
 
 @router.get("/types", response_model=ResourceTypesResponse)
