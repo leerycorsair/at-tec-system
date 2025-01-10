@@ -26,7 +26,7 @@ router = APIRouter(
     tags=["editor:functions"],
 )
 
-@router.post("/", response_model=CommonResponse[ObjectIDResponse | None])
+@router.post("", response_model=CommonResponse[ObjectIDResponse | None])
 async def create_function(
     body: FunctionRequest,
     model_id: int = Depends(get_current_model),
@@ -42,7 +42,7 @@ async def create_function(
         return InternalServiceError(e)
 
 
-@router.get("/", response_model=CommonResponse[FunctionsResponse | None])
+@router.get("", response_model=CommonResponse[FunctionsResponse | None])
 async def get_functions(
     model_id: int = Depends(get_current_model),
     function_service: IFunctionService = Depends(get_function_service),

@@ -96,7 +96,7 @@ async def create_rule(
         return InternalServiceError(e)
 
 
-@router.get("/", response_model=CommonResponse[TemplatesResponse | None])
+@router.get("", response_model=CommonResponse[TemplatesResponse | None])
 async def get_templates(
     model_id: int = Depends(get_current_model),
     template_service: ITemplateService = Depends(get_template_service),
@@ -227,7 +227,7 @@ async def delete_template(
         return InternalServiceError(e)
 
 
-@router.post("/", response_model=CommonResponse[ObjectIDResponse | None])
+@router.post("", response_model=CommonResponse[ObjectIDResponse | None])
 async def create_usage(
     body: TemplateUsageRequest,
     model_id: int = Depends(get_current_model),
@@ -245,7 +245,7 @@ async def create_usage(
         return InternalServiceError(e)
 
 
-@router.get("/", response_model=CommonResponse[TemplateUsagesResponse | None])
+@router.get("", response_model=CommonResponse[TemplateUsagesResponse | None])
 async def get_usages(
     model_id: int = Depends(get_current_model),
     template_service: ITemplateService = Depends(get_template_service),

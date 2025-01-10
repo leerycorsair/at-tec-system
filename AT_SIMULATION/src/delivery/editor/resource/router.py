@@ -120,7 +120,7 @@ async def delete_resource_type(
         return InternalServiceError(e)
 
 
-@router.post("/", response_model=CommonResponse[ObjectIDResponse | None])
+@router.post("", response_model=CommonResponse[ObjectIDResponse | None])
 async def create_resource(
     body: ResourceRequest,
     model_id: int = Depends(get_current_model),
@@ -138,7 +138,7 @@ async def create_resource(
         return InternalServiceError(e)
 
 
-@router.get("/", response_model=CommonResponse[ResourcesResponse | None])
+@router.get("", response_model=CommonResponse[ResourcesResponse | None])
 async def get_resources(
     model_id: int = Depends(get_current_model),
     resource_service: IResourceService = Depends(get_resource_service),

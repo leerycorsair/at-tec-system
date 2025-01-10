@@ -21,7 +21,7 @@ router = APIRouter(
 )
 
 
-@router.post("/", response_model=CommonResponse[ObjectIDResponse | None])
+@router.post("", response_model=CommonResponse[ObjectIDResponse | None])
 async def create_model(
     body: ModelMetaRequest,
     user_id: int = Depends(get_current_user),
@@ -37,7 +37,7 @@ async def create_model(
         return InternalServiceError(e)
 
 
-@router.get("/", response_model=CommonResponse[ModelMetasResponse | None])
+@router.get("", response_model=CommonResponse[ModelMetasResponse | None])
 async def get_models(
     user_id: int = Depends(get_current_user),
     model_service: IModelService = Depends(get_model_service),
