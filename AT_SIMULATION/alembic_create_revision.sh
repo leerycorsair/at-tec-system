@@ -13,7 +13,7 @@ fi
 REVISION_NAME=$1
 
 echo "Starting PostgreSQL container..."
-docker-compose -f $DOCKER_COMPOSE_PATH up -d postgres_simulation
+docker compose -f $DOCKER_COMPOSE_PATH up -d postgres_simulation
 if [ $? -ne 0 ]; then
   echo "Failed to start PostgreSQL container."
   exit 1
@@ -44,7 +44,7 @@ fi
 unset DB_HOST DB_PORT DB_NAME DB_USER DB_PASS SERVER_PORT
 
 echo "Stopping PostgreSQL container..."
-docker-compose -f $DOCKER_COMPOSE_PATH down postgres_simulation
+docker compose -f $DOCKER_COMPOSE_PATH down postgres_simulation
 if [ $? -ne 0 ]; then
   echo "Failed to stop PostgreSQL container."
   exit 1

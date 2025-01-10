@@ -30,7 +30,7 @@ services:
     expose:
       - ${DB_PORT}
     ports:
-      - "${DB_PORT}:5432"
+      - "${DB_PORT}:5435"
     environment:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASS}
@@ -39,12 +39,13 @@ services:
     networks:
       - custom-network
     healthcheck:
-      test: pg_isready --dbname=$DB_NAME --username=$DB_USER
+      test: pg_isready --dbname=$DB_NAME --username=$DB_USER --port=5435
       interval: 5s
       timeout: 5s
       retries: 5
     volumes:
       - postgres-data:/var/lib/postgresql/data
+    command: ["postgres", "-c", "port=5435"]
 
 networks:
   custom-network:
