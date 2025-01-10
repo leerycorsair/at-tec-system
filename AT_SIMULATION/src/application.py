@@ -1,4 +1,5 @@
 import asyncio
+import logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import Request
@@ -42,12 +43,21 @@ app.add_middleware(
 )
 
 
+# Configure logging
+logger = logging.getLogger(__name__)
+
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    logger.error(
+        f"Validation error at {request.url}: {exc.errors()}",
+        exc_info=True  
+    )
+
+    # Prepare the response
     response_content = BadRequestError(
         exception=Exception("Invalid request body.")
     )
     return JSONResponse(
         status_code=response_content.status_code,
-        content=response_content.model_dump(),  
+        content=response_content.model_dump(),
     )
