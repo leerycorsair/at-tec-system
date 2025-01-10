@@ -1,10 +1,14 @@
 import asyncio
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi import Request
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
 
 from contextlib import asynccontextmanager
 
 from src.client.auth_client import AuthClientSingleton
+from src.delivery.core.models.conversions import BadRequestError
 
 from .delivery.router import setup_routes
 
@@ -36,3 +40,14 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    response_content = BadRequestError(
+        exception=Exception("Invalid request body.")
+    )
+    return JSONResponse(
+        status_code=response_content.status_code,
+        content=response_content.model_dump(),  
+    )
