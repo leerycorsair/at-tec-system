@@ -13,24 +13,14 @@ def get_db() -> Generator[Session, None, None]:
     db = SessionLocal()
     try:
         yield db
-        db.commit()
+        if not db.is_active:  
+            return
+        db.commit()  
     except Exception as e:
-        db.rollback()
-        raise e
+        db.rollback() 
+        raise  
     finally:
         db.close()
-
-
-@contextmanager
-def session_scope(session: Session):
-    try:
-        yield session
-        session.commit()
-    except Exception:
-        session.rollback()
-        raise
-    finally:
-        session.close()
 
 
 def dispose_engine():
