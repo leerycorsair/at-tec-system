@@ -29,6 +29,7 @@ def to_ResourceTypeAttribute(
         type=attr.type,
         default_value=attr.default_value,
         resource_type_id=resource_type_id,
+        enum_values_set=attr.enum_values_set,
     )
 
 
@@ -51,6 +52,7 @@ def to_ResourceTypeAttributeDB(attr: ResourceTypeAttribute) -> ResourceTypeAttri
         type=attr.type,
         default_value=attr.default_value,
         resource_type_id=attr.resource_type_id,
+        enum_values_set=attr.enum_values_set,
     )
 
 
