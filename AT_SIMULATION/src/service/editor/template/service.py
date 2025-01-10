@@ -139,7 +139,7 @@ class TemplateService:
         return self._template_rep.get_template_usage(template_usage_id)
 
     def get_template_usages(self, model_id: int) -> List[TemplateUsageDB]:
-        return self.get_template_usages(model_id)
+        return self._template_rep.get_template_usages(model_id)
 
     def update_template_usage(self, template_usage: TemplateUsageDB) -> int:
         self._check_template_usage_rights(template_usage.id, template_usage.model_id)
