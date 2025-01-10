@@ -93,16 +93,16 @@ class TemplateRepository:
     @handle_sqlalchemy_errors
     def get_irregular_events(self, model_id: int) -> List[IrregularEventDB]:
         return self._get_templates(
-            model_id, self.get_irregular_event, "irregular_event"
+            model_id, self.get_irregular_event, "IRREGULAR_EVENT"
         )
 
     @handle_sqlalchemy_errors
     def get_operations(self, model_id: int) -> List[OperationDB]:
-        return self._get_templates(model_id, self.get_operation, "operation")
+        return self._get_templates(model_id, self.get_operation, "OPERATION")
 
     @handle_sqlalchemy_errors
     def get_rules(self, model_id: int) -> List[RuleDB]:
-        return self._get_templates(model_id, self.get_rule, "rule")
+        return self._get_templates(model_id, self.get_rule, "RULE")
 
     @handle_sqlalchemy_errors
     def get_template_meta(self, template_id: int) -> TemplateMetaDB:
