@@ -14,9 +14,9 @@ class RelevantResourceResponse(RelevantResourceRequest):
 
 
 class TemplateTypeEnum(str, Enum):
-    IRREGULAR_EVENT = "irregular_event"
-    OPERATION = "operation"
-    RULE = "rule"
+    IRREGULAR_EVENT = "IRREGULAR_EVENT"
+    OPERATION = "OPERATION"
+    RULE = "RULE"
 
 
 class TemplateMetaRequest(BaseModel):
