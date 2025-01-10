@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 
-from src.delivery.core.models.conversions import to_ObjectIDResponse
-from src.delivery.core.models.models import ObjectIDResponse
+from src.delivery.core.models.conversions import InternalServiceError, SuccessResponse, to_ObjectIDResponse
+from src.delivery.core.models.models import CommonResponse, ObjectIDResponse
 from src.delivery.editor.template.dependencies import (
     ITemplateService,
     get_template_service,
@@ -40,32 +40,7 @@ router = APIRouter(
 )
 
 
-from fastapi import APIRouter, Depends
-from src.delivery.core.models.conversions import (
-    SuccessResponse,
-    InternalServiceError,
-    to_ObjectIDResponse,
-)
-from src.delivery.core.models.models import CommonResponse, ObjectIDResponse
-from src.delivery.editor.template.dependencies import (
-    ITemplateService,
-    get_template_service,
-)
-from src.delivery.editor.template.models.conversions import (
-    to_IrregularEventDB,
-    to_IrregularEventResponse,
-    to_OperationDB,
-    to_RuleDB,
-    to_TemplatesResponse,
-)
-from src.delivery.editor.template.models.models import (
-    IrregularEventRequest,
-    IrregularEventResponse,
-    OperationRequest,
-    RuleRequest,
-    TemplatesResponse,
-)
-from src.delivery.model.dependencies import get_current_model
+
 
 router = APIRouter(
     prefix="/templates",
