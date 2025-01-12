@@ -28,6 +28,7 @@ class ResourceType(Base):
 
     attributes = relationship("ResourceTypeAttribute", cascade="all, delete-orphan")
     resources = relationship("Resource", cascade="all, delete-orphan")
+    rel_resources = relationship("RelevantResource", cascade="all, delete-orphan")
     model_id = Column(Integer, ForeignKey("models.id"), nullable=False)
 
     __table_args__ = (
@@ -49,6 +50,7 @@ class ResourceTypeAttribute(Base):
     enum_values_set = Column(ARRAY(String), nullable=True)
 
     resource_type_id = Column(Integer, ForeignKey("resource_types.id"), nullable=False)
+    resource_attributes = relationship("ResourceAttribute", cascade="all, delete-orphan")
 
     __table_args__ = (
         UniqueConstraint(
@@ -67,6 +69,7 @@ class Resource(Base):
     to_be_traced = Column(Boolean, nullable=False)
 
     attributes = relationship("ResourceAttribute", cascade="all, delete-orphan")
+    usage_resources = relationship("TemplateUsageArgument", cascade="all, delete-orphan")
     resource_type_id = Column(Integer, ForeignKey("resource_types.id"), nullable=False)
     model_id = Column(Integer, ForeignKey("models.id"), nullable=False)
 
