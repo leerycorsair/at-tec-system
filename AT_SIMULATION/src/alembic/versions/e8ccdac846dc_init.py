@@ -1,8 +1,8 @@
 """init
 
-Revision ID: b2e04e70ab1a
+Revision ID: e8ccdac846dc
 Revises: 
-Create Date: 2025-01-12 13:35:55.863920
+Create Date: 2025-01-12 14:25:40.885283
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision: str = 'b2e04e70ab1a'
+revision: str = 'e8ccdac846dc'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -44,7 +44,7 @@ def upgrade() -> None:
     sa.Column('object_table', sa.String(), nullable=False),
     sa.Column('object_name', sa.String(), nullable=False),
     sa.Column('object_id', sa.Integer(), nullable=False),
-    sa.Column('node_type', sa.Enum('RESOURCE', 'RESOURCE_TYPE', 'FUNCTION', 'RULE_TEMPLATE', 'RULE_TEMPLATE_USAGE', 'OPERATION_TEMPLATE', 'OPERATION_TEMPLATE_USAGE', 'IRREGULAR_TEMPLATE', 'IRREGULAR_TEMPLATE_USAGE', name='nodetype'), nullable=False),
+    sa.Column('node_type', sa.Enum('RESOURCE', 'RESOURCE_TYPE', 'FUNCTION', 'RULE_TEMPLATE', 'RULE_USAGE', 'OPERATION_TEMPLATE', 'OPERATION_USAGE', 'IRREGULAR_TEMPLATE', 'IRREGULAR_USAGE', name='nodetype'), nullable=False),
     sa.Column('pos_x', sa.Integer(), nullable=False),
     sa.Column('pos_y', sa.Integer(), nullable=False),
     sa.Column('width', sa.Integer(), nullable=False),
