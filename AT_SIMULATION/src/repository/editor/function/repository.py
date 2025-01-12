@@ -74,6 +74,7 @@ class FunctionRepository:
             if param.id in existing_parameters:
                 existing_parameters[param.id].name = param.name
                 existing_parameters[param.id].type = param.type
+                existing_parameter_ids.remove(param.id)
             else:
                 self.db_session.add(to_FunctionParameter(param, function.id))
         
