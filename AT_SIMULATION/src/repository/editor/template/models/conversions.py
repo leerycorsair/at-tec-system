@@ -132,7 +132,7 @@ def to_IrregularEventDB(
             dispersion=generator.dispersion,
             template_id=generator.template_id,
         ),
-        body=IrregularEventBody(
+        body=IrregularEventBodyDB(
             body=body.body,
             template_id=body.template_id,
         ),
@@ -187,7 +187,7 @@ def to_TemplateMetaDB(
     return TemplateMetaDB(
         id=meta.id,
         name=meta.name,
-        type=TemplateTypeEnum(meta.type),
+        type=meta.type,
         rel_resources=[to_RelevantResourceDB(res) for res in rel_resources],
         model_id=meta.model_id,
     )
