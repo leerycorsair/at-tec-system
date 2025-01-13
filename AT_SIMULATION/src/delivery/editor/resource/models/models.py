@@ -47,7 +47,7 @@ class ResourceTypesResponse(BaseModel):
 class ResourceAttributeRequest(BaseModel):
     id: Optional[int] = None
     rta_id: int
-    value: str
+    value: Optional[Union[int, float, bool, str]] = None
 
 
 class ResourceAttributeResponse(ResourceAttributeRequest):
