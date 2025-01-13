@@ -18,6 +18,7 @@ def to_PackageDB(pkg: Package) -> PackageDB:
         id=pkg.id,
         name=pkg.name,
         alias=pkg.alias,
+        import_id=pkg.import_id,
     )
 
 

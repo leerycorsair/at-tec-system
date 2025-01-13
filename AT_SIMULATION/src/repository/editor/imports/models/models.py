@@ -6,6 +6,7 @@ class PackageDB(BaseModel):
     id: int
     name: str
     alias: str
+    import_id: int
 
 
 class ImportDB(BaseModel):
