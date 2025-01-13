@@ -86,9 +86,9 @@ class ResourceRepository:
                 existing_attributes[attr.id].name = attr.name
                 existing_attributes[attr.id].type = attr.type
                 existing_attributes[attr.id].default_value = attr.default_value
+                existing_attribute_ids.remove(attr.id)
             else:
                 self.db_session.add(to_ResourceTypeAttribute(attr, resource_type.id))
-            existing_attribute_ids.remove(attr.id)
 
         for attr_id in existing_attribute_ids:
             attr_to_delete = existing_attributes[attr_id]

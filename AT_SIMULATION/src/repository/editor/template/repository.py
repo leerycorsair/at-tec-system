@@ -262,7 +262,6 @@ class TemplateRepository:
 
         update_meta.name = meta.name
         update_meta.type = meta.type
-        self.db_session.commit()
 
         self._update_relevant_resources(meta.id, meta.rel_resources)
 
