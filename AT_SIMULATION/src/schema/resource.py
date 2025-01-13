@@ -86,7 +86,7 @@ class ResourceAttribute(Base):
     __tablename__ = "resource_attributes"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    value = Column(String, nullable=False)
+    value = Column(JSON, nullable=False)
 
     resource_id = Column(Integer, ForeignKey("resources.id"), nullable=False)
     rta_id = Column(Integer, ForeignKey("resource_type_attributes.id"), nullable=False)

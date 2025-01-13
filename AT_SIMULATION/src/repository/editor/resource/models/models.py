@@ -23,7 +23,7 @@ class ResourceAttributeDB(BaseModel):
     id: int
     rta_id: int
     resource_id: int
-    value: str
+    value: Optional[Union[int, float, bool, str]] = None
 
 
 class ResourceDB(BaseModel):
