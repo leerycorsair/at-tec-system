@@ -29,7 +29,6 @@ class Package(Base):
     alias = Column(String, nullable=True)
 
     import_id = Column(Integer, ForeignKey("imports.id"), nullable=False)
-    import_ = relationship("Import", back_populates="packages")
 
     __table_args__ = (
         UniqueConstraint(
@@ -41,10 +40,5 @@ class Package(Base):
             "alias",
             "import_id",
             name="uix_package_alias_import_id",
-        ),
-        UniqueConstraint(
-            "alias",
-            "import_.model_id",
-            name="uix_package_alias_model_id",
         ),
     )
