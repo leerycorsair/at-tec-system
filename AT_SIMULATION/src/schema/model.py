@@ -14,7 +14,7 @@ class Model(Base):
     __tablename__ = "models"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String, unique=True, nullable=False)
+    name = Column(String, nullable=False)
     user_id = Column(Integer, nullable=False)
     created_at = Column(TIMESTAMP, nullable=False, default=datetime.now())
 
@@ -25,6 +25,7 @@ class Model(Base):
     functions = relationship("Function", cascade="all, delete-orphan")
     templates = relationship("Template", cascade="all, delete-orphan")
     template_usages = relationship("TemplateUsage", cascade="all, delete-orphan")
+    imports = relationship("Import", cascade="all, delete-orphan")
 
     __table_args__ = (
         UniqueConstraint(

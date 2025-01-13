@@ -11,6 +11,7 @@ from src.schema.model import *
 from src.schema.resource import *
 from src.schema.template import *
 from src.schema.visio import *
+from src.schema.imports import *
 
 
 from src.config.postgres import PostgresStore
