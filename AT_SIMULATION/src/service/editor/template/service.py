@@ -181,14 +181,14 @@ class TemplateService:
 
     def _check_template_rights(self, template_id: int, model_id: int) -> None:
         template_meta = self._template_rep.get_template_meta(template_id)
-        if template_meta.id != model_id:
+        if template_meta.model_id != model_id:
             raise ValueError(
                 f"Template {template_id} does not belong to model {model_id}"
             )
 
     def _check_template_usage_rights(self, usage_id: int, model_id: int) -> None:
         template_usage = self._template_rep.get_template_usage(usage_id)
-        if template_usage.id != model_id:
+        if template_usage.model_id != model_id:
             raise ValueError(
                 f"Template usage {usage_id} does not belong to model {model_id}"
             )

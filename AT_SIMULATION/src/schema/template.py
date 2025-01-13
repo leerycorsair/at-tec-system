@@ -54,6 +54,7 @@ class RelevantResource(Base):
 
     template_id = Column(Integer, ForeignKey("templates.id"), nullable=False)
     resource_type_id = Column(Integer, ForeignKey("resource_types.id"), nullable=False)
+    template_usage_args = relationship("TemplateUsageArgument", cascade="all, delete")
 
     __table_args__ = (
         UniqueConstraint(
@@ -72,6 +73,7 @@ class TemplateUsage(Base):
 
     template_id = Column(Integer, ForeignKey("templates.id"), nullable=False)
     model_id = Column(Integer, ForeignKey("models.id"), nullable=False)
+    template_usage_args = relationship("TemplateUsageArgument", cascade="all, delete")
 
     __table_args__ = (
         UniqueConstraint(
