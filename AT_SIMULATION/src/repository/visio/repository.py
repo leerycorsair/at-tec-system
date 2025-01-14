@@ -9,7 +9,13 @@ from src.repository.visio.models.conversions import (
     to_Node,
     to_NodeDB,
 )
-from src.repository.visio.models.models import EdgeDB, NodeDB, NodeTablesEnum
+from src.repository.visio.models.models import (
+    EdgeDB,
+    EditorInfoDB,
+    MoveNodeDB,
+    NodeDB,
+    NodeTablesEnum,
+)
 from src.schema.visio import Edge, Node
 
 
@@ -74,6 +80,33 @@ class VisioRepository:
         edges_db = [to_EdgeDB(edge) for edge in edges]
 
         return edges_db
+
+    @handle_sqlalchemy_errors
+    def get_node_by_id(self, node_id: int) -> NodeDB:
+        node = self.db_session.query(Node).filter(Node.id == node_id).first()
+        if not node:
+            raise ValueError("Node does not exist")
+
+        return to_NodeDB(node)
+
+    @handle_sqlalchemy_errors
+    def get_editor_info(self, model_id: int) -> EditorInfoDB:
+        return EditorInfoDB(
+            nodes=self.get_nodes(model_id),
+            edges=self.get_edges(model_id),
+        )
+
+    @handle_sqlalchemy_errors
+    def move_node(self, params: MoveNodeDB) -> None:
+        node = self.get_node_by_id(params.node_id)
+        if not node:
+            raise RuntimeError("Node not found")
+
+        node.pos_x = params.new_pos_x
+        node.pos_y = params.new_pos_y
+        self.db_session.flush()
+        
+        return
 
     def _get_node(self, object_table: NodeTablesEnum, object_id: int) -> Node:
         node = (
