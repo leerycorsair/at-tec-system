@@ -71,7 +71,7 @@ class Node(Base):
 def delete_associated_node(mapper, connection: Connection, target):
     node_ids = connection.execute(
         Node.__table__.select()
-        .with_only_columns(Node.id)  
+        .with_only_columns(Node.id)
         .where(Node.object_table == target.__tablename__)
         .where(Node.object_id == target.id)
     ).fetchall()
@@ -80,14 +80,12 @@ def delete_associated_node(mapper, connection: Connection, target):
 
     if node_ids:
         connection.execute(
-            Edge.__table__.delete()
-            .where(Edge.from_node.in_(node_ids) | Edge.to_node.in_(node_ids))
+            Edge.__table__.delete().where(
+                Edge.from_node.in_(node_ids) | Edge.to_node.in_(node_ids)
+            )
         )
 
-        connection.execute(
-            Node.__table__.delete()
-            .where(Node.id.in_(node_ids))
-        )
+        connection.execute(Node.__table__.delete().where(Node.id.in_(node_ids)))
 
 
 event.listen(Resource, "after_delete", delete_associated_node)
