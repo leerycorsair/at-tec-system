@@ -40,14 +40,6 @@ router = APIRouter(
 )
 
 
-
-
-router = APIRouter(
-    prefix="/templates",
-    tags=["editor:templates"],
-)
-
-
 @router.post("/irregular_event", response_model=CommonResponse[ObjectIDResponse | None])
 async def create_irregular_event(
     body: IrregularEventRequest,

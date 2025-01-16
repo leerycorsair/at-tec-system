@@ -1,0 +1,26 @@
+type {{ template_name }} struct {
+	currentTick int
+	duration int
+	isActive bool
+}
+
+func (t *{{ template_name }}) Execute(
+	{% for param in params %}
+	{{ param.name }} *{{ param.type }},
+	{% endfor %}
+) {
+	if t.currentTick > t.duration {
+		{{ body_after }}
+
+		t.isActive = false
+		t.currentTick = 0
+	}
+
+	if !t.isActive && {{ condition }} {
+		t.isActive = true
+
+		{{ body_before }}
+
+		t.currentTick += 1
+	}
+}

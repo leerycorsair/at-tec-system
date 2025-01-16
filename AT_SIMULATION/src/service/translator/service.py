@@ -2,9 +2,13 @@ from typing import List
 
 from src.service.translator.dependencies import IModelService
 from src.service.translator.function import trnsl_functions
+from src.service.translator.irregular_event import trnsl_irregular_events
 from src.service.translator.models.models import FileMeta, TranslateInfo
+from src.service.translator.operation import trnsl_operations
 from src.service.translator.resource import trnsl_resources
 from src.service.translator.resource_type import trnsl_resource_types
+from src.service.translator.rule import trnsl_rules
+from src.service.translator.template_usage import trnsl_template_usages
 
 
 class TranslatorService:
@@ -26,9 +30,36 @@ class TranslatorService:
         functions = trnsl_functions(model.functions)
         print("\n".join(functions))
 
+        rules = trnsl_rules(model.rules, model.resource_types)
+        print("\n".join(rules))
+
+        operations = trnsl_operations(model.operations, model.resource_types)
+        print("\n".join(operations))
+
+        irregular_events = trnsl_irregular_events(
+            model.irregular_events, model.resource_types
+        )
+        print("\n".join(irregular_events))
+
+        metas = []
+        metas.extend([template.meta for template in model.irregular_events])
+        metas.extend([template.meta for template in model.operations])
+        metas.extend([template.meta for template in model.rules])
+        # order by meta.name
+        template_usages = trnsl_template_usages(
+            model.template_usages, metas, model.resources
+        )
+        print("\n".join(template_usages))
+
         return TranslateInfo(
             file_id=0,
-            file_content="\n".join(resource_types) + "\n".join(resources) + "\n".join(functions),
+            file_content="\n".join(resource_types)
+            + "\n".join(resources)
+            + "\n".join(functions)
+            + "\n".join(rules)
+            + "\n".join(operations)
+            + "\n".join(irregular_events)
+            + "\n".join(template_usages),
             translate_logs="empty",
         )
 

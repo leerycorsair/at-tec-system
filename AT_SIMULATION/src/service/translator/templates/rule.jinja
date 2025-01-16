@@ -1,0 +1,12 @@
+type {{ template_name }} struct {}
+
+
+func (t *{{ template_name }}) Execute(
+	{% for param in params %}
+	{{ param.name }} *{{ param.type }},
+	{% endfor %}
+) {
+	if {{ condition }} {
+		{{ body }}
+	}
+}
