@@ -1,9 +1,8 @@
-from typing import Dict, List
+from typing import List
 
 from jinja2 import Environment, FileSystemLoader, Template
 
 from src.repository.editor.function.models.models import FunctionDB
-from src.repository.editor.resource.models.models import ResourceDB, ResourceTypeDB
 
 
 TEMPLATE_DIR = "./src/service/translator/templates/"
@@ -18,6 +17,5 @@ template: Template = current_env.get_template(TEMPLATE_NAME)
 
 
 def trnsl_functions(functions: List[FunctionDB]) -> List[str]:
-    print(functions)
     rendered_templates = [template.render(function=function) for function in functions]
     return rendered_templates

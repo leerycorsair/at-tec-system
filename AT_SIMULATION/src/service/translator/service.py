@@ -19,17 +19,17 @@ class TranslatorService:
 
         resource_types = trnsl_resource_types(model.resource_types)
         print("\n".join(resource_types))
-        
+
         resources = trnsl_resources(model.resources, model.resource_types)
         print("\n".join(resources))
-        
+
         functions = trnsl_functions(model.functions)
         print("\n".join(functions))
 
         return TranslateInfo(
             file_id=0,
-            file_content="LOL",
-            translate_logs="KEK",
+            file_content="\n".join(resource_types) + "\n".join(resources) + "\n".join(functions),
+            translate_logs="empty",
         )
 
     def get_translated_files(self, user_id: int) -> List[FileMeta]:
