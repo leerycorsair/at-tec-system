@@ -2,6 +2,7 @@ from typing import List
 
 from src.service.translator.dependencies import IModelService
 from src.service.translator.function import trnsl_functions
+from src.service.translator.irregular_event import trnsl_irregular_events
 from src.service.translator.models.models import FileMeta, TranslateInfo
 from src.service.translator.operation import trnsl_operations
 from src.service.translator.resource import trnsl_resources
@@ -33,6 +34,9 @@ class TranslatorService:
         
         operations = trnsl_operations(model.operations, model.resource_types)
         print("\n".join(operations))
+        
+        irregular_events = trnsl_irregular_events(model.irregular_events, model.resource_types)
+        print("\n".join(irregular_events))
 
         return TranslateInfo(
             file_id=0,
@@ -40,7 +44,8 @@ class TranslatorService:
             + "\n".join(resources)
             + "\n".join(functions)
             + "\n".join(rules)
-            + "\n".join(operations),
+            + "\n".join(operations)
+            + "\n".join(irregular_events),
             translate_logs="empty",
         )
 
