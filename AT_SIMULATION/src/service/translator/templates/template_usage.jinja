@@ -1,5 +1,5 @@
-{{ usage_name }}.Execute(
-	{% arg in args}
+{{ template_name }}.Execute( // template_usage_name == {{ usage_name }}
+	{% for arg in args %}
 	&{{ arg.resource_name }},
 	{% endfor %}
 )
