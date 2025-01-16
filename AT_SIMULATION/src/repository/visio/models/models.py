@@ -1,4 +1,5 @@
 from enum import Enum
+from typing import List
 from pydantic import BaseModel
 
 from src.schema.function import Function
@@ -45,3 +46,14 @@ class EdgeDB(BaseModel):
     from_node: int
     to_node: int
     model_id: int
+
+
+class MoveNodeDB(BaseModel):
+    node_id: int
+    new_pos_x: int
+    new_pos_y: int
+
+
+class EditorInfoDB(BaseModel):
+    nodes: List[NodeDB]
+    edges: List[EdgeDB]

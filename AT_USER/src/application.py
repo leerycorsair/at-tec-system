@@ -2,7 +2,6 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 import asyncio
-import logging
 
 from at_queue.core.session import ConnectionParameters
 from src.api.api import setup_routes

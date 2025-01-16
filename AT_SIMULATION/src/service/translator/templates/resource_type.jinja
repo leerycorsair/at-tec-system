@@ -1,0 +1,32 @@
+{% for enum in enums %}
+type {{ enum.name }} string
+
+const (
+    {% for value in enum["values"] %}
+    {{ value|upper }} {{ enum.name }} = "{{ value }}"
+    {% endfor %}
+)
+{% endfor %}
+
+type {{ resource_type.name|capitalize }} struct {
+    ResourceName string `json:"resource_name"`
+    ToBeTraced bool `json:"-"`
+    {% for attribute in resource_type.attributes %}
+    {{ attribute.name|capitalize }} {{ attribute.go_type }} `json:"{{ attribute.name }}"`
+    {% endfor %}
+}
+
+func (r {{ resource_type.name|capitalize }}) MarshalJSON() ([]byte, error) {
+    if !r.ToBeTraced {
+        return []byte("null"), nil
+    }
+
+    type Alias {{ resource_type.name|capitalize }}
+    aux := struct {
+        Alias
+    }{
+        Alias: Alias(r),
+    }
+
+    return json.Marshal(aux)
+}
