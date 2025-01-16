@@ -1,0 +1,5 @@
+{{ usage_name }}.Execute(
+	{% arg in args}
+	&{{ arg.resource_name }},
+	{% endfor %}
+)
