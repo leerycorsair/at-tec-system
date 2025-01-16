@@ -1,0 +1,8 @@
+{{ resource_name }} := {{ resource_type_name }}{
+	ResourceName: {{ resource_name }},
+	ToBeTraced: {{ to_be_traced }},
+
+	{% for attribute in attributes %}
+	{{ attribute.name | capitalize }}: {{ attribute.value }},
+	{% endfor %}
+}

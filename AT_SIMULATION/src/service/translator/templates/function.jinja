@@ -1,0 +1,7 @@
+func {{ function.name }}(
+    {% for param in function.params %}
+    {{ param.name }} {{ param.type }},
+    {% endfor %}
+) {{ function.ret_type }} {
+    {{ function.body}}
+}
