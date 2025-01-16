@@ -1,11 +1,61 @@
-type {{ template_name }} struct {}
+type {{ template_name }} struct {
+	ticksRemaining int
+}
 
 func (t *{{ template_name }}) Execute(
 	{% for param in params %}
 	{{ param.name }} *{{ param.type }},
 	{% endfor %}
 ) {
-	if {{ generator_func }} {
+	if t.ticksRemaining <= 0 {
+		t.ticksRemaining = t.generator_func({{ generator_value }}, {{ generator_dispersion }})
+	}
+
+	t.ticksRemaining--
+
+	if t.ticksRemaining == 0 {
 		{{ body }}
 	}
+}
+
+func (t *{{ template_name }}) generator_func(generator_value, generator_dispersion float) int {
+	{% if generator_type == "NORMAL" %}
+	min := generator_value - generator_dispersion
+	max := generator_value + generator_dispersion
+	randomValue := min + rand.Float64()*(max-min)
+	return int(math.Max(1, math.Round(randomValue)))
+
+	{% elif generator_type == "PRECISE" %}
+	return int(math.Max(1, math.Round(generator_value)))
+
+	{% elif generator_type == "UNIFORM" %}
+	min := generator_value - generator_dispersion
+	max := generator_value + generator_dispersion
+	randomValue := min + rand.Float64()*(max-min)
+	return int(math.Max(1, math.Round(randomValue)))
+
+	{% elif generator_type == "EXPONENTIAL" %}
+	lambda := 1.0 / generator_value	
+	randomValue := rand.ExpFloat64() / lambda
+	return int(math.Max(1, math.Round(randomValue)))
+
+	{% elif generator_type == "GAUSSIAN" %}
+	randomValue := rand.NormFloat64()*generator_dispersion + generator_value
+	return int(math.Max(1, math.Round(randomValue)))
+
+	{% elif generator_type == "POISSON" %}
+	lambda := generator_value
+	k := 0
+	p := 1.0
+	l := math.Exp(-lambda)
+	for p > l {
+		k++
+		p *= rand.Float64()
+	}
+	return k
+
+	{% else %}
+	// Default logic (fallback)
+	return int(math.Max(1, math.Round(generator_value)))
+	{% endif %}
 }
