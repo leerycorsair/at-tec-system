@@ -41,7 +41,14 @@ class TranslatorService:
         )
         print("\n".join(irregular_events))
 
-        template_usages = trnsl_template_usages(model.template_usages, model.resources)
+        metas = []
+        metas.extend([template.meta for template in model.irregular_events])
+        metas.extend([template.meta for template in model.operations])
+        metas.extend([template.meta for template in model.rules])
+        # order by meta.name
+        template_usages = trnsl_template_usages(
+            model.template_usages, metas, model.resources
+        )
         print("\n".join(template_usages))
 
         return TranslateInfo(
