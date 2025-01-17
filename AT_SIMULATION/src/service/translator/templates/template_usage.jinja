@@ -1,5 +1,8 @@
-{{ template_name }}.Execute( // template_usage_name == {{ usage_name }}
+{{ usage_name }} := {{ template_name }}{
+	UsageName: "{{usage_name}}",
+
 	{% for arg in args %}
-	&{{ arg.resource_name }},
+	{{ arg.relevant_resource_name }}: &{{ arg.resource_name }},
 	{% endfor %}
-)
+}
+usagesList := append(usagesList, &{{ usage_name }})

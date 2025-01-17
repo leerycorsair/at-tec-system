@@ -1,0 +1,159 @@
+package main
+
+import (
+	"encoding/json"
+	"fmt"
+	"sync"
+	"time"
+)
+
+type Usage interface {
+	Execute()
+}
+
+type State string
+
+const (
+	StatePaused  State = "PAUSED"
+	StateRunning State = "RUNNING"
+	StateKilled  State = "KILLED"
+)
+
+type Runner struct {
+	resources   []interface{}
+	usagesList  []Usage
+	currentTick int
+	totalTicks  int
+	state       State
+	mutex       sync.Mutex
+	wg          sync.WaitGroup
+}
+
+func NewRunner(resources []interface{}, usagesList []Usage) *Runner {
+	return &Runner{
+		resources:   resources,
+		usagesList:  usagesList,
+		currentTick: 0,
+		totalTicks:  0,
+		state:       StatePaused,
+	}
+}
+
+func (r *Runner) Run(ticks, delay int) {
+	r.mutex.Lock()
+	if r.state == StateKilled {
+		r.mutex.Unlock()
+		return
+	}
+
+	r.totalTicks += ticks
+	if r.state != StateRunning {
+		r.state = StateRunning
+	}
+	r.mutex.Unlock()
+
+	r.wg.Add(1)
+	go func(ticks, delay int) {
+		defer r.wg.Done()
+		for i := 0; i < ticks; i++ {
+			r.mutex.Lock()
+			if r.state != StateRunning {
+				r.mutex.Unlock()
+				break
+			}
+			r.currentTick++
+
+			for _, usage := range r.usagesList {
+				usage.Execute()
+			}
+
+			output := map[string]interface{}{
+				"current_tick": r.currentTick,
+				"resources":    r.resources,
+				"usages":       r.usagesList,
+			}
+
+			outputJSON, err := json.MarshalIndent(output, "", "  ")
+			if err != nil {
+				r.mutex.Unlock()
+				continue
+			}
+
+			fmt.Println(string(outputJSON))
+			r.mutex.Unlock()
+			time.Sleep(time.Duration(delay) * time.Millisecond)
+		}
+	}(ticks, delay)
+}
+
+func (r *Runner) Pause() {
+	r.mutex.Lock()
+	if r.state != StateRunning {
+		r.mutex.Unlock()
+		return
+	}
+	r.state = StatePaused
+	r.mutex.Unlock()
+}
+
+func (r *Runner) Kill() {
+	r.mutex.Lock()
+	r.state = StateKilled
+	r.mutex.Unlock()
+	r.wg.Wait()
+}
+
+{% for function in functions %}
+{{ function }}
+{% endfor %}
+
+{% for resource_type in resource_types %}
+{{ resource_type }}
+{% endfor %}
+
+{% for operation in operations %}
+{{ operation }}
+{% endfor %}
+
+{% for irregular_event in irregular_events %}
+{{ irregular_event }}
+{% endfor %}
+
+{% for rule in rules %}
+{{ rule }}
+{% endfor %}
+
+func main() {
+	var resources []interface{}
+	{% for resource in resources %}
+	{{resource}}
+	{% endfor %}
+
+	var usagesList []Usage
+	{% for usage in template_usages %}
+	{{usage}}
+	{% endfor %}
+
+	runner := NewRunner(resources, usagesList)
+	for {
+		var input string
+		fmt.Scanln(&input)
+
+		switch input {
+		case "RUN":
+			var ticks, delay int
+			fmt.Scanf("%d %d", &ticks, &delay)
+			runner.Run(ticks, delay)
+
+		case "PAUSE":
+			runner.Pause()
+
+		case "KILL":
+			runner.Kill()
+			return
+
+		default:
+			fmt.Println("Unknown command.")
+		}
+	}
+}

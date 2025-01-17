@@ -1,4 +1,9 @@
+import os
 from typing import List
+import subprocess
+import tempfile
+
+from jinja2 import Environment, FileSystemLoader, Template
 
 from src.service.translator.dependencies import IModelService
 from src.service.translator.function import trnsl_functions
@@ -9,6 +14,16 @@ from src.service.translator.resource import trnsl_resources
 from src.service.translator.resource_type import trnsl_resource_types
 from src.service.translator.rule import trnsl_rules
 from src.service.translator.template_usage import trnsl_template_usages
+
+TEMPLATE_DIR = "./src/service/translator/templates/"
+TEMPLATE_NAME = "main.jinja"
+
+current_env = Environment(
+    loader=FileSystemLoader(TEMPLATE_DIR),
+    trim_blocks=True,
+    lstrip_blocks=True,
+)
+template: Template = current_env.get_template(TEMPLATE_NAME)
 
 
 class TranslatorService:
@@ -22,24 +37,13 @@ class TranslatorService:
         model = self._model_service.get_model(model_id, user_id)
 
         resource_types = trnsl_resource_types(model.resource_types)
-        print("\n".join(resource_types))
-
         resources = trnsl_resources(model.resources, model.resource_types)
-        print("\n".join(resources))
-
         functions = trnsl_functions(model.functions)
-        print("\n".join(functions))
-
         rules = trnsl_rules(model.rules, model.resource_types)
-        print("\n".join(rules))
-
         operations = trnsl_operations(model.operations, model.resource_types)
-        print("\n".join(operations))
-
         irregular_events = trnsl_irregular_events(
             model.irregular_events, model.resource_types
         )
-        print("\n".join(irregular_events))
 
         metas = []
         metas.extend([template.meta for template in model.irregular_events])
@@ -49,18 +53,53 @@ class TranslatorService:
         template_usages = trnsl_template_usages(
             model.template_usages, metas, model.resources
         )
-        print("\n".join(template_usages))
+        
+        rendered_template = template.render(
+            resource_types=resource_types,
+            resources=resources,
+            functions=functions,
+            rules=rules,
+            operations=operations,
+            irregular_events=irregular_events,
+            template_usages=template_usages,
+        )
+                
+        try:
+            with tempfile.NamedTemporaryFile(suffix=".go", mode="w+", delete=False) as go_file:
+                go_file.write(rendered_template)
+                go_file.flush()
+                go_file.close()
+
+                fmt_result = subprocess.run(
+                    ["go", "fmt", go_file.name],
+                    capture_output=True,
+                    text=True
+                )
+                translate_logs = fmt_result.stdout + fmt_result.stderr
+
+                compiled_file_path = os.path.join(tempfile.gettempdir(), "compiled_program")
+
+                build_result = subprocess.run(
+                    ["go", "build", "-o", compiled_file_path, go_file.name],
+                    capture_output=True,
+                    text=True
+                )
+                translate_logs += build_result.stdout + build_result.stderr
+
+                if build_result.returncode == 0:
+                    translate_logs += f"\nCompilation successful! Output file: {compiled_file_path}"
+                else:
+                    translate_logs += "\nCompilation failed."
+                    
+        except Exception as e:
+            translate_logs = f"Error during compilation: {str(e)}"
+
+        print(translate_logs)
 
         return TranslateInfo(
             file_id=0,
-            file_content="\n".join(resource_types)
-            + "\n".join(resources)
-            + "\n".join(functions)
-            + "\n".join(rules)
-            + "\n".join(operations)
-            + "\n".join(irregular_events)
-            + "\n".join(template_usages),
-            translate_logs="empty",
+            file_content=rendered_template,
+            translate_logs=translate_logs,
         )
 
     def get_translated_files(self, user_id: int) -> List[FileMeta]:
