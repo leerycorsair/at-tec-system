@@ -70,22 +70,31 @@ class TranslatorService:
                 go_file.flush()
                 go_file.close()
 
+                fmt_result = subprocess.run(
+                    ["go", "fmt", go_file.name],
+                    capture_output=True,
+                    text=True
+                )
+                translate_logs = fmt_result.stdout + fmt_result.stderr
+
                 compiled_file_path = os.path.join(tempfile.gettempdir(), "compiled_program")
-                
-                result = subprocess.run(
+
+                build_result = subprocess.run(
                     ["go", "build", "-o", compiled_file_path, go_file.name],
                     capture_output=True,
                     text=True
                 )
-                translate_logs = result.stdout + result.stderr
+                translate_logs += build_result.stdout + build_result.stderr
 
-                if result.returncode == 0:
+                if build_result.returncode == 0:
                     translate_logs += f"\nCompilation successful! Output file: {compiled_file_path}"
                 else:
                     translate_logs += "\nCompilation failed."
-
+                    
         except Exception as e:
             translate_logs = f"Error during compilation: {str(e)}"
+
+        print(translate_logs)
 
         return TranslateInfo(
             file_id=0,
