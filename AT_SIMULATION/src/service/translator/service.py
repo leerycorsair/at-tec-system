@@ -1,4 +1,7 @@
+import os
 from typing import List
+import subprocess
+import tempfile
 
 from jinja2 import Environment, FileSystemLoader, Template
 
@@ -60,13 +63,34 @@ class TranslatorService:
             irregular_events=irregular_events,
             template_usages=template_usages,
         )
-        
-        print(rendered_template)
+                
+        try:
+            with tempfile.NamedTemporaryFile(suffix=".go", mode="w+", delete=False) as go_file:
+                go_file.write(rendered_template)
+                go_file.flush()
+                go_file.close()
+
+                compiled_file_path = os.path.join(tempfile.gettempdir(), "compiled_program")
+                
+                result = subprocess.run(
+                    ["go", "build", "-o", compiled_file_path, go_file.name],
+                    capture_output=True,
+                    text=True
+                )
+                translate_logs = result.stdout + result.stderr
+
+                if result.returncode == 0:
+                    translate_logs += f"\nCompilation successful! Output file: {compiled_file_path}"
+                else:
+                    translate_logs += "\nCompilation failed."
+
+        except Exception as e:
+            translate_logs = f"Error during compilation: {str(e)}"
 
         return TranslateInfo(
             file_id=0,
             file_content=rendered_template,
-            translate_logs="empty",
+            translate_logs=translate_logs,
         )
 
     def get_translated_files(self, user_id: int) -> List[FileMeta]:
