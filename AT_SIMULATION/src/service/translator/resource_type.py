@@ -51,7 +51,9 @@ def to_resource_type_tr(resource_type: ResourceTypeDB) -> dict:
     }
 
 
-def to_enum_tr(resource_type_name: str, attr_name: str, enum_values_set: List[str]) -> dict:
+def to_enum_tr(
+    resource_type_name: str, attr_name: str, enum_values_set: List[str]
+) -> dict:
     enum_name = f"{resource_type_name.capitalize()}{attr_name.capitalize()}Enum"
     return {
         "name": enum_name,
