@@ -11,6 +11,7 @@ from src.delivery.translator.models.conversions import (
     to_TranslatedFilesResponse,
 )
 from src.delivery.translator.models.models import (
+    TranslateModelRequest,
     TranslateResponse,
     TranslatedFilesResponse,
 )
@@ -38,13 +39,14 @@ async def get_translated_files(
     "/files/{model_id}", response_model=CommonResponse[TranslateResponse | None]
 )
 async def translate_model(
+    body: TranslateModelRequest,
     model_id: int,
     user_id: int = Depends(get_current_user),
     translator_service: ITranslatorService = Depends(get_translator_service),
 ) -> CommonResponse[TranslateResponse]:
-    # try:
-    return SuccessResponse(
-        to_TranslateResponse(translator_service.translate_model(model_id, user_id, "smth"))
-    )
-    # except Exception as e:
-        # return InternalServiceError(e)
+    try:
+        return SuccessResponse(
+            to_TranslateResponse(translator_service.translate_model(model_id, user_id, body.file_name))
+        )
+    except Exception as e:
+        return InternalServiceError(e)

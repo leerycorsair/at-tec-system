@@ -18,3 +18,7 @@ class TranslateResponse(BaseModel):
     file_content: str
     translate_logs: str
     stage: str
+
+
+class TranslateModelRequest(BaseModel):
+    file_name: str

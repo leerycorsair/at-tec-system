@@ -17,6 +17,7 @@ from src.storage.minio.storage import get_minio_storage
 
 class IModelService(Protocol):
     def get_model(self, model_id: int, user_id: int) -> Model: ...
+    def check_model_rights(self, model_id: int, user_id: int) -> None: ...
 
 
 def get_model_service(
@@ -39,8 +40,6 @@ class IFileRepository(Protocol):
     ) -> str: ...
 
 
-def get_file_repository(
-    minio_info =Depends(get_minio_storage)
-) -> IFileRepository:
+def get_file_repository(minio_info=Depends(get_minio_storage)) -> IFileRepository:
     client, bucket_name = minio_info
     return MinioRepository(client, bucket_name)

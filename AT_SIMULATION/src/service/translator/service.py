@@ -21,6 +21,7 @@ class TranslatorService:
     def translate_model(
         self, model_id: int, user_id: int, file_name: str
     ) -> TranslateInfo:
+        self._model_service.check_model_rights(model_id, user_id)
         model = self._model_service.get_model(model_id, user_id)
         rendered_model = trnsl_model(model)
 
