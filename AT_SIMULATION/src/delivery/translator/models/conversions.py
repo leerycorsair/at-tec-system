@@ -24,7 +24,9 @@ def to_TranslatedFilesResponse(metas: List[FileMeta]) -> TranslatedFilesResponse
 
 def to_TranslateResponse(info: TranslateInfo) -> TranslateResponse:
     return TranslateResponse(
-        file_id=info.file_id,
+        file_name=info.file_name,
         file_content=info.file_content,
         translate_logs=info.translate_logs,
+        stage=info.stage,
     )
+

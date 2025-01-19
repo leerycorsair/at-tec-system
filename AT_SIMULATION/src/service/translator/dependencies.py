@@ -40,6 +40,7 @@ class IFileRepository(Protocol):
 
 
 def get_file_repository(
-    client, bucket_name=Depends(get_minio_storage)
+    minio_info =Depends(get_minio_storage)
 ) -> IFileRepository:
+    client, bucket_name = minio_info
     return MinioRepository(client, bucket_name)
