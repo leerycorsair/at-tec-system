@@ -77,7 +77,7 @@ class TranslatorService:
 
                 # Stage 4: Upload
                 storage_file_name = self._file_repository.load_file(
-                    file_path, file_name, model.meta.name
+                    user_id, file_path, file_name, model.meta.name
                 )
                 translate_logs += "\nTranslation completed successfully."
                 self._cleanup_files(temporary_files)

@@ -1,8 +1,9 @@
+from typing import Tuple
 from minio import Minio
 from src.config.minio import MinioStore
 
 
-def get_file_storage():
+def get_minio_storage() -> Tuple[Minio, str]:
     config = MinioStore.get_minio_config()
     client = Minio(
         config.endpoint,
@@ -14,4 +15,4 @@ def get_file_storage():
     if not client.bucket_exists(config.bucket_name):
         client.make_bucket(config.bucket_name)
 
-    return client
+    return client, config.bucket_name

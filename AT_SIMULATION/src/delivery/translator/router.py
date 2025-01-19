@@ -42,9 +42,9 @@ async def translate_model(
     user_id: int = Depends(get_current_user),
     translator_service: ITranslatorService = Depends(get_translator_service),
 ) -> CommonResponse[TranslateResponse]:
-    try:
-        return SuccessResponse(
-            to_TranslateResponse(translator_service.translate_model(model_id, user_id))
-        )
-    except Exception as e:
-        return InternalServiceError(e)
+    # try:
+    return SuccessResponse(
+        to_TranslateResponse(translator_service.translate_model(model_id, user_id, "smth"))
+    )
+    # except Exception as e:
+        # return InternalServiceError(e)

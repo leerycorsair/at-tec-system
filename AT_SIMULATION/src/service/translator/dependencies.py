@@ -2,6 +2,7 @@ from typing import Protocol
 
 from fastapi import Depends
 
+from src.repository.minio.repository import MinioRepository
 from src.service.model.dependencies import (
     IModelRepository,
     get_function_service,
@@ -11,6 +12,7 @@ from src.service.model.dependencies import (
 )
 from src.service.model.models.models import Model
 from src.service.model.service import ModelService
+from src.storage.minio.storage import get_minio_storage
 
 
 class IModelService(Protocol):
@@ -32,26 +34,12 @@ def get_model_service(
 
 
 class IFileRepository(Protocol):
+    def load_file(
+        self, user_id: int, file_path: str, file_name: str, model_name: str
+    ) -> str: ...
 
-    # def __init__(self, minio_client: Minio, bucket_name: str):
-    #     self._minio_client = minio_client
-    #     self._bucket_name = bucket_name
 
-    def load_file(self, file_path: str, file_name: str, model_name: str) -> str: ...
-
-    # timestamp = int(time.time())
-    # minio_file_name = f"{file_name}_{model_name}_{timestamp}"
-    # metadata = {
-    #     "file_name": file_name,
-    #     "model_name": model_name,
-    #     "timestamp": str(timestamp),
-    # }
-
-    # self._minio_client.fput_object(
-    #     self._bucket_name,
-    #     file_name,
-    #     file_path,
-    #     metadata=metadata
-    # )
-
-    # return minio_file_name
+def get_file_repository(
+    client, bucket_name=Depends(get_minio_storage)
+) -> IFileRepository:
+    return MinioRepository(client, bucket_name)
