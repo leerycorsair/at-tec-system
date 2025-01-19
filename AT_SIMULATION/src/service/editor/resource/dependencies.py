@@ -8,8 +8,7 @@ from src.repository.visio.models.models import NodeDB, NodeTypesEnum
 from src.service.visio.dependencies import get_visio_repository
 from src.service.visio.service import VisioService
 from sqlalchemy.orm import Session
-
-from src.storage.postgres.session import get_db
+from src.storage.postgres.storage import get_db
 
 
 class IResourceRepository(Protocol):

@@ -5,7 +5,7 @@ from fastapi import Depends
 from sqlalchemy.orm import Session
 from src.repository.editor.imports.models.models import ImportDB
 from src.repository.editor.imports.repository import ImportRepository
-from src.storage.postgres.session import get_db
+from src.storage.postgres.storage import get_db
 
 
 class IImportRepository(Protocol):
