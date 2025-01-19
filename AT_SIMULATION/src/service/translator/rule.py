@@ -38,7 +38,10 @@ def trnsl_rules(rules: List[RuleDB], resource_types: List[ResourceTypeDB]) -> Li
 
 def to_rule_tr(rule: RuleDB, rel_resources_info: dict) -> dict:
     params = [
-        {"name": rel_resource.name, "type": rel_resources_info[rel_resource.id].name}
+        {
+            "name": rel_resource.name,
+            "type": rel_resources_info[rel_resource.id].name,
+        }
         for rel_resource in rule.meta.rel_resources
         if rel_resource.id in rel_resources_info
     ]
