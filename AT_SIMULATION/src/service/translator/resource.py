@@ -37,16 +37,22 @@ def to_resource_tr(resource: ResourceDB, resource_type: ResourceTypeDB) -> dict:
     attrs = [
         {
             "name": attr.name,
-            "value": next(
-                (ra.value for ra in resource.attributes if ra.rta_id == attr.id), None
+            "value": (
+                (str(ra.value).lower() if isinstance(ra.value, bool) else ra.value)
+                if (
+                    ra := next(
+                        (ra for ra in resource.attributes if ra.rta_id == attr.id), None
+                    )
+                )
+                else None
             ),
         }
         for attr in resource_type.attributes
     ]
-    
+
     return {
         "resource_name": resource.name,
         "resource_type_name": resource_type.name,
-        "to_be_traced": resource.to_be_traced,
+        "to_be_traced": str(resource.to_be_traced).lower(),
         "attributes": attrs,
     }

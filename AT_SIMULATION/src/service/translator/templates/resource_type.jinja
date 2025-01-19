@@ -8,25 +8,24 @@ const (
 )
 {% endfor %}
 
-type {{ resource_type.name|capitalize }} struct {
+type {{ resource_type.name }} struct {
     ResourceName string `json:"resource_name"`
     ToBeTraced bool `json:"-"`
     {% for attribute in resource_type.attributes %}
-    {{ attribute.name|capitalize }} {{ attribute.go_type }} `json:"{{ attribute.name }}"`
+    {{ attribute.name }} {{ attribute.go_type }}
     {% endfor %}
 }
 
-func (r {{ resource_type.name|capitalize }}) MarshalJSON() ([]byte, error) {
+func (r {{ resource_type.name }}) MarshalJSON() ([]byte, error) {
     if !r.ToBeTraced {
         return []byte("null"), nil
     }
 
-    type Alias {{ resource_type.name|capitalize }}
-    aux := struct {
-        Alias
-    }{
-        Alias: Alias(r),
-    }
+    aux := make(map[string]interface{})
+    aux["resource_name"] = r.ResourceName
+    {% for attribute in resource_type.attributes %}
+    aux["{{ attribute.name }}"] = r.{{ attribute.name }}
+    {% endfor %}
 
     return json.Marshal(aux)
 }

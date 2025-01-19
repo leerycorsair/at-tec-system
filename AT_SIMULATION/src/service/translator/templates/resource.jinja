@@ -1,9 +1,9 @@
-{{ resource_name }} := {{ resource_type_name | capitalize }}{
+{{ resource_name }} := {{ resource_type_name }}{
 	ResourceName: "{{ resource_name }}",
 	ToBeTraced: {{ to_be_traced }},
 
 	{% for attribute in attributes %}
-	{{ attribute.name | capitalize }}: {{ attribute.value | lower }},
+	{{ attribute.name }}: {{ attribute.value }},
 	{% endfor %}
 }
-resources = append(resources, {{ resource_name }})
+resources = append(resources, &{{ resource_name }})
