@@ -1,4 +1,5 @@
 from datetime import datetime
+import os
 from typing import List
 from minio import Minio, S3Error
 import uuid
@@ -32,6 +33,21 @@ class MinioRepository:
         )
 
         return minio_file_name
+
+    def fetch_file(self, file_uuid: str, file_path: str) -> str:
+        try:
+            local_file_path = f"{file_path}/{file_uuid}"
+
+            response = self._minio_client.get_object(self._bucket_name, file_uuid)
+            with open(local_file_path, "wb") as f:
+                for chunk in response.stream(32 * 1024):
+                    f.write(chunk)
+
+            os.chmod(local_file_path, 0o755)
+
+            return local_file_path
+        except Exception as e:
+            raise Exception(f"Error fetching file from MinIO: {e}")
 
     def get_files(self, user_id: int) -> List[MinioFile]:
         user_files: List[MinioFile] = []
