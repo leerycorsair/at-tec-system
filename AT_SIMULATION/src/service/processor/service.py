@@ -1,6 +1,7 @@
 from typing import List, Optional
+import uuid
 
-from fastapi import WebSocket
+from src.delivery.websocket_manager import WebsocketManager
 from src.service.processor.dependencies import IFileRepository, IModelService
 from src.service.processor.models.models import Process, ProcessStatus
 import subprocess
@@ -9,14 +10,24 @@ import json
 
 
 class ProcessorService:
-    def __init__(
+    _instance = None
+
+    def __new__(cls, *args, **kwargs):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+            cls._instance._initialize(*args, **kwargs)
+        return cls._instance
+
+    def _initialize(
         self,
         model_service: IModelService,
         file_repository: IFileRepository,
+        websocket_manager: WebsocketManager,
     ) -> None:
         self._model_service = model_service
         self._file_repository = file_repository
-        self.processes: List[Process] = []
+        self._websocket_manager = websocket_manager
+        self._processes: List[Process] = []
 
     def create_process(
         self, user_id: int, file_uuid: str, process_name: str
@@ -31,7 +42,7 @@ class ProcessorService:
             text=True,
         )
 
-        process_id = len(self.processes) + 1
+        process_id = str(uuid.uuid4())
 
         new_process = Process(
             user_id=user_id,
@@ -43,16 +54,15 @@ class ProcessorService:
             process_handle=process_handle,
         )
 
-        self.processes.append(new_process)
+        self._processes.append(new_process)
         return new_process
 
-    def run_process(
+    async def run_process(
         self,
         user_id: int,
         process_id: int,
         ticks: int,
         delay: int,
-        websocket: WebSocket,
     ) -> None:
         process = self._find_process_by_id(process_id)
         if not process:
@@ -80,8 +90,8 @@ class ProcessorService:
                     raise e
 
         threading.Thread(target=stream_output, daemon=True).start()
-        
-    def pause_process(self, user_id: int, process_id: int) -> None:
+
+    def pause_process(self, user_id: int, process_id: int) -> Process:
         process = self._find_process_by_id(process_id)
         if not process:
             raise ValueError("Process not found.")
@@ -93,7 +103,7 @@ class ProcessorService:
         process.process_handle.stdin.flush()
         process.status = ProcessStatus.PAUSE
 
-    def kill_process(self, user_id: int, process_id: int) -> None:
+    def kill_process(self, user_id: int, process_id: int) -> Process:
         process = self._find_process_by_id(process_id)
         if not process:
             raise ValueError("Process not found.")
@@ -104,10 +114,10 @@ class ProcessorService:
         process.status = ProcessStatus.KILLED
 
     def get_processes(self, user_id: int) -> List[Process]:
-        return self.processes
+        return [process for process in self._processes if process.user_id == user_id]
 
     def _find_process_by_id(self, process_id: int) -> Optional[Process]:
-        for process in self.processes:
+        for process in self._processes:
             if process.process_id == process_id:
                 return process
         return None

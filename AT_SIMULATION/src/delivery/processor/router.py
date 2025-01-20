@@ -1,15 +1,20 @@
-from fastapi import APIRouter, Depends, WebSocketDisconnect
+from fastapi import APIRouter, Depends
 from src.delivery.core.models.conversions import InternalServiceError, SuccessResponse
 from src.delivery.core.models.models import CommonResponse
 from src.delivery.model.dependencies import get_current_user
 from src.delivery.processor.dependencies import IProcessorService, get_processor_service
 from fastapi import WebSocket
+from src.delivery.processor.models.conversions import (
+    to_ProcessResponse,
+    to_ProcessesResponse,
+)
 from src.delivery.processor.models.models import (
     CreateProcessRequest,
     ProcessResponse,
     ProcessesResponse,
     RunProcessRequest,
 )
+from src.delivery.websocket_manager import WebsocketManager
 
 
 router = APIRouter(
@@ -38,45 +43,84 @@ def create_process(
         return InternalServiceError(e)
 
 
-@router.websocket("/{process_id}/run")
-async def run_process_websocket(
-    web_socket: WebSocket,
+@router.post("/{process_id}/run", response_model=CommonResponse[ProcessResponse | None])
+def run_process(
     process_id: int,
-    ticks: int,
-    delay: int,
+    body: RunProcessRequest,
     user_id: int = Depends(get_current_user),
     processor_service: IProcessorService = Depends(get_processor_service),
-):
-    await web_socket.accept()
+) -> CommonResponse[ProcessResponse]:
     try:
-        await processor_service.run_process(
-            user_id=user_id,
-            process_id=process_id,
-            ticks=ticks,
-            delay=delay,
-            web_socket=web_socket,
+        return SuccessResponse(
+            to_ProcessResponse(
+                processor_service.run_process(
+                    user_id, process_id, body.ticks, body.delay
+                )
+            )
         )
-    except WebSocketDisconnect:
-        print(f"WebSocket disconnected for process {process_id}")
     except Exception as e:
-        await web_socket.send_text(f"Error: {str(e)}")
-        await web_socket.close()
+        return InternalServiceError(e)
 
 
-@router.get("/{process_id}/run", response_model=dict, summary="WebSocket Documentation")
-def websocket_documentation(process_id: int):
+@router.post(
+    "/{process_id}/pause", response_model=CommonResponse[ProcessResponse | None]
+)
+def pause_process(
+    process_id: int,
+    user_id: int = Depends(get_current_user),
+    processor_service: IProcessorService = Depends(get_processor_service),
+) -> CommonResponse[ProcessResponse]:
+    try:
+        return SuccessResponse(
+            to_ProcessResponse(processor_service.pause_process(user_id, process_id))
+        )
+    except Exception as e:
+        return InternalServiceError(e)
+
+
+@router.post(
+    "/{process_id}/kill", response_model=CommonResponse[ProcessResponse | None]
+)
+def kill_process(
+    process_id: int,
+    user_id: int = Depends(get_current_user),
+    processor_service: IProcessorService = Depends(get_processor_service),
+) -> CommonResponse[ProcessResponse]:
+    try:
+        return SuccessResponse(
+            to_ProcessResponse(processor_service.kill_process(user_id, process_id))
+        )
+    except Exception as e:
+        return InternalServiceError(e)
+
+
+@router.get("", response_model=CommonResponse[ProcessesResponse | None])
+def get_processes(
+    user_id: int = Depends(get_current_user),
+    processor_service: IProcessorService = Depends(get_processor_service),
+) -> CommonResponse[ProcessesResponse]:
+    try:
+        return SuccessResponse(
+            to_ProcessesResponse(processor_service.get_processes(user_id))
+        )
+    except Exception as e:
+        return InternalServiceError(e)
+
+
+@router.get("/ws", summary="WebSocket Init")
+def websocket_documentation():
     """
-    ## WebSocket Documentation for `api/processor/{process_id}/run`
+    ## WebSocket Documentation for `api/processor/ws`
 
-    - **WebSocket Endpoint**: `api/processor/{process_id}/run`
+    - **WebSocket Endpoint**: `api/processor/ws`
     - **Description**: Streams real-time updates for a process.
 
+    ### Header:
+    HTTPBearer  (http, Bearer): JWT token.
+
     ### Parameters:
-    - `web_socket: WebSocket`: The WebSocket. 
-    - `auth_token: str`: Auth user JWT token. 
-    - `process_id: int`: The ID of the process to run.
-    - `ticks: int`: The number of ticks to process.
-    - `delay: int`: The delay between ticks, in milliseconds.
+    - `web_socket: WebSocket`: The WebSocket.
+    - `process_id: int`:
 
     ### Example Messages:
     - **Server Message**:
@@ -87,7 +131,7 @@ def websocket_documentation(process_id: int):
         {
         "resource_name": "vlados_ruble",
         "currency": 55,
-        "<attr_name>": "<attr_value>", 
+        "<attr_name>": "<attr_value>",
         ...,
         },
         null,
@@ -95,14 +139,14 @@ def websocket_documentation(process_id: int):
         "resource_name": "car_1",
         "pos_x": -20,
         "pos_y": 25,
-        "<attr_name>": "<attr_value>", 
+        "<attr_name>": "<attr_value>",
         ...,
         },
         {
         "resource_name": "car_2",
         "pos_x": -20,
         "pos_y": 50,
-        "<attr_name>": "<attr_value>", 
+        "<attr_name>": "<attr_value>",
         ...,
         }
     ],
@@ -155,52 +199,22 @@ def websocket_documentation(process_id: int):
 
     This endpoint does not return data directly as it is intended for documentation purposes.
     """
-    return {
-        "websocket_endpoint": f"/processor/{process_id}/run",
-        "description": "See docstring for WebSocket details.",
-    }
+    return {}
 
 
-@router.post(
-    "/{process_id}/pause", response_model=CommonResponse[ProcessResponse | None]
-)
-def pause_process(
+@router.websocket("/ws")
+async def websocket_init(
+    websocket: WebSocket,
     process_id: int,
     user_id: int = Depends(get_current_user),
-    processor_service: IProcessorService = Depends(get_processor_service),
-) -> CommonResponse[ProcessResponse]:
+    websocket_manager: WebsocketManager = Depends(WebsocketManager),
+) -> None:
+    await websocket_manager.connect(websocket, user_id, process_id)
+
     try:
-        return SuccessResponse(
-            to_ProcessResponse(processor_service.pause_process(user_id, process_id))
-        )
+        while True:
+            await websocket.receive_text()
     except Exception as e:
-        return InternalServiceError(e)
-
-
-@router.post(
-    "/{process_id}/kill", response_model=CommonResponse[ProcessResponse | None]
-)
-def kill_process(
-    process_id: int,
-    user_id: int = Depends(get_current_user),
-    processor_service: IProcessorService = Depends(get_processor_service),
-) -> CommonResponse[ProcessResponse]:
-    try:
-        return SuccessResponse(
-            to_ProcessResponse(processor_service.kill_process(user_id, process_id))
-        )
-    except Exception as e:
-        return InternalServiceError(e)
-
-
-@router.get("", response_model=CommonResponse[ProcessesResponse | None])
-def get_processes(
-    user_id: int = Depends(get_current_user),
-    processor_service: IProcessorService = Depends(get_processor_service),
-) -> CommonResponse[ProcessesResponse]:
-    try:
-        return SuccessResponse(
-            to_ProcessResponse(processor_service.get_processes(user_id))
-        )
-    except Exception as e:
-        return InternalServiceError(e)
+        print(f"WebSocket error: {e}")
+    finally:
+        websocket_manager.disconnect(websocket, user_id, process_id)
