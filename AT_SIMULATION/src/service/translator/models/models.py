@@ -1,13 +1,16 @@
+from enum import Enum
 from pydantic import BaseModel
 
 
-class FileMeta(BaseModel):
-    id: int
-    name: str
-    model_id: int
+class StagesEnum(str, Enum):
+    FORMATTING = "FORMATTING"
+    BUILDING = "BUILDING"
+    LINTING = "LINTING"
+    COMPLETED = "COMPLETED"
 
 
 class TranslateInfo(BaseModel):
-    file_id: int
+    file_name: str
     file_content: str
     translate_logs: str
+    stage: StagesEnum

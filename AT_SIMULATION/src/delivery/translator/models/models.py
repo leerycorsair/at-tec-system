@@ -1,11 +1,14 @@
+from datetime import datetime
 from typing import List
 from pydantic import BaseModel
 
 
 class TranslatedFileResponse(BaseModel):
-    id: int
-    name: str
+    file_uuid: str
+    file_name: str
     model_id: int
+    created_at: datetime
+    size: int
 
 
 class TranslatedFilesResponse(BaseModel):
@@ -14,6 +17,11 @@ class TranslatedFilesResponse(BaseModel):
 
 
 class TranslateResponse(BaseModel):
-    file_id: int
+    file_uuid: str
     file_content: str
     translate_logs: str
+    stage: str
+
+
+class TranslateModelRequest(BaseModel):
+    file_name: str

@@ -16,7 +16,7 @@ from src.service.editor.resource.service import ResourceService
 from src.service.editor.template.dependencies import get_template_repository
 from src.service.editor.template.models.models import Templates
 from src.service.editor.template.service import TemplateService
-from src.storage.postgres.session import get_db
+from src.storage.postgres.storage import get_db
 
 
 class IModelRepository(Protocol):

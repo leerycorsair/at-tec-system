@@ -19,6 +19,7 @@ func (t *{{ template_name }}) Execute() {
 		{{ body }}
 
 		t.HasTriggered = true
+		return
 	}
 
 	t.HasTriggered = false

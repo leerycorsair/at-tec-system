@@ -45,7 +45,8 @@ class ModelService:
 
     def get_model(self, model_id: int, user_id: int) -> Model:
         self.check_model_rights(model_id, user_id)
-
+        
+        meta = self._model_rep.get_model_meta(model_id)
         resource_types = self._resource_service.get_resource_types(model_id)
         resources = self._resource_service.get_resources(model_id)
         templates = self._template_service.get_templates(model_id)
@@ -53,5 +54,5 @@ class ModelService:
         functions = self._function_service.get_functions(model_id)
 
         return to_Model(
-            resource_types, resources, templates, template_usages, functions
+            meta, resource_types, resources, templates, template_usages, functions
         )

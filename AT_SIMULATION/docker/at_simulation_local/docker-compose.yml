@@ -19,6 +19,14 @@ services:
       SERVER_PORT: ${SERVER_PORT}
       RABBITMQ_HOST: ${RABBITMQ_HOST}
       RABBITMQ_PORT: ${RABBITMQ_PORT}
+
+      MINIO_HOST: ${MINIO_HOST}
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
+      MINIO_BUCKET_NAME: ${MINIO_BUCKET_NAME}
+      MINIO_SECURE: ${MINIO_SECURE}
+      MINIO_API_PORT: ${MINIO_API_PORT}
+      MINIO_CONSOLE_PORT: ${MINIO_CONSOLE_PORT}
     depends_on:
       postgres_simulation:
         condition: service_healthy
@@ -46,9 +54,26 @@ services:
       - postgres-data:/var/lib/postgresql/data
     command: ["postgres", "-c", "port=5436"]
 
+  minio:
+    container_name: at_minio
+    image: "minio/minio:latest"
+    command: server /data --console-address ":${MINIO_CONSOLE_PORT}" --address ":${MINIO_API_PORT}"
+    ports:
+      - "${MINIO_API_PORT}:${MINIO_API_PORT}"
+      - "${MINIO_CONSOLE_PORT}:${MINIO_CONSOLE_PORT}"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ACCESS_KEY}
+      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY}
+    volumes:
+      - minio-data:/data
+    restart: unless-stopped
+    networks:
+      - custom-network
+
 networks:
   custom-network:
     external: true
 
 volumes:
   postgres-data:
+  minio-data:

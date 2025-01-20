@@ -4,27 +4,34 @@ from src.delivery.translator.models.models import (
     TranslatedFileResponse,
     TranslatedFilesResponse,
 )
-from src.service.translator.models.models import FileMeta, TranslateInfo
+from src.repository.minio.models.models import MinioFile
+from src.service.translator.models.models import TranslateInfo
 
 
-def to_TranslatedFileResponse(meta: FileMeta) -> TranslatedFileResponse:
+def to_TranslatedFileResponse(file: MinioFile) -> TranslatedFileResponse:
     return TranslatedFileResponse(
-        id=meta.id,
-        name=meta.name,
-        model_id=meta.model_id,
+        file_uuid=file.minio_name,
+        file_name=file.file_meta.file_name,
+        model_id=file.file_meta.model_id,
+        created_at=file.file_meta.created_at,
+        size=file.size,
     )
 
 
-def to_TranslatedFilesResponse(metas: List[FileMeta]) -> TranslatedFilesResponse:
+def to_TranslatedFilesResponse(files: List[MinioFile]) -> TranslatedFilesResponse:
+    sorted_files = sorted(
+        files, key=lambda file: file.file_meta.created_at, reverse=True
+    )
     return TranslatedFilesResponse(
-        files=[to_TranslatedFileResponse(meta) for meta in metas],
-        total=len(metas),
+        files=[to_TranslatedFileResponse(file) for file in sorted_files],
+        total=len(sorted_files),
     )
 
 
 def to_TranslateResponse(info: TranslateInfo) -> TranslateResponse:
     return TranslateResponse(
-        file_id=info.file_id,
+        file_uuid=info.file_name,
         file_content=info.file_content,
         translate_logs=info.translate_logs,
+        stage=info.stage,
     )

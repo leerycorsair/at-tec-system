@@ -8,7 +8,7 @@ from src.repository.editor.function.repository import FunctionRepository
 from src.repository.visio.models.models import NodeTypesEnum
 from src.service.visio.dependencies import get_visio_repository
 from src.service.visio.service import VisioService
-from src.storage.postgres.session import get_db
+from src.storage.postgres.storage import get_db
 
 
 class IFunctionRepository(Protocol):

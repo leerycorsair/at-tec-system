@@ -1,4 +1,3 @@
-from typing import Optional, Union
 from yarl import URL
 import os
 from dataclasses import dataclass

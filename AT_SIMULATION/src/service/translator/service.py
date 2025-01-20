@@ -1,118 +1,145 @@
 import os
-from typing import List
+from typing import List, Tuple
 import subprocess
 import tempfile
 
-from jinja2 import Environment, FileSystemLoader, Template
 
-from src.service.translator.dependencies import IModelService
-from src.service.translator.function import trnsl_functions
-from src.service.translator.irregular_event import trnsl_irregular_events
-from src.service.translator.models.models import FileMeta, TranslateInfo
-from src.service.translator.operation import trnsl_operations
-from src.service.translator.resource import trnsl_resources
-from src.service.translator.resource_type import trnsl_resource_types
-from src.service.translator.rule import trnsl_rules
-from src.service.translator.template_usage import trnsl_template_usages
-
-TEMPLATE_DIR = "./src/service/translator/templates/"
-TEMPLATE_NAME = "main.jinja"
-
-current_env = Environment(
-    loader=FileSystemLoader(TEMPLATE_DIR),
-    trim_blocks=True,
-    lstrip_blocks=True,
-)
-template: Template = current_env.get_template(TEMPLATE_NAME)
+from src.repository.minio.models.models import MinioFile
+from src.service.translator.dependencies import IFileRepository, IModelService
+from src.service.translator.main import trnsl_model
+from src.service.translator.models.models import StagesEnum, TranslateInfo
 
 
 class TranslatorService:
     def __init__(
         self,
         model_service: IModelService,
+        file_repository: IFileRepository,
     ) -> None:
         self._model_service = model_service
+        self._file_repository = file_repository
 
-    def translate_model(self, model_id: int, user_id: int) -> TranslateInfo:
+    def translate_model(
+        self, model_id: int, user_id: int, file_name: str
+    ) -> TranslateInfo:
+        self._model_service.check_model_rights(model_id, user_id)
         model = self._model_service.get_model(model_id, user_id)
+        rendered_model = trnsl_model(model)
 
-        resource_types = trnsl_resource_types(model.resource_types)
-        resources = trnsl_resources(model.resources, model.resource_types)
-        functions = trnsl_functions(model.functions)
-        rules = trnsl_rules(model.rules, model.resource_types)
-        operations = trnsl_operations(model.operations, model.resource_types)
-        irregular_events = trnsl_irregular_events(
-            model.irregular_events, model.resource_types
-        )
-
-        metas = []
-        metas.extend([template.meta for template in model.irregular_events])
-        metas.extend([template.meta for template in model.operations])
-        metas.extend([template.meta for template in model.rules])
-        # order by meta.name
-        template_usages = trnsl_template_usages(
-            model.template_usages, metas, model.resources
-        )
-        
-        rendered_template = template.render(
-            resource_types=resource_types,
-            resources=resources,
-            functions=functions,
-            rules=rules,
-            operations=operations,
-            irregular_events=irregular_events,
-            template_usages=template_usages,
-        )
-                
+        translate_logs = ""
+        temporary_files = []
         try:
-            with tempfile.NamedTemporaryFile(suffix=".go", mode="w+", delete=False) as go_file:
-                go_file.write(rendered_template)
+            with tempfile.NamedTemporaryFile(
+                suffix=".go",
+                mode="w+",
+                delete=False,
+            ) as go_file:
+                go_file.write(rendered_model)
                 go_file.flush()
                 go_file.close()
+                temporary_files.append(go_file.name)
 
-                fmt_result = subprocess.run(
-                    ["go", "fmt", go_file.name],
-                    capture_output=True,
-                    text=True
+                # Stage 1: Formatting
+                fmt_result, logs = self._run_formatting(go_file.name)
+                translate_logs += logs
+                if fmt_result != 0:
+                    self._cleanup_files(temporary_files)
+                    return TranslateInfo(
+                        file_name="",
+                        file_content=rendered_model,
+                        translate_logs=translate_logs,
+                        stage=StagesEnum.FORMATTING,
+                    )
+
+                # Stage 2: Building
+                file_path = os.path.join(tempfile.gettempdir(), "compiled_program")
+                build_result, logs = self._run_building(go_file.name, file_path)
+                translate_logs += logs
+                temporary_files.append(file_path)
+                if build_result != 0:
+                    self._cleanup_files(temporary_files)
+                    return TranslateInfo(
+                        file_name="",
+                        file_content=rendered_model,
+                        translate_logs=translate_logs,
+                        stage=StagesEnum.BUILDING,
+                    )
+
+                # Stage 3: Linting
+                lint_result, logs = self._run_linting(go_file.name)
+                translate_logs += logs
+                if lint_result != 0:
+                    self._cleanup_files(temporary_files)
+                    return TranslateInfo(
+                        file_name="",
+                        file_content=rendered_model,
+                        translate_logs=translate_logs,
+                        stage=StagesEnum.LINTING,
+                    )
+
+                # Stage 4: Upload
+                storage_file_name = self._file_repository.load_file(
+                    user_id, file_path, file_name, model.meta.id
                 )
-                translate_logs = fmt_result.stdout + fmt_result.stderr
+                translate_logs += "\nTranslation completed successfully."
+                self._cleanup_files(temporary_files)
 
-                compiled_file_path = os.path.join(tempfile.gettempdir(), "compiled_program")
-
-                build_result = subprocess.run(
-                    ["go", "build", "-o", compiled_file_path, go_file.name],
-                    capture_output=True,
-                    text=True
+                return TranslateInfo(
+                    file_name=storage_file_name,
+                    file_content=rendered_model,
+                    translate_logs=translate_logs,
+                    stage=StagesEnum.COMPLETED,
                 )
-                translate_logs += build_result.stdout + build_result.stderr
 
-                if build_result.returncode == 0:
-                    translate_logs += f"\nCompilation successful! Output file: {compiled_file_path}"
-                else:
-                    translate_logs += "\nCompilation failed."
-                    
         except Exception as e:
-            translate_logs = f"Error during compilation: {str(e)}"
+            raise ValueError(e)
 
-        print(translate_logs)
+    def _run_formatting(self, file_path: str) -> Tuple[int, str]:
+        try:
+            result = subprocess.run(
+                ["go", "fmt", file_path],
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            logs = result.stdout + result.stderr
+            return result.returncode, logs
+        except Exception as e:
+            return 1, f"Error during formatting: {str(e)}\n"
 
-        return TranslateInfo(
-            file_id=0,
-            file_content=rendered_template,
-            translate_logs=translate_logs,
-        )
+    def _run_building(self, file_path: str, output_path: str) -> Tuple[int, str]:
+        try:
+            result = subprocess.run(
+                ["go", "build", "-o", output_path, file_path],
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            logs = result.stdout + result.stderr
+            return result.returncode, logs
+        except Exception as e:
+            return 1, f"Error during building: {str(e)}\n"
 
-    def get_translated_files(self, user_id: int) -> List[FileMeta]:
-        return []
+    def _run_linting(self, file_path: str) -> Tuple[int, str]:
+        try:
+            result = subprocess.run(
+                ["golangci-lint", "run", file_path],
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            logs = result.stdout + result.stderr
+            return result.returncode, logs
+        except Exception as e:
+            return 1, f"Error during linting: {str(e)}\n"
 
-    # def _trnsl_resources(self) -> str: ...
+    def _cleanup_files(self, files: list):
+        for file in files:
+            try:
+                if os.path.exists(file):
+                    os.remove(file)
+            except Exception as e:
+                pass
 
-    # def _trnsl_irregular_events(self) -> str: ...
-
-    # def _trnsl_operations(self) -> str: ...
-
-    # def _trnsl_rules(self) -> str: ...
-
-    # def _trnsl_template_usages(self) -> str: ...
-
-    # def _trnsl_functions(self) -> str: ...
+    def get_translated_files(self, user_id: int) -> List[MinioFile]:
+        return self._file_repository.get_files(user_id)

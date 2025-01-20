@@ -16,7 +16,6 @@ func (t *{{ template_name }}) Execute() {
 
 		t.IsActive = false
 		t.CurrentTick = 0
-
 		t.HasTriggered = true
 	}
 
@@ -26,8 +25,8 @@ func (t *{{ template_name }}) Execute() {
 		{{ body_before }}
 
 		t.CurrentTick += 1
-
-		t.HasTriggered = True
+		t.HasTriggered = true
+		return 
 	}
 
 	t.HasTriggered = false

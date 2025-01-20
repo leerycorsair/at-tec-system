@@ -11,8 +11,7 @@ from src.repository.visio.models.models import (
 )
 from src.repository.visio.repository import VisioRepository
 from sqlalchemy.orm import Session
-
-from src.storage.postgres.session import get_db
+from src.storage.postgres.storage import get_db
 
 
 class IVisioRepository(Protocol):

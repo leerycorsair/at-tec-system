@@ -9,9 +9,11 @@ from src.repository.editor.template.models.models import (
     RuleDB,
     TemplateUsageDB,
 )
+from src.repository.model.models.models import ModelMetaDB
 
 
 class Model(BaseModel):
+    meta: ModelMetaDB
     resource_types: List[ResourceTypeDB]
     resources: List[ResourceDB]
     irregular_events: List[IrregularEventDB]

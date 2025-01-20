@@ -3,6 +3,8 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"math"
+	"math/rand/v2"
 	"sync"
 	"time"
 )
@@ -137,13 +139,18 @@ func main() {
 	runner := NewRunner(resources, usagesList)
 	for {
 		var input string
-		fmt.Scanln(&input)
+		_, err := fmt.Scanln(&input) 
+		if err != nil {
+			continue
+		}
 
 		switch input {
 		case "RUN":
 			var ticks, delay int
-			fmt.Scanf("%d %d", &ticks, &delay)
-			runner.Run(ticks, delay)
+			_, err := fmt.Scanf("%d %d", &ticks, &delay) 
+			if err != nil {
+				continue
+			}
 
 		case "PAUSE":
 			runner.Pause()
