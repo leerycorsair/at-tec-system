@@ -2,12 +2,6 @@ from enum import Enum
 from pydantic import BaseModel
 
 
-class FileMeta(BaseModel):
-    id: int
-    name: str
-    model_id: int
-
-
 class StagesEnum(str, Enum):
     FORMATTING = "FORMATTING"
     BUILDING = "BUILDING"

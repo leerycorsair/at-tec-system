@@ -4,9 +4,10 @@ import subprocess
 import tempfile
 
 
+from src.repository.minio.models.models import MinioFile
 from src.service.translator.dependencies import IFileRepository, IModelService
 from src.service.translator.main import trnsl_model
-from src.service.translator.models.models import FileMeta, StagesEnum, TranslateInfo
+from src.service.translator.models.models import StagesEnum, TranslateInfo
 
 
 class TranslatorService:
@@ -78,7 +79,7 @@ class TranslatorService:
 
                 # Stage 4: Upload
                 storage_file_name = self._file_repository.load_file(
-                    user_id, file_path, file_name, model.meta.name
+                    user_id, file_path, file_name, model.meta.id
                 )
                 translate_logs += "\nTranslation completed successfully."
                 self._cleanup_files(temporary_files)
@@ -140,5 +141,5 @@ class TranslatorService:
             except Exception as e:
                 pass
 
-    def get_translated_files(self, user_id: int) -> List[FileMeta]:
-        return []
+    def get_translated_files(self, user_id: int) -> List[MinioFile]:
+        return self._file_repository.get_files(user_id)
