@@ -36,7 +36,12 @@ class MinioRepository:
 
     def fetch_file(self, file_uuid: str, file_path: str) -> str:
         try:
-            local_file_path = f"{file_path}/{file_uuid}"
+            os.makedirs(file_path, exist_ok=True)
+
+            unique_suffix = (
+                f"{datetime.now().strftime('%Y%m%d%H%M%S')}_{uuid.uuid4().hex}"
+            )
+            local_file_path = f"{file_path}/{file_uuid}_{unique_suffix}"
 
             response = self._minio_client.get_object(self._bucket_name, file_uuid)
             with open(local_file_path, "wb") as f:
