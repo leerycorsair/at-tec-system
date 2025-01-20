@@ -10,8 +10,8 @@ from src.service.translator.models.models import TranslateInfo
 
 def to_TranslatedFileResponse(file: MinioFile) -> TranslatedFileResponse:
     return TranslatedFileResponse(
-        file_uuid=file.minio_name,
-        file_name=file.file_meta.file_name,
+        id=file.minio_name,
+        name=file.file_meta.file_name,
         model_id=file.file_meta.model_id,
         created_at=file.file_meta.created_at,
         size=file.size,
@@ -30,7 +30,7 @@ def to_TranslatedFilesResponse(files: List[MinioFile]) -> TranslatedFilesRespons
 
 def to_TranslateResponse(info: TranslateInfo) -> TranslateResponse:
     return TranslateResponse(
-        file_uuid=info.file_name,
+        id=info.file_name,
         file_content=info.file_content,
         translate_logs=info.translate_logs,
         stage=info.stage,

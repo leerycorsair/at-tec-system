@@ -10,9 +10,9 @@ class ProcessStatusEnum(str, Enum):
 
 
 class ProcessResponse(BaseModel):
-    process_id: int
+    id: int
     process_name: str
-    file_uuid: str
+    file_id: str
     status: ProcessStatusEnum
     current_tick: int
 
@@ -23,7 +23,7 @@ class ProcessesResponse(BaseModel):
 
 
 class CreateProcessRequest(BaseModel):
-    file_uuid: str
+    file_id: str
     process_name: str
 
 
