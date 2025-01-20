@@ -1,4 +1,6 @@
 from typing import List, Optional
+
+from fastapi import WebSocket
 from src.service.processor.dependencies import IFileRepository, IModelService
 from src.service.processor.models.models import Process, ProcessStatus
 import subprocess
@@ -45,7 +47,12 @@ class ProcessorService:
         return new_process
 
     def run_process(
-        self, user_id: int, process_id: int, ticks: int, delay: int, websocket
+        self,
+        user_id: int,
+        process_id: int,
+        ticks: int,
+        delay: int,
+        websocket: WebSocket,
     ) -> None:
         process = self._find_process_by_id(process_id)
         if not process:
@@ -65,12 +72,15 @@ class ProcessorService:
             for line in process.process_handle.stdout:
                 try:
                     json_data = json.loads(line.strip())
-                    websocket.send(json.dumps(json_data))
+                    websocket.send_json(json_data)
                 except json.JSONDecodeError:
                     continue
+                except Exception as e:
+                    websocket.close()
+                    raise e
 
         threading.Thread(target=stream_output, daemon=True).start()
-
+        
     def pause_process(self, user_id: int, process_id: int) -> None:
         process = self._find_process_by_id(process_id)
         if not process:
