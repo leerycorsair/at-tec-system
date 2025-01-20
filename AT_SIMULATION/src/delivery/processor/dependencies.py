@@ -25,12 +25,10 @@ class IProcessorService(Protocol):
 
 
 def get_processor_service(
-    model_service=Depends(get_model_service),
     file_repository=Depends(get_file_repository),
     websocket_manager=Depends(get_websocket_manager),
 ) -> IProcessorService:
     return ProcessorService(
-        model_service,
         file_repository,
         websocket_manager,
     )

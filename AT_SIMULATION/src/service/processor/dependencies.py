@@ -2,6 +2,7 @@ from typing import Protocol
 
 from fastapi import Depends
 
+from src.repository.minio.models.models import MinioFile
 from src.repository.minio.repository import MinioRepository
 from src.service.model.dependencies import (
     IModelRepository,
@@ -36,6 +37,7 @@ def get_model_service(
 
 class IFileRepository(Protocol):
     def fetch_file(self, file_uuid: str, file_path: str) -> str: ...
+    def get_file(self, file_uuid: str) -> MinioFile: ...
 
 
 def get_file_repository(minio_info=Depends(get_minio_storage)) -> IFileRepository:

@@ -87,3 +87,25 @@ class MinioRepository:
             raise S3Error(f"Error retrieving files: {e}")
 
         return user_files
+
+    def get_file(self, file_uuid: str) -> MinioFile:
+        try:
+            obj_metadata = self._minio_client.stat_object(self._bucket_name, file_uuid)
+
+            file_meta = FileMeta(
+                user_id=int(obj_metadata.metadata.get("x-amz-meta-user_id")),
+                file_name=obj_metadata.metadata.get("x-amz-meta-file_name"),
+                model_id=obj_metadata.metadata.get("x-amz-meta-model_id"),
+                created_at=datetime.fromisoformat(
+                    obj_metadata.metadata.get("x-amz-meta-created_at")
+                ),
+            )
+
+            return MinioFile(
+                minio_name=file_uuid,
+                last_modified=obj_metadata.last_modified,
+                size=obj_metadata.size,
+                file_meta=file_meta,
+            )
+        except S3Error as e:
+            raise Exception(f"Error retrieving file {file_uuid}: {e}")

@@ -20,11 +20,9 @@ class ProcessorService:
 
     def _initialize(
         self,
-        model_service: IModelService,
         file_repository: IFileRepository,
         websocket_manager: WebsocketManager,
     ) -> None:
-        self._model_service = model_service
         self._file_repository = file_repository
         self._websocket_manager = websocket_manager
         self._processes: List[Process] = []
@@ -32,6 +30,7 @@ class ProcessorService:
     def create_process(
         self, user_id: int, file_uuid: str, process_name: str
     ) -> Process:
+        self._check_file_rights(user_id, file_uuid)
         file_path = self._file_repository.fetch_file(file_uuid, "/bin")
 
         process_handle = subprocess.Popen(
@@ -64,6 +63,8 @@ class ProcessorService:
         ticks: int,
         delay: int,
     ) -> None:
+        self._check_process_rights(user_id, process_id)
+
         process = self._find_process_by_id(process_id)
         if not process:
             raise ValueError("Process not found.")
@@ -82,16 +83,17 @@ class ProcessorService:
             for line in process.process_handle.stdout:
                 try:
                     json_data = json.loads(line.strip())
-                    websocket.send_json(json_data)
+                    self._websocket_manager.send_message(json_data, user_id, process_id)
                 except json.JSONDecodeError:
                     continue
                 except Exception as e:
-                    websocket.close()
                     raise e
 
         threading.Thread(target=stream_output, daemon=True).start()
 
-    def pause_process(self, user_id: int, process_id: int) -> Process:
+    def pause_process(self, user_id: int, process_id: str) -> Process:
+        self._check_process_rights(user_id, process_id)
+
         process = self._find_process_by_id(process_id)
         if not process:
             raise ValueError("Process not found.")
@@ -103,7 +105,9 @@ class ProcessorService:
         process.process_handle.stdin.flush()
         process.status = ProcessStatus.PAUSE
 
-    def kill_process(self, user_id: int, process_id: int) -> Process:
+    def kill_process(self, user_id: int, process_id: str) -> Process:
+        self._check_process_rights(user_id, process_id)
+
         process = self._find_process_by_id(process_id)
         if not process:
             raise ValueError("Process not found.")
@@ -116,8 +120,18 @@ class ProcessorService:
     def get_processes(self, user_id: int) -> List[Process]:
         return [process for process in self._processes if process.user_id == user_id]
 
-    def _find_process_by_id(self, process_id: int) -> Optional[Process]:
+    def _find_process_by_id(self, process_id: str) -> Optional[Process]:
         for process in self._processes:
             if process.process_id == process_id:
                 return process
         return None
+
+    def _check_file_rights(self, user_id: int, file_uuid: str):
+        file = self._file_repository.get_file(file_uuid)
+        if file.file_meta.user_id != user_id:
+            raise ValueError(f"File {file_uuid} does not belong to user {user_id}")
+
+    def _check_process_rights(self, user_id: int, process_id: str):
+        process = self._find_process_by_id(process_id)
+        if process.user_id != user_id:
+            raise ValueError(f"Process {process_id} does not belong to user {user_id}")

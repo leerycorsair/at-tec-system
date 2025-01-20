@@ -41,7 +41,7 @@ class WebsocketManager:
             if not self.active_connections[user_id]:
                 del self.active_connections[user_id]
 
-    async def send_to_process(self, message: str, user_id: int, process_id: int):
+    async def send_message(self, message: str, user_id: int, process_id: int):
         if (
             user_id in self.active_connections
             and process_id in self.active_connections[user_id]
