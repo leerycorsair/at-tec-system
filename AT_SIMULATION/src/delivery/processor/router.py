@@ -38,7 +38,6 @@ def create_process(
         return InternalServiceError(e)
 
 
-# @router.post("/{process_id}/run", response_model=CommonResponse[ProcessResponse | None])
 @router.websocket("/{process_id}/run")
 async def run_process_websocket(
     web_socket: WebSocket,
@@ -73,9 +72,11 @@ def websocket_documentation(process_id: int):
     - **Description**: Streams real-time updates for a process.
 
     ### Parameters:
-    - `process_id`: The ID of the process to run.
-    - `ticks`: The number of ticks to process.
-    - `delay`: The delay between ticks, in milliseconds.
+    - `web_socket: WebSocket`: The WebSocket. 
+    - `auth_token: str`: Auth user JWT token. 
+    - `process_id: int`: The ID of the process to run.
+    - `ticks: int`: The number of ticks to process.
+    - `delay: int`: The delay between ticks, in milliseconds.
 
     ### Example Messages:
     - **Server Message**:
