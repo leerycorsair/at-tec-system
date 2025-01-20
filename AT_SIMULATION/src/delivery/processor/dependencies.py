@@ -1,10 +1,19 @@
 from typing import Protocol
 
+from fastapi import WebSocket
+
 
 class IProcessorService(Protocol):
     def create_process(self, user_id: int, file_uuid: str, process_name: str): ...
 
-    def run_process(self, user_id: int, process_id: int, ticks: int, delay: int): ...
+    async def run_process(
+        self,
+        user_id: int,
+        process_id: int,
+        ticks: int,
+        delay: int,
+        web_socket: WebSocket,
+    ): ...
 
     def pause_process(self, user_id: int, process_id: int): ...
 
