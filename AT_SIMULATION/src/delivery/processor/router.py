@@ -43,21 +43,16 @@ def create_process(
         return InternalServiceError(e)
 
 
-@router.post("/{process_id}/run", response_model=CommonResponse[ProcessResponse | None])
-def run_process(
-    process_id: int,
+@router.post("/{process_id}/run", response_model=CommonResponse[None])
+async def run_process(
+    process_id: str,
     body: RunProcessRequest,
     user_id: int = Depends(get_current_user),
     processor_service: IProcessorService = Depends(get_processor_service),
-) -> CommonResponse[ProcessResponse]:
+) -> CommonResponse[None]:
     try:
-        return SuccessResponse(
-            to_ProcessResponse(
-                processor_service.run_process(
-                    user_id, process_id, body.ticks, body.delay
-                )
-            )
-        )
+        await processor_service.run_process(user_id, process_id, body.ticks, body.delay)
+        return SuccessResponse(None)
     except Exception as e:
         return InternalServiceError(e)
 
@@ -66,7 +61,7 @@ def run_process(
     "/{process_id}/pause", response_model=CommonResponse[ProcessResponse | None]
 )
 def pause_process(
-    process_id: int,
+    process_id: str,
     user_id: int = Depends(get_current_user),
     processor_service: IProcessorService = Depends(get_processor_service),
 ) -> CommonResponse[ProcessResponse]:
@@ -82,7 +77,7 @@ def pause_process(
     "/{process_id}/kill", response_model=CommonResponse[ProcessResponse | None]
 )
 def kill_process(
-    process_id: int,
+    process_id: str,
     user_id: int = Depends(get_current_user),
     processor_service: IProcessorService = Depends(get_processor_service),
 ) -> CommonResponse[ProcessResponse]:

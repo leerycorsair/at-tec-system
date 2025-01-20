@@ -1,8 +1,9 @@
+import asyncio
 from typing import List, Optional
 import uuid
 
 from src.delivery.websocket_manager import WebsocketManager
-from src.service.processor.dependencies import IFileRepository, IModelService
+from src.service.processor.dependencies import IFileRepository
 from src.service.processor.models.models import Process, ProcessStatus
 import subprocess
 import threading
@@ -59,7 +60,7 @@ class ProcessorService:
     async def run_process(
         self,
         user_id: int,
-        process_id: int,
+        process_id: str,
         ticks: int,
         delay: int,
     ) -> None:
@@ -73,23 +74,35 @@ class ProcessorService:
             raise ValueError("Process is not in a valid state to run.")
 
         process.status = ProcessStatus.RUNNING
-        command = "RUN\n"
-        process.process_handle.stdin.write(command)
-        command = f"{ticks} {delay}\n"
-        process.process_handle.stdin.write(command)
-        process.process_handle.stdin.flush()
+        try:
+            process.process_handle.stdin.write("RUN\n")
+            process.process_handle.stdin.write(f"{ticks} {delay}\n")
+            process.process_handle.stdin.flush()
+        except Exception as e:
+            raise RuntimeError(f"Failed to send commands to the process: {e}")
 
-        def stream_output():
-            for line in process.process_handle.stdout:
-                try:
-                    json_data = json.loads(line.strip())
-                    self._websocket_manager.send_message(json_data, user_id, process_id)
-                except json.JSONDecodeError:
-                    continue
-                except Exception as e:
-                    raise e
+        async def stream_output():
+            loop = asyncio.get_event_loop()
+            try:
+                for line in iter(process.process_handle.stdout.readline, ""):
+                    try:
+                        json_data = json.loads(line.strip())
+                        await self._websocket_manager.send_message(
+                            json.dumps(json_data), user_id, process_id
+                        )
+                    except json.JSONDecodeError:
+                        continue
+                    except Exception as e:
+                        print(f"Error sending message to WebSocket: {e}")
+                        break
+            except Exception as e:
+                print(f"Error reading process output: {e}")
+            finally:
+                await loop.run_in_executor(None, process.process_handle.stdout.close)
 
-        threading.Thread(target=stream_output, daemon=True).start()
+        threading.Thread(
+            target=lambda: asyncio.run(stream_output()), daemon=True
+        ).start()
 
     def pause_process(self, user_id: int, process_id: str) -> Process:
         self._check_process_rights(user_id, process_id)
