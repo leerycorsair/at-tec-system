@@ -1,6 +1,7 @@
 type {{ template_name }} struct {
 	UsageName string
-	HasTriggered bool
+	HasTriggeredBefore bool
+	HasTriggeredAfter bool
 	CurrentTick int
 	Duration int
 	IsActive bool
@@ -16,7 +17,7 @@ func (t *{{ template_name }}) Execute() {
 
 		t.IsActive = false
 		t.CurrentTick = 0
-		t.HasTriggered = true
+		t.HasTriggeredAfter = true
 	}
 
 	if !t.IsActive && {{ condition }} {
@@ -25,16 +26,19 @@ func (t *{{ template_name }}) Execute() {
 		{{ body_before }}
 
 		t.CurrentTick += 1
-		t.HasTriggered = true
+		t.HasTriggeredBefore = true
 		return 
 	}
 
-	t.HasTriggered = false
+	t.HasTriggeredBefore = false
+	t.HasTriggeredAfter = false
 }
 
 func (t *{{ template_name }}) MarshalJSON() ([]byte, error) {
 	return json.Marshal(map[string]interface{}{
 		"usage_name":    t.UsageName,
-		"has_triggered": t.HasTriggered,
+		"has_triggered_before": t.HasTriggeredBefore,
+		"has_triggered_after": t.HasTriggeredAfter,
+		"usage_type": "OPERATION",
 	})
 }

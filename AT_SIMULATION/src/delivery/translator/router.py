@@ -46,7 +46,7 @@ async def translate_model(
 ) -> CommonResponse[TranslateResponse]:
     try:
         return SuccessResponse(
-            to_TranslateResponse(translator_service.translate_model(model_id, user_id, body.file_name))
+            to_TranslateResponse(translator_service.translate_model(model_id, user_id, body.name))
         )
     except Exception as e:
         return InternalServiceError(e)

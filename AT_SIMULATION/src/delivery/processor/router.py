@@ -28,7 +28,7 @@ def create_process(
             to_ProcessResponse(
                 processor_service.create_process(
                     user_id,
-                    body.file_uuid,
+                    body.file_id,
                     body.process_name,
                 )
             )
