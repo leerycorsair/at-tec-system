@@ -71,5 +71,6 @@ func (t *{{ template_name }}) MarshalJSON() ([]byte, error) {
 	return json.Marshal(map[string]interface{}{
 		"usage_name":    t.UsageName,
 		"has_triggered": t.HasTriggered,
+		"usage_type": "IRREGULAR_EVENT",
 	})
 }

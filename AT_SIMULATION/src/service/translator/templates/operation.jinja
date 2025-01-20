@@ -39,5 +39,6 @@ func (t *{{ template_name }}) MarshalJSON() ([]byte, error) {
 		"usage_name":    t.UsageName,
 		"has_triggered_before": t.HasTriggeredBefore,
 		"has_triggered_after": t.HasTriggeredAfter,
+		"usage_type": "OPERATION",
 	})
 }
