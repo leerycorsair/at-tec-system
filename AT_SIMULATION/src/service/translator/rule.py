@@ -4,6 +4,7 @@ from jinja2 import Environment, FileSystemLoader, Template
 
 from src.repository.editor.resource.models.models import ResourceTypeDB
 from src.repository.editor.template.models.models import RuleDB
+from src.service.translator.utils import preprocess_template_code
 
 
 TEMPLATE_DIR = "./src/service/translator/templates/"
@@ -46,9 +47,13 @@ def to_rule_tr(rule: RuleDB, rel_resources_info: dict) -> dict:
         if rel_resource.id in rel_resources_info
     ]
 
+    param_names = [param["name"] for param in params]
+    new_condition = preprocess_template_code(rule.body.condition, param_names)
+    new_body = preprocess_template_code(rule.body.body, param_names)
+
     return {
         "template_name": rule.meta.name,
         "params": params,
-        "condition": rule.body.condition,
-        "body": rule.body.body,
+        "condition": new_condition,
+        "body": new_body,
     }
