@@ -75,7 +75,7 @@ func (r *Runner) Run(ticks, delay int) {
 				"usages":       r.usagesList,
 			}
 
-			outputJSON, err := json.MarshalIndent(output, "", "  ")
+			outputJSON, err := json.Marshal(output)
 			if err != nil {
 				r.mutex.Unlock()
 				continue
