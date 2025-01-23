@@ -74,39 +74,114 @@ class ProcessorService:
 
         print(process)
         print(process.process_handle)
+        for i in range(100):
+            json_data = json.loads(
+                """
+                {
+    "current_tick": 1,
+    "resources": [
+        {
+        "resource_name": "vlados_ruble",
+        "currency": 55,
+        "<attr_name>": "<attr_value>"
+        },
+        {
+        "resource_name": "car_1",
+        "pos_x": -20,
+        "pos_y": 25,
+        "<attr_name>": "<attr_value>"
+        },
+        {
+        "resource_name": "car_2",
+        "pos_x": -20,
+        "pos_y": 50,
+        "<attr_name>": "<attr_value>"
+        }
+    ],
+    "usages": [
+        {
+        "has_triggered": true,
+        "usage_name": "irregular_event_1",
+        "usage_type": "IRREGULAR_EVENT"
+        },
+        {
+        "has_triggered": false,
+        "usage_name": "irregular_event_2",
+        "usage_type": "IRREGULAR_EVENT"
+        },
+        {
+        "has_triggered": false,
+        "usage_name": "irregular_event_3",
+        "usage_type": "IRREGULAR_EVENT"
+        },
+        {
+        "has_triggered": false,
+        "usage_name": "irregular_event_4",
+        "usage_type": "IRREGULAR_EVENT"
+        },
+        {
+        "has_triggered_after": false,
+        "has_triggered_before": false,
+        "usage_name": "operation_1",
+        "usage_type": "OPERATION"
+        },
+        {
+        "has_triggered_after": false,
+        "has_triggered_before": false,
+        "usage_name": "operation_2",
+        "usage_type": "OPERATION"
+        },
+        {
+        "has_triggered": true,
+        "usage_name": "rule_1",
+        "usage_type": "RULE"
+        },
+        {
+        "has_triggered": false,
+        "usage_name": "rule_2",
+        "usage_type": "RULE"
+        }
+    ]
+    }
+                """
+            )
+            await self._websocket_manager.send_message(
+                json.dumps(json_data), user_id, process_id
+            )
 
-        process.status = ProcessStatus.RUNNING
-        try:
-            process.process_handle.stdin.write("RUN\n")
-            process.process_handle.stdin.write(f"{ticks} {delay}\n")
-            process.process_handle.stdin.flush()
-        except Exception as e:
-            raise RuntimeError(f"Failed to send commands to the process: {e}")
 
-        async def stream_output():
-            try:
-                while True:
-                    line = await asyncio.get_event_loop().run_in_executor(
-                        None, process.process_handle.stdout.readline
-                    )
-                    if not line:
-                        break
+        #     process.status = ProcessStatus.RUNNING
+        #     try:
+        #         process.process_handle.stdin.write("RUN\n")
+        #         process.process_handle.stdin.write(f"{ticks} {delay}\n")
+        #         process.process_handle.stdin.flush()
+        #     except Exception as e:
+        #         raise RuntimeError(f"Failed to send commands to the process: {e}")
 
-                    try:
-                        json_data = json.loads(line.strip())
-                        await self._websocket_manager.send_message(
-                            json.dumps(json_data), user_id, process_id
-                        )
-                    except json.JSONDecodeError:
-                        continue
-                    except Exception as e:
-                        print(f"Error sending message to WebSocket: {e}")
-            except Exception as e:
-                print(f"Error reading process output: {e}")
-            finally:
-                process.process_handle.stdout.close()
+        #     async def stream_output():
+        #         try:
+        #             while True:
+        #                 line = await asyncio.get_event_loop().run_in_executor(
+        #                     None, process.process_handle.stdout.readline
+        #                 )
+        #                 if not line:
+        #                     break
 
-        asyncio.create_task(stream_output())
+        #                 try:
+        #                     json_data = json.loads(line.strip())
+        #                     await self._websocket_manager.send_message(
+        #                         json.dumps(json_data), user_id, process_id
+        #                     )
+        #                 except json.JSONDecodeError:
+        #                     continue
+        #                 except Exception as e:
+        #                     print(f"Error sending message to WebSocket: {e}")
+        #         except Exception as e:
+        #             print(f"Error reading process output: {e}")
+        #         finally:
+        #             process.process_handle.stdout.close()
+
+        #     asyncio.create_task(stream_output())
 
         return Process(
             user_id=user_id,
