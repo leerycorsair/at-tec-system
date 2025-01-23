@@ -69,8 +69,13 @@ func (r *Runner) Run(ticks, delay int) {
 				usage.Execute()
 			}
 
+			if i == ticks - 1 {
+				r.state = StatePaused 
+			}
+
 			output := map[string]interface{}{
 				"current_tick": r.currentTick,
+				"current_state":r.state,
 				"resources":    r.resources,
 				"usages":       r.usagesList,
 			}
