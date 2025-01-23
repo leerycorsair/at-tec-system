@@ -4,6 +4,7 @@ from jinja2 import Environment, FileSystemLoader, Template
 
 from src.repository.editor.resource.models.models import ResourceTypeDB
 from src.repository.editor.template.models.models import IrregularEventDB, OperationDB
+from src.service.translator.utils import preprocess_template_code
 
 
 TEMPLATE_DIR = "./src/service/translator/templates/"
@@ -49,11 +50,14 @@ def to_irregular_event_tr(
         if rel_resource.id in rel_resources_info
     ]
 
+    param_names = [param["name"] for param in params]
+    new_body = preprocess_template_code(irregular_event.body.body, param_names)
+
     return {
         "template_name": irregular_event.meta.name,
         "params": params,
         "generator_type": irregular_event.generator.type,
         "generator_value": irregular_event.generator.value,
         "generator_dispersion": irregular_event.generator.dispersion,
-        "body": irregular_event.body.body,
+        "body": new_body,
     }

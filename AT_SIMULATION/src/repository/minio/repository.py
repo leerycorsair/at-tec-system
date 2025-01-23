@@ -36,7 +36,12 @@ class MinioRepository:
 
     def fetch_file(self, file_uuid: str, file_path: str) -> str:
         try:
-            local_file_path = f"{file_path}/{file_uuid}"
+            os.makedirs(file_path, exist_ok=True)
+
+            unique_suffix = (
+                f"{datetime.now().strftime('%Y%m%d%H%M%S')}_{uuid.uuid4().hex}"
+            )
+            local_file_path = f"{file_path}/{file_uuid}_{unique_suffix}"
 
             response = self._minio_client.get_object(self._bucket_name, file_uuid)
             with open(local_file_path, "wb") as f:
@@ -82,3 +87,25 @@ class MinioRepository:
             raise S3Error(f"Error retrieving files: {e}")
 
         return user_files
+
+    def get_file(self, file_uuid: str) -> MinioFile:
+        try:
+            obj_metadata = self._minio_client.stat_object(self._bucket_name, file_uuid)
+
+            file_meta = FileMeta(
+                user_id=int(obj_metadata.metadata.get("x-amz-meta-user_id")),
+                file_name=obj_metadata.metadata.get("x-amz-meta-file_name"),
+                model_id=obj_metadata.metadata.get("x-amz-meta-model_id"),
+                created_at=datetime.fromisoformat(
+                    obj_metadata.metadata.get("x-amz-meta-created_at")
+                ),
+            )
+
+            return MinioFile(
+                minio_name=file_uuid,
+                last_modified=obj_metadata.last_modified,
+                size=obj_metadata.size,
+                file_meta=file_meta,
+            )
+        except S3Error as e:
+            raise Exception(f"Error retrieving file {file_uuid}: {e}")

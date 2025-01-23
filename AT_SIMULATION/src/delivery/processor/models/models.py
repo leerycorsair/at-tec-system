@@ -10,8 +10,8 @@ class ProcessStatusEnum(str, Enum):
 
 
 class ProcessResponse(BaseModel):
-    id: int
-    process_name: str
+    id: str
+    name: str
     file_id: str
     status: ProcessStatusEnum
     current_tick: int

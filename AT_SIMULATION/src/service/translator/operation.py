@@ -4,6 +4,7 @@ from jinja2 import Environment, FileSystemLoader, Template
 
 from src.repository.editor.resource.models.models import ResourceTypeDB
 from src.repository.editor.template.models.models import OperationDB
+from src.service.translator.utils import preprocess_template_code
 
 
 TEMPLATE_DIR = "./src/service/translator/templates/"
@@ -47,10 +48,15 @@ def to_operation_tr(operation: OperationDB, rel_resources_info: dict) -> dict:
         if rel_resource.id in rel_resources_info
     ]
 
+    param_names = [param["name"] for param in params]
+    new_condition = preprocess_template_code(operation.body.condition, param_names)
+    new_body_before = preprocess_template_code(operation.body.body_before, param_names)
+    new_body_after = preprocess_template_code(operation.body.body_after, param_names)
+
     return {
         "template_name": operation.meta.name,
         "params": params,
-        "condition": operation.body.condition,
-        "body_before": operation.body.body_before,
-        "body_after": operation.body.body_after,
+        "condition": new_condition,
+        "body_before": new_body_before,
+        "body_after": new_body_after,
     }

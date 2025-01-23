@@ -1,26 +1,36 @@
+import asyncio
 from typing import List, Optional
+import uuid
 
-from fastapi import WebSocket
-from src.service.processor.dependencies import IFileRepository, IModelService
+from src.delivery.websocket_manager import WebsocketManager
+from src.service.processor.dependencies import IFileRepository
 from src.service.processor.models.models import Process, ProcessStatus
 import subprocess
-import threading
 import json
 
 
 class ProcessorService:
-    def __init__(
+    _instance = None
+
+    def __new__(cls, *args, **kwargs):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+            cls._instance._initialize(*args, **kwargs)
+        return cls._instance
+
+    def _initialize(
         self,
-        model_service: IModelService,
         file_repository: IFileRepository,
+        websocket_manager: WebsocketManager,
     ) -> None:
-        self._model_service = model_service
         self._file_repository = file_repository
-        self.processes: List[Process] = []
+        self._websocket_manager = websocket_manager
+        self._processes: List[Process] = []
 
     def create_process(
         self, user_id: int, file_uuid: str, process_name: str
     ) -> Process:
+        self._check_file_rights(user_id, file_uuid)
         file_path = self._file_repository.fetch_file(file_uuid, "/bin")
 
         process_handle = subprocess.Popen(
@@ -31,7 +41,7 @@ class ProcessorService:
             text=True,
         )
 
-        process_id = len(self.processes) + 1
+        process_id = str(uuid.uuid4())
 
         new_process = Process(
             user_id=user_id,
@@ -43,17 +53,18 @@ class ProcessorService:
             process_handle=process_handle,
         )
 
-        self.processes.append(new_process)
+        self._processes.append(new_process)
         return new_process
 
-    def run_process(
+    async def run_process(
         self,
         user_id: int,
-        process_id: int,
+        process_id: str,
         ticks: int,
         delay: int,
-        websocket: WebSocket,
-    ) -> None:
+    ) -> Process:
+        self._check_process_rights(user_id, process_id)
+
         process = self._find_process_by_id(process_id)
         if not process:
             raise ValueError("Process not found.")
@@ -62,26 +73,51 @@ class ProcessorService:
             raise ValueError("Process is not in a valid state to run.")
 
         process.status = ProcessStatus.RUNNING
-        command = "RUN\n"
-        process.process_handle.stdin.write(command)
-        command = f"{ticks} {delay}\n"
-        process.process_handle.stdin.write(command)
-        process.process_handle.stdin.flush()
+        try:
+            process.process_handle.stdin.write("RUN\n")
+            process.process_handle.stdin.write(f"{ticks} {delay}\n")
+            process.process_handle.stdin.flush()
+        except Exception as e:
+            raise RuntimeError(f"Failed to send commands to the process: {e}")
 
-        def stream_output():
-            for line in process.process_handle.stdout:
-                try:
-                    json_data = json.loads(line.strip())
-                    websocket.send_json(json_data)
-                except json.JSONDecodeError:
-                    continue
-                except Exception as e:
-                    websocket.close()
-                    raise e
+        async def stream_output():
+            try:
+                while True:
+                    line = await asyncio.get_event_loop().run_in_executor(
+                        None, process.process_handle.stdout.readline
+                    )
+                    if not line:
+                        break
 
-        threading.Thread(target=stream_output, daemon=True).start()
-        
-    def pause_process(self, user_id: int, process_id: int) -> None:
+                    try:
+                        json_data = json.loads(line.strip())
+                        await self._websocket_manager.send_message(
+                            json.dumps(json_data), user_id, process_id
+                        )
+                    except json.JSONDecodeError:
+                        continue
+                    except Exception as e:
+                        print(f"Error sending message to WebSocket: {e}")
+            except Exception as e:
+                print(f"Error reading process output: {e}")
+            finally:
+                process.process_handle.stdout.close()
+
+        asyncio.create_task(stream_output())
+
+        return Process(
+            user_id=user_id,
+            process_id=process_id,
+            process_name=process.process_name,
+            file_uuid=process.file_uuid,
+            status=ProcessStatus.PAUSE,
+            current_tick=0,
+            process_handle=process.process_handle,
+        )
+
+    def pause_process(self, user_id: int, process_id: str) -> Process:
+        self._check_process_rights(user_id, process_id)
+
         process = self._find_process_by_id(process_id)
         if not process:
             raise ValueError("Process not found.")
@@ -93,7 +129,9 @@ class ProcessorService:
         process.process_handle.stdin.flush()
         process.status = ProcessStatus.PAUSE
 
-    def kill_process(self, user_id: int, process_id: int) -> None:
+    def kill_process(self, user_id: int, process_id: str) -> Process:
+        self._check_process_rights(user_id, process_id)
+
         process = self._find_process_by_id(process_id)
         if not process:
             raise ValueError("Process not found.")
@@ -104,10 +142,20 @@ class ProcessorService:
         process.status = ProcessStatus.KILLED
 
     def get_processes(self, user_id: int) -> List[Process]:
-        return self.processes
+        return [process for process in self._processes if process.user_id == user_id]
 
-    def _find_process_by_id(self, process_id: int) -> Optional[Process]:
-        for process in self.processes:
+    def _find_process_by_id(self, process_id: str) -> Optional[Process]:
+        for process in self._processes:
             if process.process_id == process_id:
                 return process
         return None
+
+    def _check_file_rights(self, user_id: int, file_uuid: str):
+        file = self._file_repository.get_file(file_uuid)
+        if file.file_meta.user_id != user_id:
+            raise ValueError(f"File {file_uuid} does not belong to user {user_id}")
+
+    def _check_process_rights(self, user_id: int, process_id: str):
+        process = self._find_process_by_id(process_id)
+        if process.user_id != user_id:
+            raise ValueError(f"Process {process_id} does not belong to user {user_id}")
