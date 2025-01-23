@@ -112,17 +112,14 @@ def get_processes(
 @router.get("/ws", summary="WebSocket Init")
 def websocket_documentation():
     """
-    ## WebSocket Documentation for `api/processor/ws`
+    ## WebSocket Documentation for `ws://<host>:<port>/api/processor/ws`
 
-    - **WebSocket Endpoint**: `api/processor/ws`
+    - **WebSocket Endpoint**: `ws://<host>:<port>/api/processor/ws`
     - **Description**: Streams real-time updates for a process.
 
-    ### Header:
-    HTTPBearer  (http, Bearer): JWT token.
-
-    ### Parameters:
-    - `web_socket: WebSocket`: The WebSocket.
-    - `process_id: int`:
+    ### Query parameters:
+    - `process_id: str`
+    - `token: str`
 
     ### Example Messages:
     - **Server Message**:
