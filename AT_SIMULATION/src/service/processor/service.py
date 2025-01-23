@@ -110,12 +110,13 @@ class ProcessorService:
             process_id=process_id,
             process_name=process.process_name,
             file_uuid=process.file_uuid,
-            status=ProcessStatus.PAUSE,
+            status=ProcessStatus.RUNNING,
             current_tick=0,
             process_handle=process.process_handle,
         )
 
     def pause_process(self, user_id: int, process_id: str) -> Process:
+        print(self._processes)
         self._check_process_rights(user_id, process_id)
 
         process = self._find_process_by_id(process_id)
@@ -129,7 +130,18 @@ class ProcessorService:
         process.process_handle.stdin.flush()
         process.status = ProcessStatus.PAUSE
 
+        return Process(
+            user_id=user_id,
+            process_id=process_id,
+            process_name=process.process_name,
+            file_uuid=process.file_uuid,
+            status=ProcessStatus.PAUSE,
+            current_tick=0,
+            process_handle=process.process_handle,
+        )
+
     def kill_process(self, user_id: int, process_id: str) -> Process:
+        print(self._processes)
         self._check_process_rights(user_id, process_id)
 
         process = self._find_process_by_id(process_id)
@@ -140,6 +152,16 @@ class ProcessorService:
         process.process_handle.stdin.flush()
         process.process_handle.terminate()
         process.status = ProcessStatus.KILLED
+
+        return Process(
+            user_id=user_id,
+            process_id=process_id,
+            process_name=process.process_name,
+            file_uuid=process.file_uuid,
+            status=ProcessStatus.KILLED,
+            current_tick=0,
+            process_handle=process.process_handle,
+        )
 
     def get_processes(self, user_id: int) -> List[Process]:
         return [process for process in self._processes if process.user_id == user_id]
