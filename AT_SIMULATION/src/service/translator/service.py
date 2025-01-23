@@ -26,6 +26,8 @@ class TranslatorService:
         model = self._model_service.get_model(model_id, user_id)
         rendered_model = trnsl_model(model)
 
+        print(rendered_model)
+
         translate_logs = ""
         temporary_files = []
         try:
@@ -97,7 +99,7 @@ class TranslatorService:
     def _run_formatting(self, file_path: str) -> Tuple[int, str]:
         try:
             result = subprocess.run(
-                ["go", "fmt", file_path],
+                ["goimports", "-w", file_path],
                 capture_output=True,
                 text=True,
                 check=False,
