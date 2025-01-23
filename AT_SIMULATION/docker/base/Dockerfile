@@ -9,8 +9,11 @@ RUN apt-get update && \
     rm go1.23.4.linux-amd64.tar.gz && \
     ln -s /usr/local/go/bin/go /usr/bin/go && \
     curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b /usr/local/bin latest && \
+    /usr/local/go/bin/go install golang.org/x/tools/cmd/goimports@latest && \
     pip install poetry && \
     poetry config virtualenvs.create false
+
+ENV PATH=$PATH:/root/go/bin
 
 COPY pyproject.toml poetry.lock /src/
 
