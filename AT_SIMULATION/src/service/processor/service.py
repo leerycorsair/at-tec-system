@@ -116,7 +116,6 @@ class ProcessorService:
         )
 
     def pause_process(self, user_id: int, process_id: str) -> Process:
-        print(self._processes)
         self._check_process_rights(user_id, process_id)
 
         process = self._find_process_by_id(process_id)
@@ -141,7 +140,6 @@ class ProcessorService:
         )
 
     def kill_process(self, user_id: int, process_id: str) -> Process:
-        print(self._processes)
         self._check_process_rights(user_id, process_id)
 
         process = self._find_process_by_id(process_id)
