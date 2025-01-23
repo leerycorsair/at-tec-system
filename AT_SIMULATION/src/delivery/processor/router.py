@@ -1,9 +1,10 @@
-from fastapi import APIRouter, Depends
+from typing import Annotated, Optional
+from fastapi import APIRouter, Depends, WebSocket, Query, WebSocketDisconnect
+from src.client.auth_client import AuthClientSingleton
 from src.delivery.core.models.conversions import InternalServiceError, SuccessResponse
 from src.delivery.core.models.models import CommonResponse
 from src.delivery.model.dependencies import get_current_user
 from src.delivery.processor.dependencies import IProcessorService, get_processor_service
-from fastapi import WebSocket
 from src.delivery.processor.models.conversions import (
     to_ProcessResponse,
     to_ProcessesResponse,
@@ -14,7 +15,7 @@ from src.delivery.processor.models.models import (
     ProcessesResponse,
     RunProcessRequest,
 )
-from src.delivery.websocket_manager import WebsocketManager
+from src.delivery.websocket_manager import WebsocketManager, get_websocket_manager
 
 
 router = APIRouter(
@@ -43,18 +44,24 @@ def create_process(
         return InternalServiceError(e)
 
 
-@router.post("/{process_id}/run", response_model=CommonResponse[None])
+@router.post("/{process_id}/run", response_model=CommonResponse[ProcessResponse | None])
 async def run_process(
     process_id: str,
     body: RunProcessRequest,
     user_id: int = Depends(get_current_user),
     processor_service: IProcessorService = Depends(get_processor_service),
-) -> CommonResponse[None]:
+    websocket_manager: WebsocketManager = Depends(get_websocket_manager),
+) -> CommonResponse[ProcessResponse]:
     try:
-        await processor_service.run_process(user_id, process_id, body.ticks, body.delay)
+        data = await processor_service.run_process(
+            user_id, process_id, body.ticks, body.delay
+        )
+        return SuccessResponse(to_ProcessResponse(data))
+    except WebSocketDisconnect:
+        await websocket_manager.disconnect(user_id, process_id)
         return SuccessResponse(None)
-    except Exception as e:
-        return InternalServiceError(e)
+    # except Exception as e:
+    #     return InternalServiceError(e)
 
 
 @router.post(
@@ -200,10 +207,25 @@ def websocket_documentation():
 @router.websocket("/ws")
 async def websocket_init(
     websocket: WebSocket,
-    process_id: int,
-    user_id: int = Depends(get_current_user),
-    websocket_manager: WebsocketManager = Depends(WebsocketManager),
-) -> None:
+    token: Annotated[str | None, Query()] = None,
+    process_id: Annotated[str | None, Query()] = None,
+    websocket_manager: WebsocketManager = Depends(get_websocket_manager),
+):
+    if not token:
+        await websocket.close(code=1008, reason="Missing token")
+        return
+
+    try:
+        auth_client = await AuthClientSingleton.get_instance()
+        user_id = await auth_client.verify_token(token)
+    except Exception as e:
+        await websocket.close(code=1008, reason="Invalid authentication")
+        return
+
+    if process_id is None:
+        await websocket.close(code=1008, reason="Missing process_id")
+        return
+
     await websocket_manager.connect(websocket, user_id, process_id)
 
     try:
@@ -212,4 +234,4 @@ async def websocket_init(
     except Exception as e:
         print(f"WebSocket error: {e}")
     finally:
-        websocket_manager.disconnect(websocket, user_id, process_id)
+        await websocket_manager.disconnect(user_id, process_id)

@@ -6,7 +6,6 @@ from src.delivery.websocket_manager import WebsocketManager
 from src.service.processor.dependencies import IFileRepository
 from src.service.processor.models.models import Process, ProcessStatus
 import subprocess
-import threading
 import json
 
 
@@ -63,7 +62,7 @@ class ProcessorService:
         process_id: str,
         ticks: int,
         delay: int,
-    ) -> None:
+    ) -> Process:
         self._check_process_rights(user_id, process_id)
 
         process = self._find_process_by_id(process_id)
@@ -72,6 +71,9 @@ class ProcessorService:
 
         if process.status not in [ProcessStatus.PAUSE, ProcessStatus.RUNNING]:
             raise ValueError("Process is not in a valid state to run.")
+
+        print(process)
+        print(process.process_handle)
 
         process.status = ProcessStatus.RUNNING
         try:
@@ -82,9 +84,14 @@ class ProcessorService:
             raise RuntimeError(f"Failed to send commands to the process: {e}")
 
         async def stream_output():
-            loop = asyncio.get_event_loop()
             try:
-                for line in iter(process.process_handle.stdout.readline, ""):
+                while True:
+                    line = await asyncio.get_event_loop().run_in_executor(
+                        None, process.process_handle.stdout.readline
+                    )
+                    if not line:
+                        break
+
                     try:
                         json_data = json.loads(line.strip())
                         await self._websocket_manager.send_message(
@@ -94,15 +101,22 @@ class ProcessorService:
                         continue
                     except Exception as e:
                         print(f"Error sending message to WebSocket: {e}")
-                        break
             except Exception as e:
                 print(f"Error reading process output: {e}")
             finally:
-                await loop.run_in_executor(None, process.process_handle.stdout.close)
+                process.process_handle.stdout.close()
 
-        threading.Thread(
-            target=lambda: asyncio.run(stream_output()), daemon=True
-        ).start()
+        asyncio.create_task(stream_output())
+
+        return Process(
+            user_id=user_id,
+            process_id=process_id,
+            process_name=process.process_name,
+            file_uuid=process.file_uuid,
+            status=ProcessStatus.PAUSE,
+            current_tick=0,
+            process_handle=process.process_handle,
+        )
 
     def pause_process(self, user_id: int, process_id: str) -> Process:
         self._check_process_rights(user_id, process_id)
