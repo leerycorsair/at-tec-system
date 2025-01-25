@@ -15,7 +15,10 @@ from src.delivery.processor.models.models import (
     ProcessResponse,
     RunProcessRequest,
 )
-from src.delivery.websocket_manager import WebsocketManager, get_websocket_manager
+from src.service.websocket_manager.service import (
+    WebsocketManager,
+    get_websocket_manager,
+)
 
 router = APIRouter(
     prefix="/processor",

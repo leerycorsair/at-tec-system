@@ -2,10 +2,10 @@ from typing import List, Protocol
 
 from fastapi import Depends
 
-from src.delivery.websocket_manager import get_websocket_manager
 from src.service.processor.dependencies import get_file_repository
 from src.service.processor.models.models import Process
 from src.service.processor.service import ProcessorService
+from src.service.websocket_manager.service import get_websocket_manager
 
 
 class IProcessorService(Protocol):

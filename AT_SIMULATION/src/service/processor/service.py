@@ -5,9 +5,9 @@ import uuid
 from typing import List
 
 from src.core.errors import ForbiddenError, NotFoundError, WrapMethodsMeta
-from src.delivery.websocket_manager import WebsocketManager
 from src.service.processor.dependencies import IFileRepository
 from src.service.processor.models.models import Process, ProcessStatus
+from src.service.websocket_manager.service import WebsocketManager
 
 
 class ProcessorService(metaclass=WrapMethodsMeta):
