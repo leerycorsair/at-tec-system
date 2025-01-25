@@ -1,6 +1,7 @@
 import functools
 import inspect
 import types
+from http import HTTPStatus
 
 
 class Error(Exception):
@@ -23,7 +24,7 @@ class InternalServerError(Error):
     def __init__(self, error: str, **kwargs):
         super().__init__(
             error,
-            status_code=500,
+            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
             http_error="Internal Server Error",
             **kwargs,
         )
@@ -33,7 +34,7 @@ class BadRequestError(Error):
     def __init__(self, error: str, **kwargs):
         super().__init__(
             error,
-            status_code=400,
+            status_code=HTTPStatus.BAD_REQUEST,
             http_error="Bad Request Error",
             **kwargs,
         )
@@ -43,7 +44,7 @@ class AuthError(Error):
     def __init__(self, error: str, **kwargs):
         super().__init__(
             error,
-            status_code=401,
+            status_code=HTTPStatus.UNAUTHORIZED,
             http_error="Authorization Error",
             **kwargs,
         )
@@ -53,7 +54,7 @@ class ForbiddenError(Error):
     def __init__(self, error: str, **kwargs):
         super().__init__(
             error,
-            status_code=403,
+            status_code=HTTPStatus.FORBIDDEN,
             http_error="Forbidden Error",
             **kwargs,
         )
@@ -63,7 +64,7 @@ class NotFoundError(Error):
     def __init__(self, error: str, **kwargs):
         super().__init__(
             error,
-            status_code=404,
+            status_code=HTTPStatus.NOT_FOUND,
             http_error="Not Found Error",
             **kwargs,
         )
