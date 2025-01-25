@@ -1,36 +1,20 @@
-import os
-from dataclasses import dataclass
+from pydantic import Field
+from pydantic_settings import BaseSettings
 
 
-@dataclass
-class DatabaseConfig:
-    host: str
-    port: str
-    name: str
-    user: str
-    password: str
-    url: str
+class DatabaseConfig(BaseSettings):
+    host: str = Field("localhost", alias="DB_HOST")
+    port: int = Field(5432, alias="DB_PORT")
+    name: str = Field("postgres", alias="DB_NAME")
+    user: str = Field("postgres", alias="DB_USER")
+    password: str = Field("password", alias="DB_PASS")
+
+    @property
+    def url(self) -> str:
+        return f"postgresql+psycopg2://{self.user}:{self.password}@{self.host}:{self.port}/{self.name}"
 
 
 class PostgresStore:
-
     @classmethod
     def get_database_config(cls) -> DatabaseConfig:
-        DB_HOST = os.getenv("DB_HOST", "localhost").strip()
-        DB_PORT = os.getenv("DB_PORT", "5432").strip()
-        DB_NAME = os.getenv("DB_NAME", "postgres").strip()
-        DB_USER = os.getenv("DB_USER", "postgres").strip()
-        DB_PASS = os.getenv("DB_PASS", "password").strip()
-
-        database_url = (
-            f"postgresql+psycopg2://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
-        )
-
-        return DatabaseConfig(
-            host=DB_HOST,
-            port=DB_PORT,
-            name=DB_NAME,
-            user=DB_USER,
-            password=DB_PASS,
-            url=database_url,
-        )
+        return DatabaseConfig()
