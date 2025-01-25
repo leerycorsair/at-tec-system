@@ -1,16 +1,16 @@
 import asyncio
-import logging
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi import Request
-from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse
 
+from fastapi import FastAPI
 from contextlib import asynccontextmanager
 
-from src.client.auth_client import AuthClientSingleton
-from src.delivery.core.models.conversions import BadRequestError
+from fastapi.exceptions import RequestValidationError
 
+from src.client.auth_client import AuthClientSingleton
+from src.delivery.core.middleware.cors import cors_middleware
+from src.delivery.core.middleware.fastapi_exception_handler import (
+    validation_exception_handler,
+)
+from src.delivery.core.middleware.request_dump import request_dump
 from .delivery.router import setup_routes
 
 
@@ -31,27 +31,6 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="AT_SIMULATION", version="1.0.0", lifespan=lifespan)
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-
-# Configure logging
-logger = logging.getLogger(__name__)
-
-
-@app.exception_handler(RequestValidationError)
-async def validation_exception_handler(request: Request, exc: RequestValidationError):
-    logger.error(f"Validation error at {request.url}: {exc.errors()}", exc_info=True)
-
-    # Prepare the response
-    response_content = BadRequestError(exception=Exception("Invalid request body."))
-    return JSONResponse(
-        status_code=response_content.status_code,
-        content=response_content.model_dump(),
-    )
+app.middleware("http")(cors_middleware)
+app.middleware("http")(request_dump)
+app.exception_handler(RequestValidationError)(validation_exception_handler)
