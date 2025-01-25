@@ -2,10 +2,8 @@ from typing import List
 
 from src.repository.editor.function.models.models import FunctionDB
 from src.repository.visio.models.models import NodeTypesEnum
-from src.service.editor.function.dependencies import (
-    IFunctionRepository,
-    IVisioService,
-)
+from src.service.editor.function.dependencies import (IFunctionRepository,
+                                                      IVisioService)
 from src.service.helpers import handle_rollback
 
 

@@ -1,23 +1,15 @@
-from sqlalchemy import (
-    CheckConstraint,
-    Column,
-    ForeignKey,
-    Integer,
-    String,
-    Enum,
-    UniqueConstraint,
-    event,
-)
+import enum
 
+from sqlalchemy import (CheckConstraint, Column, Enum, ForeignKey, Integer,
+                        String, UniqueConstraint, event)
 from sqlalchemy.engine import Connection
 from sqlalchemy.orm import relationship
+
 from src.schema.function import Function
 from src.schema.resource import Resource, ResourceType
 from src.schema.template import Template, TemplateUsage
 
 from .base import Base
-
-import enum
 
 
 class NodeType(enum.Enum):

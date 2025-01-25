@@ -1,16 +1,10 @@
 import enum
-from sqlalchemy import (
-    JSON,
-    Boolean,
-    Column,
-    ForeignKey,
-    Integer,
-    Enum,
-    String,
-    UniqueConstraint,
-)
+
+from sqlalchemy import (JSON, Boolean, Column, Enum, ForeignKey, Integer,
+                        String, UniqueConstraint)
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.orm import relationship
+
 from src.schema.base import Base
 
 

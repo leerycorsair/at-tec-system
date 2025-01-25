@@ -2,16 +2,11 @@ from typing import List, Protocol
 
 from fastapi import Depends
 
-from src.repository.editor.template.models.models import (
-    IrregularEventDB,
-    OperationDB,
-    RuleDB,
-    TemplateUsageDB,
-)
-from src.service.editor.template.dependencies import (
-    get_template_repository,
-    get_visio_service,
-)
+from src.repository.editor.template.models.models import (IrregularEventDB,
+                                                          OperationDB, RuleDB,
+                                                          TemplateUsageDB)
+from src.service.editor.template.dependencies import (get_template_repository,
+                                                      get_visio_service)
 from src.service.editor.template.models.models import Templates
 from src.service.editor.template.service import TemplateService
 

@@ -1,8 +1,11 @@
 from fastapi import APIRouter, Depends
+
 from src.delivery.model.dependencies import get_current_model
 from src.delivery.visio.dependencies import IVisioService, get_visio_service
-from src.delivery.visio.models.conversions import to_EditorInfoResponse, to_MoveNodeDB
-from src.delivery.visio.models.models import EditorInfoResponse, MoveNodeRequest
+from src.delivery.visio.models.conversions import (to_EditorInfoResponse,
+                                                   to_MoveNodeDB)
+from src.delivery.visio.models.models import (EditorInfoResponse,
+                                              MoveNodeRequest)
 
 router = APIRouter(
     prefix="/visio",

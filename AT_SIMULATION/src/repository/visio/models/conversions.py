@@ -1,9 +1,5 @@
-from src.repository.visio.models.models import (
-    EdgeDB,
-    NodeDB,
-    NodeTablesEnum,
-    NodeTypesEnum,
-)
+from src.repository.visio.models.models import (EdgeDB, NodeDB, NodeTablesEnum,
+                                                NodeTypesEnum)
 from src.schema.function import Function
 from src.schema.resource import Resource, ResourceType
 from src.schema.template import Template, TemplateUsage

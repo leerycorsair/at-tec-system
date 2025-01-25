@@ -1,16 +1,12 @@
 from typing import List
-from src.repository.editor.template.models.models import (
-    IrregularEventDB,
-    OperationDB,
-    RuleDB,
-    TemplateTypeEnum,
-    TemplateUsageDB,
-)
+
+from src.repository.editor.template.models.models import (IrregularEventDB,
+                                                          OperationDB, RuleDB,
+                                                          TemplateTypeEnum,
+                                                          TemplateUsageDB)
 from src.repository.visio.models.models import NodeTypesEnum
-from src.service.editor.template.dependencies import (
-    ITemplateRepository,
-    IVisioService,
-)
+from src.service.editor.template.dependencies import (ITemplateRepository,
+                                                      IVisioService)
 from src.service.editor.template.models.models import Templates
 from src.service.helpers import handle_rollback
 

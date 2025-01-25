@@ -1,9 +1,8 @@
 from typing import List
-from src.delivery.processor.models.models import (
-    ProcessResponse,
-    ProcessStatusEnum,
-    ProcessesResponse,
-)
+
+from src.delivery.processor.models.models import (ProcessesResponse,
+                                                  ProcessResponse,
+                                                  ProcessStatusEnum)
 from src.service.processor.models.models import Process
 
 

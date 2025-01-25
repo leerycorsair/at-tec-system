@@ -1,13 +1,9 @@
 from datetime import datetime
-from sqlalchemy import (
-    Column,
-    Integer,
-    String,
-    TIMESTAMP,
-    UniqueConstraint,
-)
-from .base import Base
+
+from sqlalchemy import TIMESTAMP, Column, Integer, String, UniqueConstraint
 from sqlalchemy.orm import relationship
+
+from .base import Base
 
 
 class Model(Base):

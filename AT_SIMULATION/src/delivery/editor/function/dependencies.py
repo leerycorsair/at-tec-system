@@ -1,11 +1,10 @@
 from typing import List, Protocol
 
 from fastapi import Depends
+
 from src.repository.editor.function.models.models import FunctionDB
-from src.service.editor.function.dependencies import (
-    get_function_repository,
-    get_visio_service,
-)
+from src.service.editor.function.dependencies import (get_function_repository,
+                                                      get_visio_service)
 from src.service.editor.function.service import FunctionService
 
 

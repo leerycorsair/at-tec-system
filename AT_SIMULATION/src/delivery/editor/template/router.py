@@ -1,39 +1,23 @@
 from fastapi import APIRouter, Depends
 
-from src.delivery.core.models.models import (
-    to_ObjectIDResponse,
-)
-from src.delivery.core.models.models import ObjectIDResponse
-from src.delivery.editor.template.dependencies import (
-    ITemplateService,
-    get_template_service,
-)
-
-
+from src.delivery.core.models.models import (ObjectIDResponse,
+                                             to_ObjectIDResponse)
+from src.delivery.editor.template.dependencies import (ITemplateService,
+                                                       get_template_service)
 from src.delivery.editor.template.models.conversions import (
-    to_IrregularEventDB,
-    to_IrregularEventResponse,
-    to_OperationDB,
-    to_OperationResponse,
-    to_RuleDB,
-    to_RuleResponse,
-    to_TemplateUsageDB,
-    to_TemplateUsageResponse,
-    to_TemplateUsagesResponse,
-    to_TemplatesResponse,
-)
-from src.delivery.editor.template.models.models import (
-    IrregularEventRequest,
-    IrregularEventResponse,
-    OperationRequest,
-    OperationResponse,
-    RuleRequest,
-    RuleResponse,
-    TemplateUsageRequest,
-    TemplateUsageResponse,
-    TemplateUsagesResponse,
-    TemplatesResponse,
-)
+    to_IrregularEventDB, to_IrregularEventResponse, to_OperationDB,
+    to_OperationResponse, to_RuleDB, to_RuleResponse, to_TemplatesResponse,
+    to_TemplateUsageDB, to_TemplateUsageResponse, to_TemplateUsagesResponse)
+from src.delivery.editor.template.models.models import (IrregularEventRequest,
+                                                        IrregularEventResponse,
+                                                        OperationRequest,
+                                                        OperationResponse,
+                                                        RuleRequest,
+                                                        RuleResponse,
+                                                        TemplatesResponse,
+                                                        TemplateUsageRequest,
+                                                        TemplateUsageResponse,
+                                                        TemplateUsagesResponse)
 from src.delivery.model.dependencies import get_current_model
 
 router = APIRouter(

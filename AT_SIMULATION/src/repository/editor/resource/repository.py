@@ -1,25 +1,16 @@
 from typing import List
+
 from sqlalchemy.orm import Session
 
 from src.repository.editor.resource.models.conversions import (
-    to_Resource,
-    to_ResourceAttribute,
-    to_ResourceDB,
-    to_ResourceType,
-    to_ResourceTypeAttribute,
-    to_ResourceTypeDB,
-)
-from src.repository.editor.resource.models.models import (
-    ResourceDB,
-    ResourceTypeDB,
-)
+    to_Resource, to_ResourceAttribute, to_ResourceDB, to_ResourceType,
+    to_ResourceTypeAttribute, to_ResourceTypeDB)
+from src.repository.editor.resource.models.models import (ResourceDB,
+                                                          ResourceTypeDB)
 from src.repository.helper import handle_sqlalchemy_errors
-from src.schema.resource import (
-    ResourceType,
-    ResourceTypeAttribute,
-    Resource,
-    ResourceAttribute,
-)
+from src.schema.resource import (Resource, ResourceAttribute, ResourceType,
+                                 ResourceTypeAttribute)
+
 
 class ResourceRepository:
     def __init__(self, db_session: Session):

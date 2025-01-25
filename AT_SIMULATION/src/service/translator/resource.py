@@ -2,8 +2,8 @@ from typing import Dict, List
 
 from jinja2 import Environment, FileSystemLoader, Template
 
-from src.repository.editor.resource.models.models import ResourceDB, ResourceTypeDB
-
+from src.repository.editor.resource.models.models import (ResourceDB,
+                                                          ResourceTypeDB)
 
 TEMPLATE_DIR = "./src/service/translator/templates/"
 TEMPLATE_NAME = "resource.jinja"

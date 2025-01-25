@@ -1,20 +1,16 @@
 from logging.config import fileConfig
 
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool
+from sqlalchemy import engine_from_config, pool
 
 from alembic import context
-
+from src.config.postgres import PostgresStore
 from src.schema.base import Base
 from src.schema.function import *
+from src.schema.imports import *
 from src.schema.model import *
 from src.schema.resource import *
 from src.schema.template import *
 from src.schema.visio import *
-from src.schema.imports import *
-
-
-from src.config.postgres import PostgresStore
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

@@ -3,12 +3,10 @@ from typing import List, Protocol
 from fastapi import Depends
 
 from src.repository.minio.models.models import MinioFile
-from src.service.translator.dependencies import (
-    IFileRepository,
-    IModelService,
-    get_file_repository,
-    get_model_service,
-)
+from src.service.translator.dependencies import (IFileRepository,
+                                                 IModelService,
+                                                 get_file_repository,
+                                                 get_model_service)
 from src.service.translator.models.models import TranslateInfo
 from src.service.translator.service import TranslatorService
 

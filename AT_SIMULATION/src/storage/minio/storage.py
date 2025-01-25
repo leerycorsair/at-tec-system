@@ -1,5 +1,7 @@
 from typing import Tuple
+
 from minio import Minio
+
 from src.config.minio import MinioStore
 
 

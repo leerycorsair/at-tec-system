@@ -1,12 +1,8 @@
 from typing import List
 
 from src.repository.model.models.models import ModelMetaDB
-from src.service.model.dependencies import (
-    IFunctionService,
-    IModelRepository,
-    IResourceService,
-    ITemplateService,
-)
+from src.service.model.dependencies import (IFunctionService, IModelRepository,
+                                            IResourceService, ITemplateService)
 from src.service.model.models.conversions import to_Model
 from src.service.model.models.models import Model
 

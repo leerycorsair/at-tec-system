@@ -1,6 +1,7 @@
-from yarl import URL
 import os
 from dataclasses import dataclass
+
+from yarl import URL
 
 
 @dataclass

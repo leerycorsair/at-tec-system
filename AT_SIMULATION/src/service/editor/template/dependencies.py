@@ -1,18 +1,16 @@
 from typing import List, Protocol
 
 from fastapi import Depends
-from src.repository.editor.template.models.models import (
-    IrregularEventDB,
-    OperationDB,
-    RuleDB,
-    TemplateMetaDB,
-    TemplateUsageDB,
-)
+from sqlalchemy.orm import Session
+
+from src.repository.editor.template.models.models import (IrregularEventDB,
+                                                          OperationDB, RuleDB,
+                                                          TemplateMetaDB,
+                                                          TemplateUsageDB)
 from src.repository.editor.template.repository import TemplateRepository
 from src.repository.visio.models.models import NodeDB, NodeTypesEnum
 from src.service.visio.dependencies import get_visio_repository
 from src.service.visio.service import VisioService
-from sqlalchemy.orm import Session
 from src.storage.postgres.storage import get_db
 
 

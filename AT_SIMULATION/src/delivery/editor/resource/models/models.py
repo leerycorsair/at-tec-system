@@ -1,6 +1,7 @@
-from pydantic import BaseModel
 from enum import Enum
 from typing import List, Optional, Union
+
+from pydantic import BaseModel
 
 
 class BaseTypesEnum(Enum):

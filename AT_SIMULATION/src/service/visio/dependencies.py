@@ -1,16 +1,12 @@
 from typing import List, Protocol
 
 from fastapi import Depends
-
-from src.repository.visio.models.models import (
-    EdgeDB,
-    EditorInfoDB,
-    MoveNodeDB,
-    NodeDB,
-    NodeTablesEnum,
-)
-from src.repository.visio.repository import VisioRepository
 from sqlalchemy.orm import Session
+
+from src.repository.visio.models.models import (EdgeDB, EditorInfoDB,
+                                                MoveNodeDB, NodeDB,
+                                                NodeTablesEnum)
+from src.repository.visio.repository import VisioRepository
 from src.storage.postgres.storage import get_db
 
 

@@ -1,11 +1,10 @@
 from typing import List
 
-from src.repository.editor.resource.models.models import ResourceDB, ResourceTypeDB
+from src.repository.editor.resource.models.models import (ResourceDB,
+                                                          ResourceTypeDB)
 from src.repository.visio.models.models import NodeTypesEnum
-from src.service.editor.resource.dependencies import (
-    IResourceRepository,
-    IVisioService,
-)
+from src.service.editor.resource.dependencies import (IResourceRepository,
+                                                      IVisioService)
 from src.service.helpers import handle_rollback
 
 

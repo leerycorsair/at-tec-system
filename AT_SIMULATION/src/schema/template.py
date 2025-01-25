@@ -1,17 +1,10 @@
-from sqlalchemy import (
-    Column,
-    Float,
-    ForeignKey,
-    Integer,
-    Enum,
-    String,
-    Text,
-    UniqueConstraint,
-)
-from src.schema.base import Base
+import enum
+
+from sqlalchemy import (Column, Enum, Float, ForeignKey, Integer, String, Text,
+                        UniqueConstraint)
 from sqlalchemy.orm import relationship
 
-import enum
+from src.schema.base import Base
 
 
 class TemplateTypeEnum(enum.Enum):

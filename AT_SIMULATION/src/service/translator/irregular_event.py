@@ -3,9 +3,9 @@ from typing import List
 from jinja2 import Environment, FileSystemLoader, Template
 
 from src.repository.editor.resource.models.models import ResourceTypeDB
-from src.repository.editor.template.models.models import IrregularEventDB, OperationDB
+from src.repository.editor.template.models.models import (IrregularEventDB,
+                                                          OperationDB)
 from src.service.translator.utils import preprocess_template_code
-
 
 TEMPLATE_DIR = "./src/service/translator/templates/"
 TEMPLATE_NAME = "irregular_event.jinja"

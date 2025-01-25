@@ -1,9 +1,10 @@
 from fastapi import APIRouter, FastAPI
+
 from .editor.router import router as editor_router
 from .model.router import router as model_router
-from .visio.router import router as visio_router
-from .translator.router import router as translator_router
 from .processor.router import router as processor_router
+from .translator.router import router as translator_router
+from .visio.router import router as visio_router
 
 _router = APIRouter(
     prefix="/api",

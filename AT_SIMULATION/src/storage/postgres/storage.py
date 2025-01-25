@@ -1,8 +1,9 @@
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, Session
-from src.config.postgres import PostgresStore
 from typing import Generator
 
+from sqlalchemy import create_engine
+from sqlalchemy.orm import Session, sessionmaker
+
+from src.config.postgres import PostgresStore
 
 engine = create_engine(PostgresStore.get_database_config().url, echo=True)
 SessionLocal = sessionmaker(autoflush=False, bind=engine)

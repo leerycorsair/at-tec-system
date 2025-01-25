@@ -1,21 +1,13 @@
 from typing import List
+
 from sqlalchemy.orm import Session
 
-
 from src.repository.helper import handle_sqlalchemy_errors
-from src.repository.visio.models.conversions import (
-    to_Edge,
-    to_EdgeDB,
-    to_Node,
-    to_NodeDB,
-)
-from src.repository.visio.models.models import (
-    EdgeDB,
-    EditorInfoDB,
-    MoveNodeDB,
-    NodeDB,
-    NodeTablesEnum,
-)
+from src.repository.visio.models.conversions import (to_Edge, to_EdgeDB,
+                                                     to_Node, to_NodeDB)
+from src.repository.visio.models.models import (EdgeDB, EditorInfoDB,
+                                                MoveNodeDB, NodeDB,
+                                                NodeTablesEnum)
 from src.schema.visio import Edge, Node
 
 

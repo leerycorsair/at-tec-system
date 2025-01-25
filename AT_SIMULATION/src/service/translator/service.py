@@ -1,8 +1,7 @@
 import os
-from typing import List, Tuple
 import subprocess
 import tempfile
-
+from typing import List, Tuple
 
 from src.repository.minio.models.models import MinioFile
 from src.service.translator.dependencies import IFileRepository, IModelService

@@ -1,41 +1,23 @@
-from typing import Callable, List, Optional, Tuple, Any, TypeVar
+from typing import Any, Callable, List, Optional, Tuple, TypeVar
+
 from sqlalchemy.orm import Session
 
 from src.repository.editor.template.models.conversions import (
-    to_IrregularEventBody,
-    to_IrregularEventDB,
-    to_IrregularEventGenerator,
-    to_OperationBody,
-    to_OperationDB,
-    to_RelevantResource,
-    to_RuleBody,
-    to_RuleDB,
-    to_Template,
-    to_TemplateMetaDB,
-    to_TemplateUsage,
-    to_TemplateUsageArgument,
-    to_TemplateUsageDB,
-)
+    to_IrregularEventBody, to_IrregularEventDB, to_IrregularEventGenerator,
+    to_OperationBody, to_OperationDB, to_RelevantResource, to_RuleBody,
+    to_RuleDB, to_Template, to_TemplateMetaDB, to_TemplateUsage,
+    to_TemplateUsageArgument, to_TemplateUsageDB)
+from src.repository.editor.template.models.models import (IrregularEventDB,
+                                                          OperationDB,
+                                                          RelevantResourceDB,
+                                                          RuleDB,
+                                                          TemplateMetaDB,
+                                                          TemplateUsageDB)
 from src.repository.helper import handle_sqlalchemy_errors
-from src.repository.editor.template.models.models import (
-    IrregularEventDB,
-    OperationDB,
-    RelevantResourceDB,
-    RuleDB,
-    TemplateMetaDB,
-    TemplateUsageDB,
-)
-from src.schema.template import (
-    RelevantResource,
-    Template,
-    TemplateTypeEnum,
-    TemplateUsage,
-    OperationBody,
-    RuleBody,
-    IrregularEventGenerator,
-    TemplateUsageArgument,
-    IrregularEventBody,
-)
+from src.schema.template import (IrregularEventBody, IrregularEventGenerator,
+                                 OperationBody, RelevantResource, RuleBody,
+                                 Template, TemplateTypeEnum, TemplateUsage,
+                                 TemplateUsageArgument)
 
 T = TypeVar("T", IrregularEventDB, OperationDB, RuleDB)
 

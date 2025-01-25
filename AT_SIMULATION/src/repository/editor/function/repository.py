@@ -1,13 +1,11 @@
 from typing import List
+
 from sqlalchemy.orm import Session
 
 from src.repository.editor.function.models.conversions import (
-    to_Function,
-    to_FunctionDB,
-    to_FunctionParameter,
-)
-from src.repository.helper import handle_sqlalchemy_errors
+    to_Function, to_FunctionDB, to_FunctionParameter)
 from src.repository.editor.function.models.models import FunctionDB
+from src.repository.helper import handle_sqlalchemy_errors
 from src.schema.function import Function, FunctionParameter
 
 

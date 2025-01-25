@@ -9,7 +9,6 @@ from src.service.translator.resource_type import trnsl_resource_types
 from src.service.translator.rule import trnsl_rules
 from src.service.translator.template_usage import trnsl_template_usages
 
-
 TEMPLATE_DIR = "./src/service/translator/templates/"
 TEMPLATE_NAME = "main.jinja"
 

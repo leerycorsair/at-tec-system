@@ -6,7 +6,6 @@ from src.repository.editor.resource.models.models import ResourceTypeDB
 from src.repository.editor.template.models.models import RuleDB
 from src.service.translator.utils import preprocess_template_code
 
-
 TEMPLATE_DIR = "./src/service/translator/templates/"
 TEMPLATE_NAME = "rule.jinja"
 

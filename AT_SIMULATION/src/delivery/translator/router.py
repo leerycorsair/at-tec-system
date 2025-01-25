@@ -1,18 +1,13 @@
 from fastapi import APIRouter, Depends
+
 from src.delivery.model.dependencies import get_current_user
-from src.delivery.translator.dependencies import (
-    ITranslatorService,
-    get_translator_service,
-)
+from src.delivery.translator.dependencies import (ITranslatorService,
+                                                  get_translator_service)
 from src.delivery.translator.models.conversions import (
-    to_TranslateResponse,
-    to_TranslatedFilesResponse,
-)
-from src.delivery.translator.models.models import (
-    TranslateModelRequest,
-    TranslateResponse,
-    TranslatedFilesResponse,
-)
+    to_TranslatedFilesResponse, to_TranslateResponse)
+from src.delivery.translator.models.models import (TranslatedFilesResponse,
+                                                   TranslateModelRequest,
+                                                   TranslateResponse)
 
 router = APIRouter(
     prefix="/translator",

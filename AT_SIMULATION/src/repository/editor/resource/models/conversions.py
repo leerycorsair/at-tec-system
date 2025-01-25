@@ -1,16 +1,9 @@
 from typing import List
+
 from src.repository.editor.resource.models.models import (
-    ResourceAttributeDB,
-    ResourceDB,
-    ResourceTypeAttributeDB,
-    ResourceTypeDB,
-)
-from src.schema.resource import (
-    Resource,
-    ResourceAttribute,
-    ResourceType,
-    ResourceTypeAttribute,
-)
+    ResourceAttributeDB, ResourceDB, ResourceTypeAttributeDB, ResourceTypeDB)
+from src.schema.resource import (Resource, ResourceAttribute, ResourceType,
+                                 ResourceTypeAttribute)
 
 
 def to_ResourceType(resource_type: ResourceTypeDB) -> ResourceType:

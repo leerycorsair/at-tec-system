@@ -1,8 +1,9 @@
 from typing import List
+
 from src.delivery.editor.function.models.models import (
     FunctionParameterRequest,
-    FunctionRequest,
     FunctionParameterResponse,
+    FunctionRequest,
     FunctionResponse,
     FunctionsResponse,
 )
@@ -32,8 +33,7 @@ def to_FunctionDB(
         body=function.body,
         model_id=model_id,
         params=[
-            to_FunctionParameterDB(param, function.id or 0)
-            for param in function.params
+            to_FunctionParameterDB(param, function.id or 0) for param in function.params
         ],
     )
 

@@ -1,38 +1,13 @@
-import logging
+import json
 import traceback
 from typing import AsyncIterator, Awaitable, Callable
+
 from fastapi import Request, Response
 from fastapi.responses import JSONResponse, StreamingResponse
-from pythonjsonlogger import jsonlogger
-from src.delivery.core.models.errors import Error, InternalServerError
-import json
-
-logger = logging.getLogger("request_logger")
-logger.setLevel(logging.DEBUG)
-
-handler = logging.StreamHandler()
-
-
-class CustomJsonFormatter(jsonlogger.JsonFormatter):
-    def format(self, record):
-        log_record = super().format(record)
-        try:
-            return json.dumps(json.loads(log_record), indent=4)
-        except Exception:
-            return log_record
-
-
-formatter = CustomJsonFormatter(
-    "%(asctime)s %(name)s %(levelname)s %(message)s %(details)s"
-)
-handler.setFormatter(formatter)
-logger.addHandler(handler)
-
-
-from fastapi.responses import StreamingResponse
 from starlette.responses import JSONResponse
-from typing import AsyncIterator
-import json
+
+from src.config.logger import application_logger as logger
+from src.delivery.core.models.errors import Error, InternalServerError
 
 
 async def wrap_stream_with_metadata(

@@ -4,7 +4,6 @@ from jinja2 import Environment, FileSystemLoader, Template
 
 from src.repository.editor.function.models.models import FunctionDB
 
-
 TEMPLATE_DIR = "./src/service/translator/templates/"
 TEMPLATE_NAME = "function.jinja"
 

@@ -1,9 +1,8 @@
 from typing import List
-from src.delivery.translator.models.models import (
-    TranslateResponse,
-    TranslatedFileResponse,
-    TranslatedFilesResponse,
-)
+
+from src.delivery.translator.models.models import (TranslatedFileResponse,
+                                                   TranslatedFilesResponse,
+                                                   TranslateResponse)
 from src.repository.minio.models.models import MinioFile
 from src.service.translator.models.models import TranslateInfo
 

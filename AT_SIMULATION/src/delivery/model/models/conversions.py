@@ -1,12 +1,9 @@
 from typing import List
-from src.delivery.model.models.models import (
-    ModelMetaRequest,
-    ModelMetaResponse,
-    ModelMetasResponse,
-)
-from src.repository.model.models.models import (
-    ModelMetaDB,
-)
+
+from src.delivery.model.models.models import (ModelMetaRequest,
+                                              ModelMetaResponse,
+                                              ModelMetasResponse)
+from src.repository.model.models.models import ModelMetaDB
 
 
 def to_ModelMetaDB(model: ModelMetaRequest, user_id: int) -> ModelMetaDB:

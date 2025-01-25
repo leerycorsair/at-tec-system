@@ -1,17 +1,14 @@
 import asyncio
-from typing import List
+import json
+import subprocess
 import uuid
+from typing import List
 
-from src.delivery.core.models.errors import (
-    ForbiddenError,
-    NotFoundError,
-    WrapMethodsMeta,
-)
+from src.delivery.core.models.errors import (ForbiddenError, NotFoundError,
+                                             WrapMethodsMeta)
 from src.delivery.websocket_manager import WebsocketManager
 from src.service.processor.dependencies import IFileRepository
 from src.service.processor.models.models import Process, ProcessStatus
-import subprocess
-import json
 
 
 class ProcessorService(metaclass=WrapMethodsMeta):

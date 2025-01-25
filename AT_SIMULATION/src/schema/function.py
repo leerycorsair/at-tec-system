@@ -1,6 +1,8 @@
-from sqlalchemy import Column, ForeignKey, Integer, String, Text, UniqueConstraint
-from src.schema.base import Base
+from sqlalchemy import (Column, ForeignKey, Integer, String, Text,
+                        UniqueConstraint)
 from sqlalchemy.orm import relationship
+
+from src.schema.base import Base
 
 
 class Function(Base):

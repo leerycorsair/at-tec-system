@@ -1,8 +1,9 @@
-from datetime import datetime
 import os
-from typing import List
-from minio import Minio, S3Error
 import uuid
+from datetime import datetime
+from typing import List
+
+from minio import Minio, S3Error
 
 from src.repository.minio.models.models import FileMeta, MinioFile
 

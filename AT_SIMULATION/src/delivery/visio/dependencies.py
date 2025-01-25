@@ -1,6 +1,7 @@
 from typing import Protocol
 
 from fastapi import Depends
+
 from src.repository.visio.models.models import EditorInfoDB, MoveNodeDB
 from src.service.visio.dependencies import get_visio_repository
 from src.service.visio.service import VisioService
