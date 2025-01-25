@@ -37,6 +37,7 @@ def get_model_service(
 
 class IFileRepository(Protocol):
     def fetch_file(self, file_uuid: str, file_path: str) -> str: ...
+
     def get_file(self, file_uuid: str) -> MinioFile: ...
 
 

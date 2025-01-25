@@ -1,7 +1,12 @@
 import asyncio
-from typing import List, Optional
+from typing import List
 import uuid
 
+from src.delivery.core.models.errors import (
+    ForbiddenError,
+    NotFoundError,
+    WrapMethodsMeta,
+)
 from src.delivery.websocket_manager import WebsocketManager
 from src.service.processor.dependencies import IFileRepository
 from src.service.processor.models.models import Process, ProcessStatus
@@ -9,7 +14,7 @@ import subprocess
 import json
 
 
-class ProcessorService:
+class ProcessorService(metaclass=WrapMethodsMeta):
     _instance = None
 
     def __new__(cls, *args, **kwargs):
@@ -119,9 +124,6 @@ class ProcessorService:
         self._check_process_rights(user_id, process_id)
 
         process = self._find_process_by_id(process_id)
-        if not process:
-            raise ValueError("Process not found.")
-
         if process.status != ProcessStatus.RUNNING:
             raise ValueError("Process is not currently running.")
 
@@ -135,9 +137,6 @@ class ProcessorService:
         self._check_process_rights(user_id, process_id)
 
         process = self._find_process_by_id(process_id)
-        if not process:
-            raise ValueError("Process not found.")
-        
         if process.status == ProcessStatus.KILLED:
             raise ValueError("Process is already killed.")
 
@@ -151,18 +150,20 @@ class ProcessorService:
     def get_processes(self, user_id: int) -> List[Process]:
         return [process for process in self._processes if process.user_id == user_id]
 
-    def _find_process_by_id(self, process_id: str) -> Optional[Process]:
+    def _find_process_by_id(self, process_id: str) -> Process:
         for process in self._processes:
             if process.process_id == process_id:
                 return process
-        return None
+        raise NotFoundError(f"Process {process_id} not found.")
 
     def _check_file_rights(self, user_id: int, file_uuid: str):
         file = self._file_repository.get_file(file_uuid)
         if file.file_meta.user_id != user_id:
-            raise ValueError(f"File {file_uuid} does not belong to user {user_id}")
+            raise ForbiddenError(f"File {file_uuid} does not belong to user {user_id}")
 
     def _check_process_rights(self, user_id: int, process_id: str):
         process = self._find_process_by_id(process_id)
         if process.user_id != user_id:
-            raise ValueError(f"Process {process_id} does not belong to user {user_id}")
+            raise ForbiddenError(
+                f"Process {process_id} does not belong to user {user_id}"
+            )
