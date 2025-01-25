@@ -1,11 +1,9 @@
 from fastapi import APIRouter, Depends
 
 from src.delivery.core.models.conversions import (
-    InternalServiceError,
-    SuccessResponse,
     to_ObjectIDResponse,
 )
-from src.delivery.core.models.models import CommonResponse, ObjectIDResponse
+from src.delivery.core.models.models import ObjectIDResponse
 from src.delivery.model.dependencies import (
     IModelService,
     get_current_user,
@@ -21,61 +19,43 @@ router = APIRouter(
 )
 
 
-@router.post("", response_model=CommonResponse[ObjectIDResponse | None])
+@router.post("", response_model=ObjectIDResponse)
 async def create_model(
     body: ModelMetaRequest,
     user_id: int = Depends(get_current_user),
     model_service: IModelService = Depends(get_model_service),
-) -> CommonResponse[ObjectIDResponse]:
-    try:
-        return SuccessResponse(
-            to_ObjectIDResponse(
-                model_service.create_model(to_ModelMetaDB(body, user_id))
-            )
-        )
-    except Exception as e:
-        return InternalServiceError(e)
+) -> ObjectIDResponse:
+    return to_ObjectIDResponse(
+        model_service.create_model(to_ModelMetaDB(body, user_id))
+    )
 
 
-@router.get("", response_model=CommonResponse[ModelMetasResponse | None])
+@router.get("", response_model=ModelMetasResponse)
 async def get_models(
     user_id: int = Depends(get_current_user),
     model_service: IModelService = Depends(get_model_service),
-) -> CommonResponse[ModelMetasResponse]:
-    try:
-        return SuccessResponse(to_ModelMetasResponse(model_service.get_models(user_id)))
-    except Exception as e:
-        return InternalServiceError(e)
+) -> ModelMetasResponse:
+    return to_ModelMetasResponse(model_service.get_models(user_id))
 
 
-@router.put("/{model_id}", response_model=CommonResponse[ObjectIDResponse | None])
+@router.put("/{model_id}", response_model=ObjectIDResponse)
 async def update_model(
     body: ModelMetaRequest,
     user_id: int = Depends(get_current_user),
     model_service: IModelService = Depends(get_model_service),
-) -> CommonResponse[ObjectIDResponse]:
-    try:
-        return SuccessResponse(
-            to_ObjectIDResponse(
-                model_service.update_model(to_ModelMetaDB(body, user_id))
-            )
-        )
-    except Exception as e:
-        return InternalServiceError(e)
+) -> ObjectIDResponse:
+    return to_ObjectIDResponse(
+        model_service.update_model(to_ModelMetaDB(body, user_id))
+    )
 
 
-@router.delete("/{model_id}", response_model=CommonResponse[ObjectIDResponse | None])
+@router.delete("/{model_id}", response_model=ObjectIDResponse)
 async def delete_model(
     model_id: int,
     user_id: int = Depends(get_current_user),
     model_service: IModelService = Depends(get_model_service),
-) -> CommonResponse[ObjectIDResponse]:
-    try:
-        return SuccessResponse(
-            to_ObjectIDResponse(model_service.delete_model(model_id, user_id))
-        )
-    except Exception as e:
-        return InternalServiceError(e)
+) -> ObjectIDResponse:
+    return to_ObjectIDResponse(model_service.delete_model(model_id, user_id))
 
 
 # TODO: нужно придумать как не писать ID'шники, но сохранить связи
