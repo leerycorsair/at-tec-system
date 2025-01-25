@@ -4,11 +4,7 @@ import subprocess
 import uuid
 from typing import List
 
-from src.delivery.core.models.errors import (
-    ForbiddenError,
-    NotFoundError,
-    WrapMethodsMeta,
-)
+from src.core.errors import ForbiddenError, NotFoundError, WrapMethodsMeta
 from src.delivery.websocket_manager import WebsocketManager
 from src.service.processor.dependencies import IFileRepository
 from src.service.processor.models.models import Process, ProcessStatus

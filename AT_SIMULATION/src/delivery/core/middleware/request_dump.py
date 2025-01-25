@@ -6,7 +6,7 @@ from fastapi import Request, Response
 from fastapi.responses import JSONResponse, StreamingResponse
 
 from src.config.logger import application_logger as logger
-from src.delivery.core.models.errors import Error, InternalServerError
+from src.core.errors import Error, InternalServerError
 
 
 class ResponseHelper:
