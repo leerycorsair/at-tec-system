@@ -4,58 +4,59 @@ from typing import AsyncIterator, Awaitable, Callable
 
 from fastapi import Request, Response
 from fastapi.responses import JSONResponse, StreamingResponse
-from starlette.responses import JSONResponse
 
 from src.config.logger import application_logger as logger
 from src.delivery.core.models.errors import Error, InternalServerError
 
 
-async def wrap_stream_with_metadata(
-    original_stream: AsyncIterator[bytes], metadata: dict
-) -> AsyncIterator[bytes]:
-    yield b"{\n"
-    yield f'"status_code": {metadata["status_code"]},\n'.encode()
-    yield f'"is_error": {json.dumps(metadata["is_error"])},\n'.encode()
-    yield f'"error_message": {json.dumps(metadata["error_message"])},\n'.encode()
-    yield b'"data": [\n'
+class ResponseHelper:
+    SUCCESS_MESSAGE = "Success"
 
-    first_chunk = True
-    async for chunk in original_stream:
-        if not first_chunk:
-            yield b",\n"
-        yield chunk
-        first_chunk = False
+    IS_ERROR = "is_error"
+    STATUS_CODE = "status_code"
+    ERROR_MESSAGE = "error_message"
+    DATA = "data"
 
-    yield b"\n]\n}"
+    AUTHORIZATION = "authorization"
+    REDACTED = "REDACTED"
 
+    @staticmethod
+    async def wrap_stream_with_metadata(
+        original_stream: AsyncIterator[bytes], metadata: dict
+    ) -> AsyncIterator[bytes]:
+        yield b"{\n"
+        yield f'"{ResponseHelper.STATUS_CODE}": {metadata[ResponseHelper.STATUS_CODE]},\n'.encode()
+        yield f'"{ResponseHelper.IS_ERROR}": {json.dumps(metadata[ResponseHelper.IS_ERROR])},\n'.encode()
+        yield f'"{ResponseHelper.ERROR_MESSAGE}": {json.dumps(metadata[ResponseHelper.ERROR_MESSAGE])},\n'.encode()
+        yield f'"{ResponseHelper.DATA}": [\n'.encode()
 
-async def request_dump(
-    request: Request,
-    call_next: Callable[[Request], Awaitable[Response]],
-):
-    try:
-        response = await call_next(request)
+        first_chunk = True
+        async for chunk in original_stream:
+            if not first_chunk:
+                yield b",\n"
+            yield chunk
+            first_chunk = False
 
+        yield b"\n]\n}"
+
+    @staticmethod
+    def log_request(details: dict, level: str = "info"):
+        if level == "info":
+            logger.info("Request Log", extra={"details": details})
+        elif level == "error":
+            logger.error("Request Dump", extra={"details": details})
+
+    @staticmethod
+    async def handle_response(request: Request, response: Response) -> Response:
         if isinstance(response, StreamingResponse):
             metadata = {
-                "status_code": response.status_code,
-                "is_error": False,
-                "error_message": "Success",
+                ResponseHelper.STATUS_CODE: response.status_code,
+                ResponseHelper.IS_ERROR: False,
+                ResponseHelper.ERROR_MESSAGE: ResponseHelper.SUCCESS_MESSAGE,
             }
-
-            logger.info(
-                "Success",
-                extra={
-                    "details": {
-                        "method": request.method,
-                        "url": str(request.url),
-                        "status_code": response.status_code,
-                    }
-                },
+            wrapped_stream = ResponseHelper.wrap_stream_with_metadata(
+                response.body_iterator, metadata
             )
-
-            wrapped_stream = wrap_stream_with_metadata(response.body_iterator, metadata)
-
             return StreamingResponse(
                 wrapped_stream,
                 status_code=response.status_code,
@@ -67,73 +68,87 @@ async def request_dump(
                 },
             )
 
+        # Parse response body
         response_body = None
         if isinstance(response, JSONResponse):
             response_body = json.loads(response.body.decode())
         elif hasattr(response, "body"):
             response_body = response.body.decode()
 
-        logger.info(
-            "Success",
-            extra={
-                "details": {
-                    "method": request.method,
-                    "url": str(request.url),
-                    "status_code": response.status_code,
-                }
-            },
-        )
-
         return JSONResponse(
             status_code=response.status_code,
             content={
-                "status_code": response.status_code,
-                "is_error": False,
-                "error_message": "Success",
-                "data": response_body,
+                ResponseHelper.STATUS_CODE: response.status_code,
+                ResponseHelper.IS_ERROR: False,
+                ResponseHelper.ERROR_MESSAGE: ResponseHelper.SUCCESS_MESSAGE,
+                ResponseHelper.DATA: response_body,
             },
         )
 
+
+async def request_dump(
+    request: Request, call_next: Callable[[Request], Awaitable[Response]]
+):
+    try:
+        response = await call_next(request)
+
+        ResponseHelper.log_request(
+            {
+                "method": request.method,
+                "url": str(request.url),
+                ResponseHelper.STATUS_CODE: response.status_code,
+            },
+            level="info",
+        )
+        return await ResponseHelper.handle_response(request, response)
+
     except Error as e:
         log_details = {
-            "status_code": e.status_code,
-            "error_message": str(e),
+            ResponseHelper.STATUS_CODE: e.status_code,
+            ResponseHelper.ERROR_MESSAGE: str(e),
             "method": request.method,
             "url": str(request.url),
             "headers": {
-                key: value if key.lower() != "authorization" else "REDACTED"
+                key: (
+                    value
+                    if key.lower() != ResponseHelper.AUTHORIZATION
+                    else ResponseHelper.REDACTED
+                )
                 for key, value in request.headers.items()
             },
         }
-        logger.error("Request Dump", extra={"details": log_details})
-
+        ResponseHelper.log_request(log_details, level="error")
         return JSONResponse(
             status_code=e.status_code,
             content={
-                "status_code": e.status_code,
-                "is_error": True,
-                "error_message": e.http_error,
+                ResponseHelper.STATUS_CODE: e.status_code,
+                ResponseHelper.IS_ERROR: True,
+                ResponseHelper.ERROR_MESSAGE: e.http_error,
             },
         )
     except Exception as e:
         internal_error = InternalServerError(str(e))
         log_details = {
-            "status_code": internal_error.status_code,
-            "error_message": str(internal_error),
+            ResponseHelper.STATUS_CODE: internal_error.status_code,
+            ResponseHelper.ERROR_MESSAGE: str(internal_error),
             "method": request.method,
             "url": str(request.url),
             "headers": {
-                key: value if key.lower() != "authorization" else "REDACTED"
+                key: (
+                    value
+                    if key.lower() != ResponseHelper.AUTHORIZATION
+                    else ResponseHelper.REDACTED
+                )
                 for key, value in request.headers.items()
             },
             "trace": traceback.format_exc(),
         }
-        logger.error("Request Dump", extra={"details": log_details})
+        ResponseHelper.log_request(log_details, level="error")
         return JSONResponse(
             status_code=internal_error.status_code,
             content={
-                "status_code": internal_error.status_code,
-                "is_error": True,
-                "error_message": internal_error.http_error,
+                ResponseHelper.STATUS_CODE: internal_error.status_code,
+                ResponseHelper.IS_ERROR: True,
+                ResponseHelper.ERROR_MESSAGE: internal_error.http_error,
             },
         )
