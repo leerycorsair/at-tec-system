@@ -1,18 +1,26 @@
 from fastapi import APIRouter, Depends
 
-from src.delivery.core.models.models import (ObjectIDResponse,
-                                             to_ObjectIDResponse)
-from src.delivery.editor.resource.dependencies import (IResourceService,
-                                                       get_resource_service)
+from src.delivery.core.models.models import ObjectIDResponse, to_ObjectIDResponse
+from src.delivery.editor.resource.dependencies import (
+    IResourceService,
+    get_resource_service,
+)
 from src.delivery.editor.resource.models.conversions import (
-    to_ResourceDB, to_ResourceResponse, to_ResourcesResponse,
-    to_ResourceTypeDB, to_ResourceTypeResponse, to_ResourceTypesResponse)
-from src.delivery.editor.resource.models.models import (ResourceRequest,
-                                                        ResourceResponse,
-                                                        ResourcesResponse,
-                                                        ResourceTypeRequest,
-                                                        ResourceTypeResponse,
-                                                        ResourceTypesResponse)
+    to_ResourceDB,
+    to_ResourceResponse,
+    to_ResourcesResponse,
+    to_ResourceTypeDB,
+    to_ResourceTypeResponse,
+    to_ResourceTypesResponse,
+)
+from src.delivery.editor.resource.models.models import (
+    ResourceRequest,
+    ResourceResponse,
+    ResourcesResponse,
+    ResourceTypeRequest,
+    ResourceTypeResponse,
+    ResourceTypesResponse,
+)
 from src.delivery.model.dependencies import get_current_model
 
 router = APIRouter(

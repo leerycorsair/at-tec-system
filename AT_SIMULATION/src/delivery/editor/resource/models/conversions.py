@@ -1,13 +1,25 @@
 from typing import List
 
 from src.delivery.editor.resource.models.models import (
-    BaseTypesEnum, ResourceAttributeRequest, ResourceAttributeResponse,
-    ResourceRequest, ResourceResponse, ResourcesResponse,
-    ResourceTypeAttributeRequest, ResourceTypeAttributeResponse,
-    ResourceTypeRequest, ResourceTypeResponse, ResourceTypesResponse,
-    ResourceTypeTypesEnum)
+    BaseTypesEnum,
+    ResourceAttributeRequest,
+    ResourceAttributeResponse,
+    ResourceRequest,
+    ResourceResponse,
+    ResourcesResponse,
+    ResourceTypeAttributeRequest,
+    ResourceTypeAttributeResponse,
+    ResourceTypeRequest,
+    ResourceTypeResponse,
+    ResourceTypesResponse,
+    ResourceTypeTypesEnum,
+)
 from src.repository.editor.resource.models.models import (
-    ResourceAttributeDB, ResourceDB, ResourceTypeAttributeDB, ResourceTypeDB)
+    ResourceAttributeDB,
+    ResourceDB,
+    ResourceTypeAttributeDB,
+    ResourceTypeDB,
+)
 
 
 def to_ResourceTypeAttributeDB(

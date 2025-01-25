@@ -1,7 +1,6 @@
 from typing import List
 
-from src.repository.editor.function.models.models import (FunctionDB,
-                                                          FunctionParameterDB)
+from src.repository.editor.function.models.models import FunctionDB, FunctionParameterDB
 from src.schema.function import Function, FunctionParameter
 
 

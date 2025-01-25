@@ -3,11 +3,19 @@ from typing import List
 from sqlalchemy.orm import Session
 
 from src.repository.helper import handle_sqlalchemy_errors
-from src.repository.visio.models.conversions import (to_Edge, to_EdgeDB,
-                                                     to_Node, to_NodeDB)
-from src.repository.visio.models.models import (EdgeDB, EditorInfoDB,
-                                                MoveNodeDB, NodeDB,
-                                                NodeTablesEnum)
+from src.repository.visio.models.conversions import (
+    to_Edge,
+    to_EdgeDB,
+    to_Node,
+    to_NodeDB,
+)
+from src.repository.visio.models.models import (
+    EdgeDB,
+    EditorInfoDB,
+    MoveNodeDB,
+    NodeDB,
+    NodeTablesEnum,
+)
 from src.schema.visio import Edge, Node
 
 
@@ -97,7 +105,7 @@ class VisioRepository:
         node.pos_x = params.new_pos_x
         node.pos_y = params.new_pos_y
         self.db_session.flush()
-        
+
         return
 
     def _get_node(self, object_table: NodeTablesEnum, object_id: int) -> Node:

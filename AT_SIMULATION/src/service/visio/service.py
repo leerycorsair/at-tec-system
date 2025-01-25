@@ -1,7 +1,10 @@
-from src.repository.visio.models.conversions import \
-    to_NodeTablesEnum_from_node_type
-from src.repository.visio.models.models import (EditorInfoDB, MoveNodeDB,
-                                                NodeDB, NodeTypesEnum)
+from src.repository.visio.models.conversions import to_NodeTablesEnum_from_node_type
+from src.repository.visio.models.models import (
+    EditorInfoDB,
+    MoveNodeDB,
+    NodeDB,
+    NodeTypesEnum,
+)
 from src.service.visio.conversions import to_EdgeDB, to_NodeDB
 from src.service.visio.dependencies import IVisioRepository
 

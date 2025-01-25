@@ -4,11 +4,13 @@ from fastapi import Depends
 
 from src.repository.minio.models.models import MinioFile
 from src.repository.minio.repository import MinioRepository
-from src.service.model.dependencies import (IModelRepository,
-                                            get_function_service,
-                                            get_model_repository,
-                                            get_resource_service,
-                                            get_template_service)
+from src.service.model.dependencies import (
+    IModelRepository,
+    get_function_service,
+    get_model_repository,
+    get_resource_service,
+    get_template_service,
+)
 from src.service.model.models.models import Model
 from src.service.model.service import ModelService
 from src.storage.minio.storage import get_minio_storage

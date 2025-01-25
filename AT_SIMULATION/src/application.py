@@ -6,8 +6,9 @@ from fastapi.exceptions import RequestValidationError
 
 from src.client.auth_client import AuthClientSingleton
 from src.delivery.core.middleware.cors import cors_middleware
-from src.delivery.core.middleware.fastapi_exception_handler import \
-    validation_exception_handler
+from src.delivery.core.middleware.fastapi_exception_handler import (
+    validation_exception_handler,
+)
 from src.delivery.core.middleware.request_dump import request_dump
 
 from .delivery.router import setup_routes

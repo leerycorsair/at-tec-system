@@ -5,11 +5,13 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 from src.client.auth_client import AuthClientSingleton
 from src.repository.model.models.models import ModelMetaDB
-from src.service.model.dependencies import (IModelRepository,
-                                            get_function_service,
-                                            get_model_repository,
-                                            get_resource_service,
-                                            get_template_service)
+from src.service.model.dependencies import (
+    IModelRepository,
+    get_function_service,
+    get_model_repository,
+    get_resource_service,
+    get_template_service,
+)
 from src.service.model.service import ModelService
 
 bearer_scheme = HTTPBearer()

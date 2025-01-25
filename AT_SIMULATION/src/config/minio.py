@@ -24,7 +24,7 @@ class MinioStore:
         MINIO_BUCKET_NAME = os.getenv("MINIO_BUCKET_NAME", "my-bucket").strip()
         MINIO_API_PORT = int(os.getenv("MINIO_API_PORT", "9000"))
         MINIO_CONSOLE_PORT = int(os.getenv("MINIO_CONSOLE_PORT", "9001"))
-        
+
         endpoint = f"{MINIO_HOST}:{MINIO_API_PORT}"
 
         return MinioConfig(

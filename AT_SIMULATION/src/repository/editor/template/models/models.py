@@ -10,10 +10,12 @@ class RelevantResourceDB(BaseModel):
     template_id: int
     resource_type_id: int
 
+
 class TemplateTypeEnum(str, Enum):
     IRREGULAR_EVENT = "IRREGULAR_EVENT"
     OPERATION = "OPERATION"
     RULE = "RULE"
+
 
 class TemplateMetaDB(BaseModel):
     id: int

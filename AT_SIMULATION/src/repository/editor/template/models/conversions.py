@@ -1,13 +1,28 @@
 from typing import List
 
 from src.repository.editor.template.models.models import (
-    IrregularEventBodyDB, IrregularEventDB, IrregularEventGeneratorDB,
-    OperationBodyDB, OperationDB, RelevantResourceDB, RuleBodyDB, RuleDB,
-    TemplateMetaDB, TemplateTypeEnum, TemplateUsageArgumentDB, TemplateUsageDB)
-from src.schema.template import (IrregularEventBody, IrregularEventGenerator,
-                                 OperationBody, RelevantResource, RuleBody,
-                                 Template, TemplateUsage,
-                                 TemplateUsageArgument)
+    IrregularEventBodyDB,
+    IrregularEventDB,
+    IrregularEventGeneratorDB,
+    OperationBodyDB,
+    OperationDB,
+    RelevantResourceDB,
+    RuleBodyDB,
+    RuleDB,
+    TemplateMetaDB,
+    TemplateUsageArgumentDB,
+    TemplateUsageDB,
+)
+from src.schema.template import (
+    IrregularEventBody,
+    IrregularEventGenerator,
+    OperationBody,
+    RelevantResource,
+    RuleBody,
+    Template,
+    TemplateUsage,
+    TemplateUsageArgument,
+)
 
 
 def to_Template(meta: TemplateMetaDB) -> Template:

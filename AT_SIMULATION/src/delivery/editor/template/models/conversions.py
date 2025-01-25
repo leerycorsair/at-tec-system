@@ -1,18 +1,42 @@
 from typing import List
 
 from src.delivery.editor.template.models.models import (
-    GeneratorTypeEnum, IrregularEventBody, IrregularEventGenerator,
-    IrregularEventRequest, IrregularEventResponse, OperationBody,
-    OperationRequest, OperationResponse, RelevantResourceRequest,
-    RelevantResourceResponse, RuleBody, RuleRequest, RuleResponse,
-    TemplateMetaRequest, TemplateMetaResponse, TemplatesResponse,
-    TemplateTypeEnum, TemplateUsageArgumentRequest,
-    TemplateUsageArgumentResponse, TemplateUsageRequest, TemplateUsageResponse,
-    TemplateUsagesResponse)
+    GeneratorTypeEnum,
+    IrregularEventBody,
+    IrregularEventGenerator,
+    IrregularEventRequest,
+    IrregularEventResponse,
+    OperationBody,
+    OperationRequest,
+    OperationResponse,
+    RelevantResourceRequest,
+    RelevantResourceResponse,
+    RuleBody,
+    RuleRequest,
+    RuleResponse,
+    TemplateMetaRequest,
+    TemplateMetaResponse,
+    TemplatesResponse,
+    TemplateTypeEnum,
+    TemplateUsageArgumentRequest,
+    TemplateUsageArgumentResponse,
+    TemplateUsageRequest,
+    TemplateUsageResponse,
+    TemplateUsagesResponse,
+)
 from src.repository.editor.template.models.models import (
-    IrregularEventBodyDB, IrregularEventDB, IrregularEventGeneratorDB,
-    OperationBodyDB, OperationDB, RelevantResourceDB, RuleBodyDB, RuleDB,
-    TemplateMetaDB, TemplateUsageArgumentDB, TemplateUsageDB)
+    IrregularEventBodyDB,
+    IrregularEventDB,
+    IrregularEventGeneratorDB,
+    OperationBodyDB,
+    OperationDB,
+    RelevantResourceDB,
+    RuleBodyDB,
+    RuleDB,
+    TemplateMetaDB,
+    TemplateUsageArgumentDB,
+    TemplateUsageDB,
+)
 from src.service.editor.template.models.models import Templates
 
 

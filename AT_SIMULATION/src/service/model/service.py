@@ -1,8 +1,12 @@
 from typing import List
 
 from src.repository.model.models.models import ModelMetaDB
-from src.service.model.dependencies import (IFunctionService, IModelRepository,
-                                            IResourceService, ITemplateService)
+from src.service.model.dependencies import (
+    IFunctionService,
+    IModelRepository,
+    IResourceService,
+    ITemplateService,
+)
 from src.service.model.models.conversions import to_Model
 from src.service.model.models.models import Model
 
@@ -41,7 +45,7 @@ class ModelService:
 
     def get_model(self, model_id: int, user_id: int) -> Model:
         self.check_model_rights(model_id, user_id)
-        
+
         meta = self._model_rep.get_model_meta(model_id)
         resource_types = self._resource_service.get_resource_types(model_id)
         resources = self._resource_service.get_resources(model_id)

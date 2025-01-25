@@ -3,21 +3,40 @@ from typing import Any, Callable, List, Optional, Tuple, TypeVar
 from sqlalchemy.orm import Session
 
 from src.repository.editor.template.models.conversions import (
-    to_IrregularEventBody, to_IrregularEventDB, to_IrregularEventGenerator,
-    to_OperationBody, to_OperationDB, to_RelevantResource, to_RuleBody,
-    to_RuleDB, to_Template, to_TemplateMetaDB, to_TemplateUsage,
-    to_TemplateUsageArgument, to_TemplateUsageDB)
-from src.repository.editor.template.models.models import (IrregularEventDB,
-                                                          OperationDB,
-                                                          RelevantResourceDB,
-                                                          RuleDB,
-                                                          TemplateMetaDB,
-                                                          TemplateUsageDB)
+    to_IrregularEventBody,
+    to_IrregularEventDB,
+    to_IrregularEventGenerator,
+    to_OperationBody,
+    to_OperationDB,
+    to_RelevantResource,
+    to_RuleBody,
+    to_RuleDB,
+    to_Template,
+    to_TemplateMetaDB,
+    to_TemplateUsage,
+    to_TemplateUsageArgument,
+    to_TemplateUsageDB,
+)
+from src.repository.editor.template.models.models import (
+    IrregularEventDB,
+    OperationDB,
+    RelevantResourceDB,
+    RuleDB,
+    TemplateMetaDB,
+    TemplateUsageDB,
+)
 from src.repository.helper import handle_sqlalchemy_errors
-from src.schema.template import (IrregularEventBody, IrregularEventGenerator,
-                                 OperationBody, RelevantResource, RuleBody,
-                                 Template, TemplateTypeEnum, TemplateUsage,
-                                 TemplateUsageArgument)
+from src.schema.template import (
+    IrregularEventBody,
+    IrregularEventGenerator,
+    OperationBody,
+    RelevantResource,
+    RuleBody,
+    Template,
+    TemplateTypeEnum,
+    TemplateUsage,
+    TemplateUsageArgument,
+)
 
 T = TypeVar("T", IrregularEventDB, OperationDB, RuleDB)
 
@@ -94,9 +113,7 @@ class TemplateRepository:
     @handle_sqlalchemy_errors
     def delete_template(self, template_id: int) -> int:
         template_meta = (
-            self.db_session.query(Template)
-            .filter(Template.id == template_id)
-            .first()
+            self.db_session.query(Template).filter(Template.id == template_id).first()
         )
         if not template_meta:
             raise RuntimeError("Template does not exist")

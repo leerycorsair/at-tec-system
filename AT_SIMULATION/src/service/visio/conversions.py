@@ -1,7 +1,6 @@
 from typing import Optional
 
-from src.repository.visio.models.conversions import \
-    to_NodeTablesEnum_from_node_type
+from src.repository.visio.models.conversions import to_NodeTablesEnum_from_node_type
 from src.repository.visio.models.models import EdgeDB, NodeDB, NodeTypesEnum
 
 DEFAULT_NODE_X = 0

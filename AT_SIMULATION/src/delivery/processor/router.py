@@ -4,16 +4,18 @@ from fastapi import APIRouter, Depends, Query, WebSocket, WebSocketDisconnect
 
 from src.client.auth_client import AuthClientSingleton
 from src.delivery.model.dependencies import get_current_user
-from src.delivery.processor.dependencies import (IProcessorService,
-                                                 get_processor_service)
-from src.delivery.processor.models.conversions import (to_ProcessesResponse,
-                                                       to_ProcessResponse)
-from src.delivery.processor.models.models import (CreateProcessRequest,
-                                                  ProcessesResponse,
-                                                  ProcessResponse,
-                                                  RunProcessRequest)
-from src.delivery.websocket_manager import (WebsocketManager,
-                                            get_websocket_manager)
+from src.delivery.processor.dependencies import IProcessorService, get_processor_service
+from src.delivery.processor.models.conversions import (
+    to_ProcessesResponse,
+    to_ProcessResponse,
+)
+from src.delivery.processor.models.models import (
+    CreateProcessRequest,
+    ProcessesResponse,
+    ProcessResponse,
+    RunProcessRequest,
+)
+from src.delivery.websocket_manager import WebsocketManager, get_websocket_manager
 
 router = APIRouter(
     prefix="/processor",

@@ -1,7 +1,15 @@
 import enum
 
-from sqlalchemy import (Column, Enum, Float, ForeignKey, Integer, String, Text,
-                        UniqueConstraint)
+from sqlalchemy import (
+    Column,
+    Enum,
+    Float,
+    ForeignKey,
+    Integer,
+    String,
+    Text,
+    UniqueConstraint,
+)
 from sqlalchemy.orm import relationship
 
 from src.schema.base import Base

@@ -3,9 +3,11 @@ from typing import List
 from jinja2 import Environment, FileSystemLoader, Template
 
 from src.repository.editor.resource.models.models import ResourceDB
-from src.repository.editor.template.models.models import (RelevantResourceDB,
-                                                          TemplateMetaDB,
-                                                          TemplateUsageDB)
+from src.repository.editor.template.models.models import (
+    RelevantResourceDB,
+    TemplateMetaDB,
+    TemplateUsageDB,
+)
 
 TEMPLATE_DIR = "./src/service/translator/templates/"
 TEMPLATE_NAME = "template_usage.jinja"

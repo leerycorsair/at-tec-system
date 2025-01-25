@@ -5,8 +5,7 @@ from sqlalchemy.orm import Session
 
 from src.delivery.visio.dependencies import get_visio_service
 from src.repository.editor.function.models.models import FunctionDB
-from src.repository.editor.resource.models.models import (ResourceDB,
-                                                          ResourceTypeDB)
+from src.repository.editor.resource.models.models import ResourceDB, ResourceTypeDB
 from src.repository.editor.template.models.models import TemplateUsageDB
 from src.repository.model.models.models import ModelMetaDB
 from src.repository.model.repository import ModelRepository

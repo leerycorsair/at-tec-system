@@ -3,7 +3,10 @@ from typing import List
 from sqlalchemy.orm import Session
 
 from src.repository.editor.function.models.conversions import (
-    to_Function, to_FunctionDB, to_FunctionParameter)
+    to_Function,
+    to_FunctionDB,
+    to_FunctionParameter,
+)
 from src.repository.editor.function.models.models import FunctionDB
 from src.repository.helper import handle_sqlalchemy_errors
 from src.schema.function import Function, FunctionParameter
@@ -21,12 +24,11 @@ class FunctionRepository:
         self.db_session.flush()
 
         new_function_parameters = [
-            to_FunctionParameter(param, new_function.id)
-            for param in function.params
+            to_FunctionParameter(param, new_function.id) for param in function.params
         ]
 
         self.db_session.add_all(new_function_parameters)
-        
+
         return new_function.id
 
     @handle_sqlalchemy_errors
@@ -66,7 +68,7 @@ class FunctionRepository:
             .filter(FunctionParameter.function_id == function.id)
             .all()
         }
-        existing_parameter_ids = set(existing_parameters.keys())  
+        existing_parameter_ids = set(existing_parameters.keys())
 
         for param in function.params:
             if param.id in existing_parameters:
@@ -75,11 +77,11 @@ class FunctionRepository:
                 existing_parameter_ids.remove(param.id)
             else:
                 self.db_session.add(to_FunctionParameter(param, function.id))
-        
+
         for param_id in existing_parameter_ids:
             param_to_delete = existing_parameters[param_id]
             self.db_session.delete(param_to_delete)
-                
+
         return function.id
 
     @handle_sqlalchemy_errors
@@ -88,7 +90,7 @@ class FunctionRepository:
         if not function:
             raise RuntimeError("Function not found")
         self.db_session.delete(function)
-            
+
         return function_id
 
     def _get_function_by_id(self, function_id: int) -> Function:

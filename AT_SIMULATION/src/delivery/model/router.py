@@ -1,13 +1,13 @@
 from fastapi import APIRouter, Depends
 
-from src.delivery.core.models.models import (ObjectIDResponse,
-                                             to_ObjectIDResponse)
-from src.delivery.model.dependencies import (IModelService, get_current_user,
-                                             get_model_service)
-from src.delivery.model.models.conversions import (to_ModelMetaDB,
-                                                   to_ModelMetasResponse)
-from src.delivery.model.models.models import (ModelMetaRequest,
-                                              ModelMetasResponse)
+from src.delivery.core.models.models import ObjectIDResponse, to_ObjectIDResponse
+from src.delivery.model.dependencies import (
+    IModelService,
+    get_current_user,
+    get_model_service,
+)
+from src.delivery.model.models.conversions import to_ModelMetaDB, to_ModelMetasResponse
+from src.delivery.model.models.models import ModelMetaRequest, ModelMetasResponse
 
 router = APIRouter(
     prefix="/models",

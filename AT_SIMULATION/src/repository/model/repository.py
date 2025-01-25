@@ -32,7 +32,7 @@ class ModelRepository:
     @handle_sqlalchemy_errors
     def update_model(self, model: ModelMetaDB) -> int:
         existing_model = self._get_model_by_id(model.id)
-        existing_model.name = model.name  
+        existing_model.name = model.name
         return existing_model.id
 
     @handle_sqlalchemy_errors

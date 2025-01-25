@@ -1,5 +1,3 @@
-import asyncio
-
 from at_queue.core.at_component import ATComponent
 from at_queue.core.session import ConnectionParameters
 from at_queue.utils.decorators import component_method

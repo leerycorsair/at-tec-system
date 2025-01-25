@@ -2,10 +2,11 @@ from typing import List, Protocol
 
 from fastapi import Depends
 
-from src.repository.editor.resource.models.models import (ResourceDB,
-                                                          ResourceTypeDB)
-from src.service.editor.resource.dependencies import (get_resource_repository,
-                                                      get_visio_service)
+from src.repository.editor.resource.models.models import ResourceDB, ResourceTypeDB
+from src.service.editor.resource.dependencies import (
+    get_resource_repository,
+    get_visio_service,
+)
 from src.service.editor.resource.service import ResourceService
 
 

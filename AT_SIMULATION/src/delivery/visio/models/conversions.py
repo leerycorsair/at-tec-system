@@ -1,8 +1,11 @@
-from src.delivery.visio.models.models import (EdgeResponse, EditorInfoResponse,
-                                              MoveNodeRequest, NodeResponse,
-                                              NodeTypesEnum)
-from src.repository.visio.models.models import (EdgeDB, EditorInfoDB,
-                                                MoveNodeDB, NodeDB)
+from src.delivery.visio.models.models import (
+    EdgeResponse,
+    EditorInfoResponse,
+    MoveNodeRequest,
+    NodeResponse,
+    NodeTypesEnum,
+)
+from src.repository.visio.models.models import EdgeDB, EditorInfoDB, MoveNodeDB, NodeDB
 
 
 def to_MoveNodeDB(params: MoveNodeRequest, node_id: int) -> MoveNodeDB:

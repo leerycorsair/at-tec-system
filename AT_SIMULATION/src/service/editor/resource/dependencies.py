@@ -3,8 +3,7 @@ from typing import List, Protocol
 from fastapi import Depends
 from sqlalchemy.orm import Session
 
-from src.repository.editor.resource.models.models import (ResourceDB,
-                                                          ResourceTypeDB)
+from src.repository.editor.resource.models.models import ResourceDB, ResourceTypeDB
 from src.repository.editor.resource.repository import ResourceRepository
 from src.repository.visio.models.models import NodeDB, NodeTypesEnum
 from src.service.visio.dependencies import get_visio_repository

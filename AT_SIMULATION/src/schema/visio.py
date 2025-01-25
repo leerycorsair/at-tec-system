@@ -1,7 +1,15 @@
 import enum
 
-from sqlalchemy import (CheckConstraint, Column, Enum, ForeignKey, Integer,
-                        String, UniqueConstraint, event)
+from sqlalchemy import (
+    CheckConstraint,
+    Column,
+    Enum,
+    ForeignKey,
+    Integer,
+    String,
+    UniqueConstraint,
+    event,
+)
 from sqlalchemy.engine import Connection
 from sqlalchemy.orm import relationship
 
