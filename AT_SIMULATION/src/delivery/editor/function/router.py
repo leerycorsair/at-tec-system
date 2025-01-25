@@ -1,10 +1,8 @@
 from fastapi import APIRouter, Depends
 from src.delivery.core.models.conversions import (
-    SuccessResponse,
-    InternalServiceError,
     to_ObjectIDResponse,
 )
-from src.delivery.core.models.models import CommonResponse, ObjectIDResponse
+from src.delivery.core.models.models import ObjectIDResponse
 from src.delivery.editor.function.dependencies import (
     IFunctionService,
     get_function_service,
@@ -26,76 +24,50 @@ router = APIRouter(
     tags=["editor:functions"],
 )
 
-@router.post("", response_model=CommonResponse[ObjectIDResponse | None])
+
+@router.post("", response_model=ObjectIDResponse)
 async def create_function(
     body: FunctionRequest,
     model_id: int = Depends(get_current_model),
     function_service: IFunctionService = Depends(get_function_service),
-) -> CommonResponse[ObjectIDResponse]:
-    try:
-        return SuccessResponse(
-            to_ObjectIDResponse(
-                function_service.create_function(to_FunctionDB(body, model_id))
-            )
-        )
-    except Exception as e:
-        return InternalServiceError(e)
+) -> ObjectIDResponse:
+    return to_ObjectIDResponse(
+        function_service.create_function(to_FunctionDB(body, model_id))
+    )
 
 
-@router.get("", response_model=CommonResponse[FunctionsResponse | None])
+@router.get("", response_model=FunctionsResponse)
 async def get_functions(
     model_id: int = Depends(get_current_model),
     function_service: IFunctionService = Depends(get_function_service),
-) -> CommonResponse[FunctionsResponse]:
-    try:
-        return SuccessResponse(
-            to_FunctionsResponse(function_service.get_functions(model_id))
-        )
-    except Exception as e:
-        return InternalServiceError(e)
+) -> FunctionsResponse:
+    return to_FunctionsResponse(function_service.get_functions(model_id))
 
 
-@router.get("/{function_id}", response_model=CommonResponse[FunctionResponse | None])
+@router.get("/{function_id}", response_model=FunctionResponse)
 async def get_function(
     function_id: int,
     model_id: int = Depends(get_current_model),
     function_service: IFunctionService = Depends(get_function_service),
-) -> CommonResponse[FunctionResponse]:
-    try:
-        return SuccessResponse(
-            to_FunctionResponse(function_service.get_function(function_id, model_id))
-        )
-    except Exception as e:
-        return InternalServiceError(e)
+) -> FunctionResponse:
+    return to_FunctionResponse(function_service.get_function(function_id, model_id))
 
 
-@router.put("/{function_id}", response_model=CommonResponse[ObjectIDResponse | None])
+@router.put("/{function_id}", response_model=ObjectIDResponse)
 async def update_function(
     body: FunctionRequest,
     model_id: int = Depends(get_current_model),
     function_service: IFunctionService = Depends(get_function_service),
-) -> CommonResponse[ObjectIDResponse]:
-    try:
-        return SuccessResponse(
-            to_ObjectIDResponse(
-                function_service.update_function(to_FunctionDB(body, model_id))
-            )
-        )
-    except Exception as e:
-        return InternalServiceError(e)
+) -> ObjectIDResponse:
+    return to_ObjectIDResponse(
+        function_service.update_function(to_FunctionDB(body, model_id))
+    )
 
 
-@router.delete("/{function_id}", response_model=CommonResponse[ObjectIDResponse | None])
+@router.delete("/{function_id}", response_model=ObjectIDResponse)
 async def delete_function(
     function_id: int,
     model_id: int = Depends(get_current_model),
     function_service: IFunctionService = Depends(get_function_service),
-) -> CommonResponse[ObjectIDResponse]:
-    try:
-        return SuccessResponse(
-            to_ObjectIDResponse(
-                function_service.delete_function(function_id, model_id)
-            )
-        )
-    except Exception as e:
-        return InternalServiceError(e)
+) -> ObjectIDResponse:
+    return to_ObjectIDResponse(function_service.delete_function(function_id, model_id))
