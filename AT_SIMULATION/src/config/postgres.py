@@ -1,3 +1,5 @@
+from functools import lru_cache
+
 from pydantic import Field
 from pydantic_settings import BaseSettings
 
@@ -16,5 +18,6 @@ class DatabaseConfig(BaseSettings):
 
 class PostgresStore:
     @classmethod
+    @lru_cache(maxsize=1)
     def get_database_config(cls) -> DatabaseConfig:
         return DatabaseConfig()

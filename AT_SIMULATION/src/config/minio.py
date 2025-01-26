@@ -1,3 +1,5 @@
+from functools import lru_cache
+
 from pydantic import Field
 from pydantic_settings import BaseSettings
 
@@ -18,5 +20,6 @@ class MinioConfig(BaseSettings):
 
 class MinioStore:
     @classmethod
+    @lru_cache(maxsize=1)
     def get_minio_config(cls) -> MinioConfig:
         return MinioConfig()
