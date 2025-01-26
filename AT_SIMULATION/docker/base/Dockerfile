@@ -1,7 +1,5 @@
 FROM python:3.10
 
-WORKDIR /src
-
 RUN apt-get update && \
     apt-get install -y wget && \
     wget https://go.dev/dl/go1.23.4.linux-amd64.tar.gz && \
@@ -15,7 +13,7 @@ RUN apt-get update && \
 
 ENV PATH=$PATH:/root/go/bin
 
-COPY pyproject.toml poetry.lock /src/
+COPY pyproject.toml poetry.lock /
 
 RUN poetry install --no-root
 
