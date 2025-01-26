@@ -1,6 +1,6 @@
 from typing import List
 
-from src.core.errors import ForbiddenError
+from src.core.errors import ForbiddenError, WrapMethodsMeta
 from src.repository.model.models.models import ModelMetaDB
 from src.service.model.dependencies import (
     IFunctionService,
@@ -12,7 +12,7 @@ from src.service.model.models.conversions import to_Model
 from src.service.model.models.models import Model
 
 
-class ModelService:
+class ModelService(metaclass=WrapMethodsMeta):
     def __init__(
         self,
         model_rep: IModelRepository,

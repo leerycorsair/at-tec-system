@@ -3,13 +3,14 @@ import subprocess
 import tempfile
 from typing import List, Tuple
 
+from src.core.errors import WrapMethodsMeta
 from src.repository.minio.models.models import MinioFile
 from src.service.translator.dependencies import IFileRepository, IModelService
 from src.service.translator.main import trnsl_model
 from src.service.translator.models.models import StagesEnum, TranslateInfo
 
 
-class TranslatorService:
+class TranslatorService(metaclass=WrapMethodsMeta):
     def __init__(
         self,
         model_service: IModelService,

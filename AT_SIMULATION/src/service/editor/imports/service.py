@@ -1,11 +1,11 @@
 from typing import List
 
-from src.core.errors import ForbiddenError
+from src.core.errors import ForbiddenError, WrapMethodsMeta
 from src.repository.editor.imports.models.models import ImportDB
 from src.service.editor.imports.dependencies import IImportRepository
 
 
-class ImportService:
+class ImportService(metaclass=WrapMethodsMeta):
     def __init__(
         self,
         import_rep: IImportRepository,

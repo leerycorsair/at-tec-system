@@ -1,6 +1,6 @@
 from typing import List
 
-from src.core.errors import ForbiddenError
+from src.core.errors import ForbiddenError, WrapMethodsMeta
 from src.repository.editor.template.models.models import (
     IrregularEventDB,
     OperationDB,
@@ -14,7 +14,7 @@ from src.service.editor.template.models.models import Templates
 from src.service.helpers import handle_rollback
 
 
-class TemplateService:
+class TemplateService(metaclass=WrapMethodsMeta):
     _template_nodes = {
         TemplateTypeEnum.IRREGULAR_EVENT: NodeTypesEnum.IRREGULAR_EVENT_T,
         TemplateTypeEnum.OPERATION: NodeTypesEnum.OPERATION_T,

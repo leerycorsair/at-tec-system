@@ -1,4 +1,4 @@
-from src.core.errors import ForbiddenError
+from src.core.errors import ForbiddenError, WrapMethodsMeta
 from src.repository.visio.models.conversions import to_NodeTablesEnum_from_node_type
 from src.repository.visio.models.models import (
     EditorInfoDB,
@@ -10,8 +10,7 @@ from src.service.visio.conversions import to_EdgeDB, to_NodeDB
 from src.service.visio.dependencies import IVisioRepository
 
 
-class VisioService:
-
+class VisioService(metaclass=WrapMethodsMeta):
     def __init__(
         self,
         visio_rep: IVisioRepository,

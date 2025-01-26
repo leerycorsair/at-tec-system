@@ -1,13 +1,13 @@
 from typing import List
 
-from src.core.errors import ForbiddenError
+from src.core.errors import ForbiddenError, WrapMethodsMeta
 from src.repository.editor.resource.models.models import ResourceDB, ResourceTypeDB
 from src.repository.visio.models.models import NodeTypesEnum
 from src.service.editor.resource.dependencies import IResourceRepository, IVisioService
 from src.service.helpers import handle_rollback
 
 
-class ResourceService:
+class ResourceService(metaclass=WrapMethodsMeta):
     def __init__(
         self,
         resource_rep: IResourceRepository,

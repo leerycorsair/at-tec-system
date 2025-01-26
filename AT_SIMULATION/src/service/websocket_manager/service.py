@@ -5,10 +5,12 @@ from typing import Dict, List, Optional
 
 from fastapi.websockets import WebSocket
 
+from src.core.errors import WrapMethodsMeta
+
 logger = logging.getLogger(__name__)
 
 
-class WebsocketManager:
+class WebsocketManager(metaclass=WrapMethodsMeta):
     _instance = None
     _lock = asyncio.Lock()
 
