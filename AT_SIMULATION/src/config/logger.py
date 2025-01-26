@@ -27,4 +27,7 @@ def setup_logger(logger_name: str = "application_logger") -> logging.Logger:
     return logger
 
 
+logging.getLogger("uvicorn").setLevel(logging.CRITICAL)
+logging.getLogger("uvicorn.access").setLevel(logging.CRITICAL)
+
 application_logger = setup_logger()
