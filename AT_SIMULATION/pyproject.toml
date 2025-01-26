@@ -17,6 +17,7 @@ jinja2 = "^3.1.5"
 minio = "^7.2.15"
 python-json-logger = "^3.2.1"
 rich = "^13.9.4"
+pydantic-settings = "^2.7.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
