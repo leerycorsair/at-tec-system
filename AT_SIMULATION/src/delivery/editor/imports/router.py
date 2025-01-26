@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 
 from src.delivery.core.models.models import ObjectIDResponse, to_ObjectIDResponse
-from src.delivery.editor.imports.dependencies import IImportService, get_import_service
+from src.delivery.editor.imports.dependencies import IImportService
 from src.delivery.editor.imports.models.conversions import (
     to_ImportDB,
     to_ImportResponse,
@@ -13,6 +13,7 @@ from src.delivery.editor.imports.models.models import (
     ImportsResponse,
 )
 from src.delivery.model.dependencies import get_current_model
+from src.providers.imports import get_import_service
 
 router = APIRouter(
     prefix="/imports",

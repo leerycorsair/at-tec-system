@@ -4,14 +4,8 @@ from fastapi import Depends, Header, HTTPException, Security
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 from src.client.auth_client import AuthClientSingleton
+from src.providers.model import get_model_service
 from src.repository.model.models.models import ModelMetaDB
-from src.service.model.dependencies import (
-    IModelRepository,
-    get_function_service,
-    get_model_repository,
-    get_resource_service,
-    get_template_service,
-)
 from src.service.model.service import ModelService
 
 bearer_scheme = HTTPBearer()
@@ -29,18 +23,7 @@ class IModelService(Protocol):
     def delete_model(self, model_id: int, user_id: int) -> int: ...
 
 
-def get_model_service(
-    model_rep: IModelRepository = Depends(get_model_repository),
-    resource_service=Depends(get_resource_service),
-    template_service=Depends(get_template_service),
-    function_service=Depends(get_function_service),
-) -> IModelService:
-    return ModelService(
-        model_rep,
-        resource_service,
-        template_service,
-        function_service,
-    )
+_: IModelService = ModelService(..., ..., ..., ...)  # type: ignore[arg-type, reportArgumentType]
 
 
 async def get_current_user(

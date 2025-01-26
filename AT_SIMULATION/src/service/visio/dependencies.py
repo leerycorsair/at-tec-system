@@ -1,8 +1,5 @@
 from typing import List, Protocol
 
-from fastapi import Depends
-from sqlalchemy.orm import Session
-
 from src.repository.visio.models.models import (
     EdgeDB,
     EditorInfoDB,
@@ -11,7 +8,6 @@ from src.repository.visio.models.models import (
     NodeTablesEnum,
 )
 from src.repository.visio.repository import VisioRepository
-from src.storage.postgres.storage import get_db
 
 
 class IVisioRepository(Protocol):
@@ -36,5 +32,4 @@ class IVisioRepository(Protocol):
     def move_node(self, params: MoveNodeDB) -> None: ...
 
 
-def get_visio_repository(session: Session = Depends(get_db)) -> IVisioRepository:
-    return VisioRepository(session)
+_: IVisioRepository = VisioRepository(...)  # type: ignore[arg-type, reportArgumentType]

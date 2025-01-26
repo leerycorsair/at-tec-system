@@ -1,10 +1,7 @@
 from fastapi import APIRouter, Depends
 
 from src.delivery.core.models.models import ObjectIDResponse, to_ObjectIDResponse
-from src.delivery.editor.resource.dependencies import (
-    IResourceService,
-    get_resource_service,
-)
+from src.delivery.editor.resource.dependencies import IResourceService
 from src.delivery.editor.resource.models.conversions import (
     to_ResourceDB,
     to_ResourceResponse,
@@ -22,6 +19,7 @@ from src.delivery.editor.resource.models.models import (
     ResourceTypesResponse,
 )
 from src.delivery.model.dependencies import get_current_model
+from src.providers.resource import get_resource_service
 
 router = APIRouter(
     prefix="/resources",

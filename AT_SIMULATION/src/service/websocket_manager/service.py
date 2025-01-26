@@ -105,7 +105,3 @@ class _ConnectionPool:
 
     def get_all_connections(self) -> List[_Connection]:
         return list(self._connections.values())
-
-
-def get_websocket_manager() -> WebsocketManager:
-    return WebsocketManager()

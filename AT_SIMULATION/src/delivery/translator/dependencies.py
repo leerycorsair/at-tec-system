@@ -1,14 +1,6 @@
 from typing import List, Protocol
 
-from fastapi import Depends
-
 from src.repository.minio.models.models import MinioFile
-from src.service.translator.dependencies import (
-    IFileRepository,
-    IModelService,
-    get_file_repository,
-    get_model_service,
-)
 from src.service.translator.models.models import TranslateInfo
 from src.service.translator.service import TranslatorService
 
@@ -21,11 +13,4 @@ class ITranslatorService(Protocol):
     def get_translated_files(self, user_id: int) -> List[MinioFile]: ...
 
 
-def get_translator_service(
-    model_service: IModelService = Depends(get_model_service),
-    file_repository: IFileRepository = Depends(get_file_repository),
-) -> ITranslatorService:
-    return TranslatorService(
-        model_service,
-        file_repository,
-    )
+_: ITranslatorService = TranslatorService(..., ...)  # type: ignore[arg-type, reportArgumentType]

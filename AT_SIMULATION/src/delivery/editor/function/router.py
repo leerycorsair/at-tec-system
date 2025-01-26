@@ -1,10 +1,7 @@
 from fastapi import APIRouter, Depends
 
 from src.delivery.core.models.models import ObjectIDResponse, to_ObjectIDResponse
-from src.delivery.editor.function.dependencies import (
-    IFunctionService,
-    get_function_service,
-)
+from src.delivery.editor.function.dependencies import IFunctionService
 from src.delivery.editor.function.models.conversions import (
     to_FunctionDB,
     to_FunctionResponse,
@@ -16,6 +13,7 @@ from src.delivery.editor.function.models.models import (
     FunctionsResponse,
 )
 from src.delivery.model.dependencies import get_current_model
+from src.providers.function import get_function_service
 
 router = APIRouter(
     prefix="/functions",

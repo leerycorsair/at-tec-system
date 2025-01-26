@@ -1,11 +1,7 @@
 from typing import List, Protocol
 
-from fastapi import Depends
-from sqlalchemy.orm import Session
-
 from src.repository.editor.imports.models.models import ImportDB
 from src.repository.editor.imports.repository import ImportRepository
-from src.storage.postgres.storage import get_db
 
 
 class IImportRepository(Protocol):
@@ -20,5 +16,4 @@ class IImportRepository(Protocol):
     def delete_import(self, import_id: int) -> int: ...
 
 
-def get_import_repository(session: Session = Depends(get_db)) -> IImportRepository:
-    return ImportRepository(session)
+_: IImportRepository = ImportRepository(...)  # type: ignore[arg-type, reportArgumentType]

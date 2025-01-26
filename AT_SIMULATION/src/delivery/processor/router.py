@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, Query, WebSocket, WebSocketDisconnect
 
 from src.client.auth_client import AuthClientSingleton
 from src.delivery.model.dependencies import get_current_user
-from src.delivery.processor.dependencies import IProcessorService, get_processor_service
+from src.delivery.processor.dependencies import IProcessorService
 from src.delivery.processor.models.conversions import (
     to_ProcessesResponse,
     to_ProcessResponse,
@@ -15,10 +15,9 @@ from src.delivery.processor.models.models import (
     ProcessResponse,
     RunProcessRequest,
 )
-from src.service.websocket_manager.service import (
-    WebsocketManager,
-    get_websocket_manager,
-)
+from src.providers.processor import get_processor_service
+from src.providers.websocket_manager import get_websocket_manager
+from src.service.websocket_manager.service import WebsocketManager
 
 router = APIRouter(
     prefix="/processor",

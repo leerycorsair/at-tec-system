@@ -1,11 +1,7 @@
 from typing import List, Protocol
 
-from fastapi import Depends
-
-from src.service.processor.dependencies import get_file_repository
 from src.service.processor.models.models import Process
 from src.service.processor.service import ProcessorService
-from src.service.websocket_manager.service import get_websocket_manager
 
 
 class IProcessorService(Protocol):
@@ -24,11 +20,4 @@ class IProcessorService(Protocol):
     def get_processes(self, user_id: int) -> List[Process]: ...
 
 
-def get_processor_service(
-    file_repository=Depends(get_file_repository),
-    websocket_manager=Depends(get_websocket_manager),
-) -> IProcessorService:
-    return ProcessorService(
-        file_repository,
-        websocket_manager,
-    )
+_: IProcessorService = ProcessorService(..., ...)  # type: ignore[arg-type, reportArgumentType]

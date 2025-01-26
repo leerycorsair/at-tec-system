@@ -1,10 +1,7 @@
 from fastapi import APIRouter, Depends
 
 from src.delivery.core.models.models import ObjectIDResponse, to_ObjectIDResponse
-from src.delivery.editor.template.dependencies import (
-    ITemplateService,
-    get_template_service,
-)
+from src.delivery.editor.template.dependencies import ITemplateService
 from src.delivery.editor.template.models.conversions import (
     to_IrregularEventDB,
     to_IrregularEventResponse,
@@ -30,6 +27,7 @@ from src.delivery.editor.template.models.models import (
     TemplateUsagesResponse,
 )
 from src.delivery.model.dependencies import get_current_model
+from src.providers.template import get_template_service
 
 router = APIRouter(
     prefix="/templates",
