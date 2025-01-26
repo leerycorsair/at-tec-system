@@ -50,7 +50,7 @@ class VisioService:
         return self._visio_rep.create_edge(edge)
 
     def get_editor_info(self, model_id: int) -> EditorInfoDB:
-        return self.get_editor_info(model_id)
+        return self._visio_rep.get_editor_info(model_id)
 
     def move_node(self, params: MoveNodeDB, model_id: int) -> None:
         self._check_node_rights(params.node_id, model_id)
