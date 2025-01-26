@@ -1,5 +1,6 @@
 from typing import List
 
+from src.core.errors import ForbiddenError
 from src.repository.editor.imports.models.models import ImportDB
 from src.service.editor.imports.dependencies import IImportRepository
 
@@ -14,11 +15,12 @@ class ImportService:
     def _check_import_rights(self, import_id: int, model_id: int) -> None:
         imp = self._import_rep.get_import(import_id)
         if imp.model_id != model_id:
-            raise ValueError(f"Import {import_id} does not belong to model {model_id}")
+            raise ForbiddenError(
+                f"Import {import_id} does not belong to model {model_id}"
+            )
 
     def create_import(self, imp: ImportDB) -> int:
         obj_id = self._import_rep.create_import(imp)
-
         return obj_id
 
     def get_import(self, import_id: int, model_id: int) -> ImportDB:
@@ -31,7 +33,6 @@ class ImportService:
     def update_import(self, imp: ImportDB) -> int:
         self._check_import_rights(imp.id, imp.model_id)
         obj_id = self._import_rep.update_import(imp)
-
         return obj_id
 
     def delete_import(self, import_id: int, model_id: int) -> int:

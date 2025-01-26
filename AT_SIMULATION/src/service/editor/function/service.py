@@ -1,5 +1,6 @@
 from typing import List
 
+from src.core.errors import ForbiddenError
 from src.repository.editor.function.models.models import FunctionDB
 from src.repository.visio.models.models import NodeTypesEnum
 from src.service.editor.function.dependencies import IFunctionRepository, IVisioService
@@ -18,7 +19,7 @@ class FunctionService:
     def _check_function_rights(self, function_id: int, model_id: int) -> None:
         function = self._function_rep.get_function(function_id)
         if function.model_id != model_id:
-            raise ValueError(
+            raise ForbiddenError(
                 f"Function {function_id} does not belong to model {model_id}"
             )
 

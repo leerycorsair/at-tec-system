@@ -1,5 +1,6 @@
 from typing import List
 
+from src.core.errors import ForbiddenError
 from src.repository.model.models.models import ModelMetaDB
 from src.service.model.dependencies import (
     IFunctionService,
@@ -27,7 +28,7 @@ class ModelService:
     def check_model_rights(self, model_id: int, user_id: int) -> None:
         model = self._model_rep.get_model_meta(model_id)
         if model.user_id != user_id:
-            raise ValueError(f"Model {model_id} does not belong to user {user_id}")
+            raise ForbiddenError(f"Model {model_id} does not belong to user {user_id}")
 
     def create_model(self, model: ModelMetaDB) -> int:
         return self._model_rep.create_model(model)

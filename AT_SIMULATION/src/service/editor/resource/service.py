@@ -1,5 +1,6 @@
 from typing import List
 
+from src.core.errors import ForbiddenError
 from src.repository.editor.resource.models.models import ResourceDB, ResourceTypeDB
 from src.repository.visio.models.models import NodeTypesEnum
 from src.service.editor.resource.dependencies import IResourceRepository, IVisioService
@@ -18,7 +19,7 @@ class ResourceService:
     def _check_resource_type_rights(self, resource_type_id: int, model_id: int) -> None:
         resource_type = self._resource_rep.get_resource_type(resource_type_id)
         if resource_type.model_id != model_id:
-            raise ValueError(
+            raise ForbiddenError(
                 f"Resource type {resource_type_id} does not belong to model {model_id}"
             )
 
@@ -29,7 +30,7 @@ class ResourceService:
     ) -> None:
         resource = self._resource_rep.get_resource(resource_id)
         if resource.model_id != model_id:
-            raise ValueError(
+            raise ForbiddenError(
                 f"Resource {resource_id} does not belong to model {model_id}"
             )
 

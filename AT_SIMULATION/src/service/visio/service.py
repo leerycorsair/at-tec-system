@@ -1,3 +1,4 @@
+from src.core.errors import ForbiddenError
 from src.repository.visio.models.conversions import to_NodeTablesEnum_from_node_type
 from src.repository.visio.models.models import (
     EditorInfoDB,
@@ -20,7 +21,7 @@ class VisioService:
     def _check_node_rights(self, node_id: int, model_id: int) -> None:
         node = self._visio_rep.get_node_by_id(node_id)
         if node.model_id != model_id:
-            raise ValueError(f"Node {node_id} does not belong to model {model_id}")
+            raise ForbiddenError(f"Node {node_id} does not belong to model {model_id}")
 
     def create_node(
         self, object_id: int, object_name: str, node_type: NodeTypesEnum, model_id: int
