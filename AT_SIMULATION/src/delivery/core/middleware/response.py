@@ -43,6 +43,9 @@ class ResponseMiddleware(BaseHTTPMiddleware):
         try:
             response = await call_next(request)
 
+            if request.url.path in ["/docs", "/redoc", "/openapi.json"]:
+                return response
+
             if isinstance(response, StreamingResponse):
                 metadata = {
                     ResponseHelper.STATUS_CODE: response.status_code,

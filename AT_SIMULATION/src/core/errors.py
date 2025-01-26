@@ -77,6 +77,16 @@ def wrap_exceptions():
             try:
                 return func(*args, **kwargs)
             except Error as e:
+                class_name = None
+                if len(args) > 0:
+                    instance_or_cls = args[0]
+                    if inspect.isclass(instance_or_cls):
+                        class_name = instance_or_cls.__name__
+                    elif hasattr(instance_or_cls, "__class__"):
+                        class_name = instance_or_cls.__class__.__name__
+
+                method_name = func.__name__
+                e.error = f"{class_name}.{method_name}: {str(e)}"
                 raise e
             except Exception as e:
                 class_name = None
@@ -91,8 +101,7 @@ def wrap_exceptions():
                 context = {"class_name": class_name, "method_name": method_name}
 
                 raise InternalServerError(
-                    f"Unhandled exception in {class_name}.{method_name}: {str(e)}",
-                    **context,
+                    f"{class_name}.{method_name}: {str(e)}", **context
                 ) from e
 
         return wrapper
