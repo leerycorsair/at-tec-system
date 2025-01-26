@@ -94,6 +94,9 @@ class RequestDumpMiddleware(BaseHTTPMiddleware):
         if request.url.path in ["/docs", "/openapi.json", "/redoc"]:
             return await call_next(request)
 
+        client_ip = request.client.host if request.client else "unknown"
+        client_port = request.client.port if request.client else "unknown"
+
         try:
             response = await call_next(request)
 
@@ -101,6 +104,8 @@ class RequestDumpMiddleware(BaseHTTPMiddleware):
                 {
                     "method": request.method,
                     "url": str(request.url),
+                    "client_ip": client_ip,
+                    "client_port": client_port,
                     ResponseHelper.STATUS_CODE: response.status_code,
                 },
                 level="info",
@@ -113,6 +118,8 @@ class RequestDumpMiddleware(BaseHTTPMiddleware):
                 ResponseHelper.ERROR_MESSAGE: str(e),
                 "method": request.method,
                 "url": str(request.url),
+                "client_ip": client_ip,
+                "client_port": client_port,
                 "headers": {
                     key: (
                         value
@@ -138,6 +145,8 @@ class RequestDumpMiddleware(BaseHTTPMiddleware):
                 ResponseHelper.ERROR_MESSAGE: str(internal_error),
                 "method": request.method,
                 "url": str(request.url),
+                "client_ip": client_ip,
+                "client_port": client_port,
                 "headers": {
                     key: (
                         value
