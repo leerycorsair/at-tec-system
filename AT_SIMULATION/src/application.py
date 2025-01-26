@@ -9,7 +9,7 @@ from src.client.auth_client import AuthClientSingleton
 from src.delivery.core.middleware.fastapi_exception_handler import (
     validation_exception_handler,
 )
-from src.delivery.core.middleware.request_dump import request_dump
+from src.delivery.core.middleware.request_dump import RequestDumpMiddleware
 
 from .delivery.router import setup_routes
 
@@ -38,5 +38,5 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-app.middleware("http")(request_dump)
+app.add_middleware(RequestDumpMiddleware)
 app.exception_handler(RequestValidationError)(validation_exception_handler)
