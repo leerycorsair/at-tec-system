@@ -11,22 +11,15 @@ from src.service.websocket_manager.service import WebsocketManager
 
 
 class ProcessorService(metaclass=WrapMethodsMeta):
-    _instance = None
+    _processes: List[Process] = []
 
-    def __new__(cls, *args, **kwargs):
-        if cls._instance is None:
-            cls._instance = super().__new__(cls)
-            cls._instance._initialize(*args, **kwargs)
-        return cls._instance
-
-    def _initialize(
+    def __init__(
         self,
         file_repository: IFileRepository,
         websocket_manager: WebsocketManager,
     ) -> None:
         self._file_repository = file_repository
         self._websocket_manager = websocket_manager
-        self._processes: List[Process] = []
 
     def create_process(
         self, user_id: int, file_uuid: str, process_name: str
