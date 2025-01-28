@@ -109,6 +109,35 @@ class ProcessorService(metaclass=WrapMethodsMeta):
             process_handle=process.process_handle,
         )
 
+    async def run_tick(
+        self,
+        user_id: int,
+        process_id: str,
+    ) -> dict:
+        self._check_process_rights(user_id, process_id)
+
+        process = self._find_process_by_id(process_id)
+        if not process:
+            raise ValueError("Process not found.")
+
+        if process.status not in [ProcessStatus.PAUSE, ProcessStatus.RUNNING]:
+            raise ValueError("Process is not in a valid state to run.")
+
+        try:
+            process.process_handle.stdin.write("RUN\n")
+            process.process_handle.stdin.write("1 1\n")
+            process.process_handle.stdin.flush()
+        except Exception as e:
+            raise RuntimeError(f"Failed to send commands to the process: {e}")
+
+        try:
+            output = await asyncio.get_event_loop().run_in_executor(
+                None, process.process_handle.stdout.readline
+            )
+            return json.loads(output.strip())
+        except json.JSONDecodeError:
+            raise ValueError("Failed to decode process output as JSON.")
+
     def pause_process(self, user_id: int, process_id: str) -> Process:
         self._check_process_rights(user_id, process_id)
 
