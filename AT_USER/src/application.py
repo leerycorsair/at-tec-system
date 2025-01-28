@@ -1,9 +1,10 @@
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-from contextlib import asynccontextmanager
 import asyncio
+from contextlib import asynccontextmanager
 
 from at_queue.core.session import ConnectionParameters
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
 from src.api.api import setup_routes
 from src.config.rabbitmq import RabbitMQStore
 from src.service.user.user import UserService
@@ -11,7 +12,7 @@ from src.worker.auth import AuthWorker
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):   
+async def lifespan(app: FastAPI):
     setup_routes(app)
 
     rabbitmq_config = RabbitMQStore.get_rabbitmq_config()
@@ -37,11 +38,10 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="AT_USER", version="1.0.0", lifespan=lifespan)
 
-origins = ["*"]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
